@@ -1,0 +1,296 @@
+{
+  "trending": [
+    {
+      "productId": "1",
+      "sku": "MS46891318-1",
+      "imageUrls": [
+        "/images/products/product-1/image-1.webp",
+        "/images/products/product-1/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.3",
+      "reviewCount": "13",
+      "productName": "Galaxy S21 Ultra 5G 128GB Unlocked International Version",
+      "currentPrice": "126.00",
+      "originalPrice": "136.00",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "2",
+      "sku": "MS46891318-2",
+      "imageUrls": [
+        "/images/products/product-2/image-1.webp",
+        "/images/products/product-2/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "3.5",
+      "reviewCount": "13",
+      "productName": "Apple Watch Aluminum Case - Pride Edition",
+      "currentPrice": "126.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "3",
+      "sku": "MS46891318-3",
+      "imageUrls": [
+        "/images/products/product-3/image-1.webp",
+        "/images/products/product-3/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.5",
+      "reviewCount": "13",
+      "productName": "Apple IPad Pro M1 11-Inch 2021 Wi-Fi 128GB-Space Gray",
+      "currentPrice": "68.00",
+      "originalPrice": "85.00",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "4",
+      "sku": "MS46891318-4",
+      "imageUrls": [
+        "/images/products/product-4/image-1.webp",
+        "/images/products/product-4/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.5",
+      "reviewCount": "13",
+      "productName": "Samsung Galaxy S21 FE 8GB/128GB - White",
+      "currentPrice": "150.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "5",
+      "sku": "MS46891318-5",
+      "imageUrls": [
+        "/images/products/product-5/image-1.webp",
+        "/images/products/product-5/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.5",
+      "reviewCount": "13",
+      "productName": "Samsung Galaxy S22 Plus 5G 8GB/128GB-Unlocked",
+      "currentPrice": "60.00",
+      "originalPrice": "75.00",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    }
+  ],
+
+  "topSelling": [
+    {
+      "productId": "6",
+      "sku": "MS46891318-6",
+      "imageUrls": [
+        "/images/products/product-6/image-1.webp",
+        "/images/products/product-6/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.5",
+      "reviewCount": "13",
+      "productName": "Samsung Galaxy S21 FE 8GB/128GB - White",
+      "currentPrice": "150.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "7",
+      "sku": "MS46891318-7",
+      "imageUrls": [
+        "/images/products/product-7/image-1.webp",
+        "/images/products/product-7/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.5",
+      "reviewCount": "13",
+      "productName": "Apple IPhone 13 Mini 5G 128GB Pink-Unlocked",
+      "currentPrice": "55.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "8",
+      "sku": "MS46891318-8",
+      "imageUrls": [
+        "/images/products/product-8/image-1.webp",
+        "/images/products/product-8/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.5",
+      "reviewCount": "13",
+      "productName": "Samsung Galaxy S20 FE 8GB/256GB storage - Blue",
+      "currentPrice": "126.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    }
+  ],
+
+  "topRated": [
+    {
+      "productId": "10",
+      "sku": "MS46891318-10",
+      "imageUrls": [
+        "/images/products/product-9/image-1.webp",
+        "/images/products/product-9/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.5",
+      "reviewCount": "13",
+      "productName": "Apple IPhone 13 Mini 5G 128GB Pink-Unlocked",
+      "currentPrice": "55.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "11",
+      "sku": "MS46891318-11",
+      "imageUrls": [
+        "/images/products/product-10/image-1.webp",
+        "/images/products/product-10/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "1.5",
+      "reviewCount": "13",
+      "productName": "Apple Watch Aluminum Case - Pride Edition",
+      "currentPrice": "156.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "12",
+      "sku": "MS46891318-12",
+      "imageUrls": [
+        "/images/products/product-11/image-1.webp",
+        "/images/products/product-11/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "2.5",
+      "reviewCount": "13",
+      "productName": "Apple Watch Aluminum Case - Pride Edition",
+      "currentPrice": "126.00",
+      "originalPrice": "136.00",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "13",
+      "sku": "MS46891318-13",
+      "imageUrls": [
+        "/images/products/product-12/image-1.webp",
+        "/images/products/product-12/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "4.5",
+      "reviewCount": "13",
+      "productName": "Apple IPad Mini 6 Wi-Fi Cellular 64GB/128GB",
+      "currentPrice": "231.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    },
+    {
+      "productId": "14",
+      "sku": "MS46891318-14",
+      "imageUrls": [
+        "/images/products/product-13/image-1.webp",
+        "/images/products/product-13/image-2.webp"
+      ],
+      "vendorName": "John Doe",
+      "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+      "averageRating": "3.5",
+      "reviewCount": "13",
+      "productName": "Samsung Galaxy S21 FE 8GB/128GB - White",
+      "currentPrice": "150.00",
+      "originalPrice": "",
+      "storageOptions": "8GB 128GB",
+      "variationAttributes": [{ "type": "Color", "values": ["Black"] }],
+      "featureList": [
+        "Lorem ipsum dolor sit amet",
+        "Consectetur adipiscing elit",
+        "Sed et turpis non urna bibendum tri"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+.footer {
+  width: 100%;
+  text-align: start;
+  background-color: var(--bg-secondary);
+  padding: 6rem var(--spacing-lg) 2.4rem;
+  gap: 6.6rem;
+
+  .footerWrapper {
+    width: 100%;
+
+    & .footerCard {
+      width: 36%;
+      margin-right: 6rem;
+      gap: var(--spacing-md);
+
+      & p {
+        color: var(--text-light);
+      }
+
+      & a {
+        max-width: max-content;
+        gap: var(--spacing-xs);
+        color: var(--text-footer);
+      }
+
+      &:first-child a:last-child {
+        color: var(--text-light);
+      }
+
+      & .footerSocialIcons button {
+        border-color: var(--accent-color);
+
+        & svg {
+          color: var(--accent-color);
+        }
+
+        &:hover {
+          background-color: var(--accent-color);
+
+          & svg {
+            color: var(--white-color);
+          }
+        }
+      }
+    }
+
+    & .footerLinks {
+      flex: 1;
+
+      & .footerCard {
+        width: 32%;
+        gap: var(--spacing-md);
+
+        & .cardTitle {
+          color: var(--white-color);
+          font-size: var(--font-lg);
+        }
+      }
+    }
+
+    & a:hover {
+      color: var(--accent-color) !important;
+    }
+  }
+
+  .footerBottom {
+    width: 100%;
+
+    & p {
+      color: var(--text-medium);
+    }
+  }
+}

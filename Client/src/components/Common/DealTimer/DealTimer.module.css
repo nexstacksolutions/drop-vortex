@@ -1,0 +1,4 @@
+.dealTimer {
+  margin: 0 auto 0 var(--spacing-md);
+  padding: var(--spacing-xs);
+}

@@ -1,0 +1,7 @@
+.categoryPage {
+  width: 100%;
+
+  & .showcaseGrid {
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+}

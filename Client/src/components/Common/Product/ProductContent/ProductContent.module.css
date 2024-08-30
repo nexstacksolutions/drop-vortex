@@ -1,0 +1,45 @@
+.productContent {
+  position: relative;
+  width: 100%;
+  margin-top: auto;
+  gap: var(--spacing-sm);
+
+  & .productDetails {
+    width: 100%;
+    gap: var(--spacing-xs);
+
+    & .vendorName {
+      text-transform: uppercase;
+      font-size: var(--font-xs);
+      color: var(--secondary-color);
+      font-weight: var(--weight-semibold);
+    }
+
+    & .productName {
+      line-clamp: 2;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      transition: var(--transition-base);
+
+      &:hover {
+        color: var(--accent-color);
+      }
+    }
+  }
+
+  & .productPrice {
+    gap: var(--spacing-sm);
+
+    & .currentPrice {
+      color: var(--accent-color);
+    }
+
+    & .originalPrice {
+      font-weight: var(--weight-normal);
+      color: var(--text-light);
+      text-decoration: line-through;
+    }
+  }
+}

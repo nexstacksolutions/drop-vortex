@@ -1,0 +1,25 @@
+.showcaseContent {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  height: 100%;
+
+  & .featureCard {
+    height: 100%;
+    width: auto;
+  }
+
+  & .showcaseWrapper {
+    display: grid;
+    grid-column: 2 / 3;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    padding: 0 !important;
+
+    & .productCardV2 {
+      width: auto;
+    }
+  }
+}

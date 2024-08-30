@@ -1,0 +1,10 @@
+.showcaseGrid {
+  position: relative;
+  width: 100%;
+  gap: var(--spacing-md);
+  overflow: hidden;
+
+  &:hover button {
+    opacity: 1;
+  }
+}

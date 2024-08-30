@@ -1,0 +1,12 @@
+.productRating {
+  gap: 0;
+
+  svg {
+    font-variation-settings: "FILL" 1;
+    /* color: var(--primary-color); */
+    color: orange;
+    font-size: var(--font-md);
+    font-weight: var(--weight-normal);
+    transition: var(--common-transition);
+  }
+}

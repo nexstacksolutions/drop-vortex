@@ -1,0 +1,43 @@
+.productBtns {
+  position: absolute;
+  overflow: hidden;
+  gap: var(--spacing-sm);
+  top: 2rem;
+  right: 0;
+  z-index: 10;
+  opacity: 0;
+  transition: var(--transition-base);
+
+  & button {
+    padding: 0;
+    width: 3.8rem;
+    height: 3.8rem;
+    background-color: var(--white-color);
+    box-shadow: var(--shadow-light);
+    border-radius: 50%;
+    transition: var(--common-transition);
+
+    & svg {
+      color: var(--primary-color);
+      font-size: var(--font-base);
+      font-weight: var(--weight-normal);
+      transition: var(--common-transition);
+    }
+
+    &:hover {
+      background-color: var(--bg-secondary);
+
+      & svg {
+        color: var(--white-color);
+      }
+    }
+  }
+
+  & .productAdded {
+    background-color: var(--primary-color);
+
+    & span {
+      color: var(--white-color);
+    }
+  }
+}

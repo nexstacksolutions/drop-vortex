@@ -1,0 +1,29 @@
+{
+  "productId": "1",
+  "sku": "MS46891318-1",
+  "imageUrls": [
+    "/product/image-1.jpg",
+    "/product/image-2.jpg",
+    "/product/image-3.jpg",
+    "/product/image-4.jpg",
+    "/product/image-5.jpg",
+    "/product/image-6.jpg"
+  ],
+  "vendorName": "John Doe",
+  "brand": { "name": "No Brand", "logo": "/product/brand-image.png" },
+  "averageRating": "4.5",
+  "reviewCount": "13",
+  "productName": "Alarm Clock with Bluetooth Support - Black",
+  "currentPrice": "126.00",
+  "originalPrice": "136.00",
+  "storageOptions": "8GB 128GB",
+  "variationAttributes": [
+    { "type": "Color", "values": ["Red", "Blue", "Green"] },
+    { "type": "Size", "values": ["XS", "S", "M", "L", "XL", "1XL"] }
+  ],
+  "featureList": [
+    "Lorem ipsum dolor sit amet",
+    "Consectetur adipiscing elit",
+    "Sed et turpis non urna bibendum tri"
+  ]
+}

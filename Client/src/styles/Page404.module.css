@@ -1,0 +1,23 @@
+.Page404 {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+
+  & .content {
+    width: 50%;
+    gap: var(--spacing-xl);
+
+    & h1 {
+      font-size: 16rem;
+      color: var(--accent-color);
+    }
+
+    & p {
+      max-width: 90%;
+    }
+
+    & a {
+      max-width: max-content;
+    }
+  }
+}

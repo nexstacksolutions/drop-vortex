@@ -1,0 +1,32 @@
+[
+  {
+    "subTitle": "Surface",
+    "title": "Save Up To $569",
+    "link": "Shop Surface",
+    "image": "/images/feature/cards/image-1.webp"
+  },
+  {
+    "subTitle": "Gamepad",
+    "title": "Save Up To $69",
+    "link": "Shop Deals",
+    "image": "/images/feature/cards/image-2.webp"
+  },
+  {
+    "subTitle": "Cameras",
+    "title": "Save Up To $159",
+    "link": "Shop Camera",
+    "image": "/images/feature/cards/image-3.webp"
+  },
+  {
+    "subTitle": "Super Sale",
+    "title": "B&O Beoplay. Save $599.00",
+    "link": "Shop B&O Beoplay",
+    "image": "/images/feature/cards/image-4.webp"
+  },
+  {
+    "subTitle": "Deals Good",
+    "title": "Cellphone Ultra. Save $199.00",
+    "link": "Shop Iphone Red",
+    "image": "/images/feature/cards/image-5.webp"
+  }
+]

@@ -1,0 +1,16 @@
+.showcaseContent,
+.showcaseWrapper {
+  width: 100%;
+  row-gap: var(--spacing-lg);
+  padding: var(--spacing-sm);
+  scroll-behavior: smooth;
+  overflow: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:hover button {
+    opacity: 1;
+  }
+}
