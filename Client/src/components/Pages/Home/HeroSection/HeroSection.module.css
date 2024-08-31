@@ -46,7 +46,7 @@
         }
 
         &.categoryItemActive {
-          background-color: #f7f7f7;
+          background-color: var(--bg-light);
 
           & svg,
           a {
@@ -56,6 +56,10 @@
 
         &:last-child {
           border: none;
+        }
+
+        & a:hover {
+          color: var(--accent-color) !important;
         }
       }
     }
@@ -114,7 +118,6 @@
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 1;
             overflow: hidden;
-            color: var(--text-dark);
           }
         }
 

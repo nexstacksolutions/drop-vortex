@@ -23,7 +23,7 @@
         & a {
           position: relative;
           font-size: var(--font-sm);
-          color: var(--text-dark);
+          color: var(--secondary-color);
           gap: var(--spacing-xs);
 
           & svg {

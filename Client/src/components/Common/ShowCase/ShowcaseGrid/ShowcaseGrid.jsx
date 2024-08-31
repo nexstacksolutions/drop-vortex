@@ -6,6 +6,7 @@ import classNames from "classnames";
 function ShowcaseGrid({
   showcaseHeaderProps,
   showcaseContentProps,
+  showShowcaseHeader = true,
   customClass,
 }) {
   return (
@@ -14,7 +15,9 @@ function ShowcaseGrid({
         [customClass]: customClass,
       })}
     >
-      <ShowcaseHeader showcaseHeaderProps={showcaseHeaderProps} />
+      {showShowcaseHeader && (
+        <ShowcaseHeader showcaseHeaderProps={showcaseHeaderProps} />
+      )}
       <ShowcaseContent showcaseContentProps={showcaseContentProps} />
     </section>
   );

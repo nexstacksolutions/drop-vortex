@@ -10,15 +10,6 @@
   cursor: pointer;
   gap: 0;
 
-  & .productImages {
-    background-color: var(--bg-tertiary);
-  }
-
-  & .productContent {
-    padding: var(--spacing-sm) var(--spacing-md);
-    background-color: var(--white-color);
-  }
-
   &:hover {
     & .navDots {
       opacity: 1;

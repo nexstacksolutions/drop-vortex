@@ -5,9 +5,10 @@ import styles from "./ProductImages.module.css";
 function ProductImages({
   cardData,
   currentImage = 0,
-  customClass,
+  productImagesProps,
   navDotsProps,
 }) {
+  const { customClass } = productImagesProps || {};
   const { imageUrls } = cardData;
 
   if (!imageUrls || imageUrls.length === 0) {

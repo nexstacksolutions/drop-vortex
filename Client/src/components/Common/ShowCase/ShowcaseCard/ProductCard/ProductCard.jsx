@@ -6,13 +6,19 @@ import ProductButtons from "../../../Product/ProductButtons/ProductButtons";
 import ProductImages from "../../../Product/ProductImages/ProductImages";
 import classNames from "classnames";
 
-function ProductCard({ cardData, customClass }) {
+function ProductCard({ cardData, showcaseCardProps }) {
+  const {
+    customClass,
+    productImagesProps,
+    productContentProps,
+    showProductButtons,
+  } = showcaseCardProps || {};
   const { imageUrls } = cardData;
   const [currentImage, setCurrentImage] = useState(0);
 
   const handleImageChange = useCallback(() => {
-    setCurrentImage((prev) => (prev + 1) % imageUrls.length);
-  }, [imageUrls.length]);
+    setCurrentImage((prev) => (prev + 1) % imageUrls?.length);
+  }, [imageUrls?.length]);
 
   const handleMouseLeave = useCallback(() => {
     setCurrentImage(0);
@@ -33,9 +39,18 @@ function ProductCard({ cardData, customClass }) {
         currentImage={currentImage}
         cardData={cardData}
         customClass={styles.productImages}
+        productImagesProps={productImagesProps}
       />
-      <ProductButtons customClass={styles.productButtons} cardData={cardData} />
-      <ProductContent cardData={cardData} />
+      {showProductButtons && (
+        <ProductButtons
+          customClass={styles.productButtons}
+          cardData={cardData}
+        />
+      )}
+      <ProductContent
+        cardData={cardData}
+        productContentProps={productContentProps}
+      />
     </Link>
   );
 }

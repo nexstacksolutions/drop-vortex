@@ -33,10 +33,10 @@
     }
   }
 
-  & .productAdded {
+  &.productAdded button {
     background-color: var(--primary-color);
 
-    & span {
+    & svg {
       color: var(--white-color);
     }
   }

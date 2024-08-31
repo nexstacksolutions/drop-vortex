@@ -15,14 +15,18 @@ function Product() {
         showcaseHeaderProps={{ showcaseName: "More Products From This Vendor" }}
         showcaseContentProps={{
           showcaseList: trending,
-          ShowcaseCard: ProductCard,
+          showcaseWrapperProps: {
+            ShowcaseCard: ProductCard,
+          },
         }}
       />
       <ShowcaseGrid
         showcaseHeaderProps={{ showcaseName: "Related products" }}
         showcaseContentProps={{
           showcaseList: topSelling,
-          ShowcaseCard: ProductCard,
+          showcaseWrapperProps: {
+            ShowcaseCard: ProductCard,
+          },
         }}
       />
     </main>

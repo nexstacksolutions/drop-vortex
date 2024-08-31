@@ -20,11 +20,11 @@
       & a {
         max-width: max-content;
         gap: var(--spacing-xs);
-        color: var(--text-footer);
+        color: var(--text-light);
       }
 
       &:first-child a:last-child {
-        color: var(--text-light);
+        color: var(--secondary-color);
       }
 
       & .footerSocialIcons button {

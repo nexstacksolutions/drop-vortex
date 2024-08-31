@@ -2,13 +2,14 @@ import styles from "./ShowcaseContent.module.css";
 import ShowcaseWrapper from "../ShowcaseWrapper/ShowcaseWrapper";
 import classNames from "classnames";
 
-function ShowcaseContent({ showcaseContentProps, customClass }) {
+function ShowcaseContent({ showcaseContentProps }) {
   const {
+    customClass,
     showcaseList,
-    ShowcaseCard,
     FeatureCard,
     wrapContent,
-    FeatureBanner,
+    featureCardProps,
+    showcaseWrapperProps,
   } = showcaseContentProps || {};
 
   const updatedShowcaseList = wrapContent
@@ -24,25 +25,21 @@ function ShowcaseContent({ showcaseContentProps, customClass }) {
       {wrapContent && FeatureCard && (
         <FeatureCard
           cardData={showcaseList[0]}
-          customClass={styles.featureCard}
+          showcaseCardProps={featureCardProps}
         />
       )}
 
       <ShowcaseWrapper
-        ShowcaseCard={ShowcaseCard}
         showcaseList={updatedShowcaseList}
-        customClass={styles.showcaseWrapper}
         wrapContent={wrapContent}
-        showcaseCardProps={{ customClass: styles.productCardV2 }}
+        showcaseWrapperProps={showcaseWrapperProps}
       />
     </section>
   ) : (
     <ShowcaseWrapper
-      ShowcaseCard={ShowcaseCard}
       showcaseList={showcaseList}
-      FeatureBanner={FeatureBanner}
-      customClass={classNames({ [styles.showcaseWrapper]: wrapContent })}
       wrapContent={wrapContent}
+      showcaseWrapperProps={showcaseWrapperProps}
     />
   );
 }

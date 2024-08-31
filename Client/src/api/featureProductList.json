@@ -1,0 +1,127 @@
+[
+  {
+    "imageUrls": ["/images/feature/banners/product-1.jpg"],
+    "productName": "Alarm Clock with Bluetooth Support - Black",
+    "currentPrice": "126.00",
+    "originalPrice": "136.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-2.jpg"],
+    "productName": "Smartwatch with Heart Rate Monitor - White",
+    "currentPrice": "189.00",
+    "originalPrice": "220.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-3.jpg"],
+    "productName": "Smart Home Thermostat with Remote - Blue",
+    "currentPrice": "109.00",
+    "originalPrice": "140.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-4.jpg"],
+    "productName": "Smart Speaker with Bluetooth Support - Black",
+    "currentPrice": "146.00",
+    "originalPrice": "160.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-5.jpg"],
+    "productName": "Smart Door Lock with Voice Commands - Black",
+    "currentPrice": "99.00",
+    "originalPrice": "115.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-6.jpg"],
+    "productName": "Smart Lamp with LED Bulb - White",
+    "currentPrice": "85.00",
+    "originalPrice": "100.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-7.jpg"],
+    "productName": "Smart Camera with Night Mode - Black",
+    "currentPrice": "199.00",
+    "originalPrice": "240.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-8.jpg"],
+    "productName": "Smart Thermostat with Remote - White",
+    "currentPrice": "129.00",
+    "originalPrice": "150.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-9.jpg"],
+    "productName": "Smart Door Lock with Voice Commands - White",
+    "currentPrice": "104.00",
+    "originalPrice": "120.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-10.jpg"],
+    "productName": "Smart Thermostat with Remote - Black",
+    "currentPrice": "139.00",
+    "originalPrice": "160.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-11.jpg"],
+    "productName": "Smart Door Lock with Voice Commands - Black",
+    "currentPrice": "109.00",
+    "originalPrice": "125.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-12.jpg"],
+    "productName": "Smart Thermostat with Remote - White",
+    "currentPrice": "129.00",
+    "originalPrice": "150.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-13.jpg"],
+    "productName": "Smart Door Lock with Voice Commands - White",
+    "currentPrice": "104.00",
+    "originalPrice": "120.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-14.jpg"],
+    "productName": "Smart Thermostat with Remote - Black",
+    "currentPrice": "139.00",
+    "originalPrice": "160.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-15.jpg"],
+    "productName": "Smart Door Lock with Voice Commands - White",
+    "currentPrice": "104.00",
+    "originalPrice": "120.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-16.jpg"],
+    "productName": "Smart Thermostat with Remote - White",
+    "currentPrice": "129.00",
+    "originalPrice": "150.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-17.jpg"],
+    "productName": "Smart Door Lock with Voice Commands - White",
+    "currentPrice": "104.00",
+    "originalPrice": "120.00"
+  },
+
+  {
+    "imageUrls": ["/images/feature/banners/product-18.jpg"],
+    "productName": "Smart Thermostat with Remote - White",
+    "currentPrice": "129.00",
+    "originalPrice": "150.00"
+  }
+]

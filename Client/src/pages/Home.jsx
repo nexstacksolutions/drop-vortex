@@ -4,7 +4,7 @@ import FeatureSection from "../components/Pages/Home/FeatureSection/FeatureSecti
 import ShowcaseGrid from "../components/Common/ShowCase/ShowcaseGrid/ShowcaseGrid";
 import PromotionCard from "../components/Common/ShowCase/ShowcaseCard/PromotionCard/PromotionCard";
 import ProductCard from "../components/Common/ShowCase/ShowcaseCard/ProductCard/ProductCard";
-import FeatureBanner from "../components/Common/ShowCase/ShowcaseBanner/FeatureBanner/FeatureBanner";
+import FeatureBannerV2 from "../components/Common/ShowCase/ShowcaseBanner/FeatureBannerV2/FeatureBannerV2";
 import productList from "../api/productList.json";
 import featureDeals from "../api/featureDeals.json";
 import promoOffers from "../api/promoOffers.json";
@@ -20,18 +20,19 @@ function Home() {
         showcaseHeaderProps={{ showcaseName: "Trending Products" }}
         showcaseContentProps={{
           showcaseList: trending,
-          ShowcaseCard: ProductCard,
+          showcaseWrapperProps: {
+            ShowcaseCard: ProductCard,
+          },
         }}
       />
       <ShowcaseGrid
-        showcaseList={topRated}
-        showcaseName={"High Profit"}
-        ShowcaseCard={ProductCard}
         showcaseHeaderProps={{ showcaseName: "New Arrivals" }}
         showcaseContentProps={{
           showcaseList: topSelling,
-          ShowcaseCard: ProductCard,
-          FeatureBanner: FeatureBanner,
+          showcaseWrapperProps: {
+            ShowcaseCard: ProductCard,
+            FeatureBannerV2: FeatureBannerV2,
+          },
         }}
       />
       <FeatureSection
@@ -41,21 +42,27 @@ function Home() {
         showcaseHeaderProps={{ showcaseName: "Top Rated" }}
         showcaseContentProps={{
           showcaseList: topRated,
-          ShowcaseCard: ProductCard,
+          showcaseWrapperProps: {
+            ShowcaseCard: ProductCard,
+          },
         }}
       />
       <ShowcaseGrid
         showcaseHeaderProps={{ showcaseName: "Selected for You" }}
         showcaseContentProps={{
           showcaseList: trending,
-          ShowcaseCard: ProductCard,
+          showcaseWrapperProps: {
+            ShowcaseCard: ProductCard,
+          },
         }}
       />
       <ShowcaseGrid
         showcaseHeaderProps={{ showcaseName: "Deals & Promotions" }}
         showcaseContentProps={{
           showcaseList: promoOffers,
-          ShowcaseCard: PromotionCard,
+          showcaseWrapperProps: {
+            ShowcaseCard: PromotionCard,
+          },
         }}
       />
     </main>

@@ -1,6 +1,6 @@
 import styles from "./FeatureSection.module.css";
 import classNames from "classnames";
-import FeatureCard from "../../../Common/ShowCase/ShowcaseCard/FeatureCard/FeatureCard";
+import FeatureBanner from "../../../Common/ShowCase/ShowcaseBanner/FeatureBanner/FeatureBanner";
 
 function FeatureSection({ showcaseList, customClass }) {
   return (
@@ -13,7 +13,7 @@ function FeatureSection({ showcaseList, customClass }) {
       )}
     >
       {showcaseList.map((item, index) => (
-        <FeatureCard key={index} cardData={item} />
+        <FeatureBanner key={index} cardData={item} />
       ))}
     </section>
   );

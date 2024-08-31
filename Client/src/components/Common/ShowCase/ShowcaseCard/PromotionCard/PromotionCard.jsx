@@ -1,7 +1,9 @@
 import styles from "./PromotionCard.module.css";
 import classNames from "classnames";
 
-function PromotionCard({ cardData, customClass }) {
+function PromotionCard({ cardData, showcaseCardProps }) {
+  const { customClass } = showcaseCardProps || {};
+
   return (
     <div
       className={classNames(`${styles.promotionCard} flex flex-col`, {

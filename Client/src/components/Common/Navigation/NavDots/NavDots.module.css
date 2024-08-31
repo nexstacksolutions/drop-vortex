@@ -12,7 +12,7 @@
     width: 6px;
     height: 6px;
     border-radius: var(--rounded);
-    background-color: var(--neutral-light);
+    background-color: var(--bg-muted);
     transition: var(--transition-base);
 
     &.active {

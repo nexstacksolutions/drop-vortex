@@ -4,7 +4,13 @@ import { DiscountIcon } from "../../FeatureIcons/FeatureIcons";
 import classNames from "classnames";
 
 function ProductContent(props) {
-  const { cardData, customClass } = props;
+  const { cardData, productContentProps } = props;
+  const {
+    customClass,
+    showVendorNames = true,
+    showProductRatings = true,
+    showDiscountPercentage = true,
+  } = productContentProps || {};
   const { currentPrice, originalPrice, vendorName, productName } = cardData;
 
   const discountPercentage = originalPrice
@@ -24,11 +30,13 @@ function ProductContent(props) {
         <div
           className={`${styles.productDetails} flex flex-col justify-start align-start`}
         >
-          <span className={styles.vendorName}>{vendorName}</span>
+          {showVendorNames && (
+            <span className={styles.vendorName}>{vendorName}</span>
+          )}
           <h4 className={styles.productName}>{productName}</h4>
         </div>
 
-        <ProductRatings cardData={cardData} />
+        {showProductRatings && <ProductRatings cardData={cardData} />}
 
         <div
           className={`${styles.productPrice} flex justify-start align-center`}
@@ -40,7 +48,9 @@ function ProductContent(props) {
         </div>
       </div>
 
-      {discountPercentage > 0 && <DiscountIcon discount={discountPercentage} />}
+      {showDiscountPercentage && discountPercentage > 0 && (
+        <DiscountIcon discount={discountPercentage} />
+      )}
     </>
   );
 }

@@ -6,7 +6,13 @@ import ProductImages from "../../../Product/ProductImages/ProductImages";
 import ProductContent from "../../../Product/ProductContent/ProductContent";
 import classNames from "classnames";
 
-function ProductCardV2({ cardData, customClass }) {
+function ProductCardV2({ cardData, showcaseCardProps }) {
+  const {
+    customClass,
+    productImagesProps,
+    productContentProps,
+    showProductButtons,
+  } = showcaseCardProps || {};
   const { imageUrls } = cardData;
   const [currentImage, setCurrentImage] = useState(0);
 
@@ -46,11 +52,20 @@ function ProductCardV2({ cardData, customClass }) {
       <ProductImages
         currentImage={currentImage}
         cardData={cardData}
-        customClass={styles.productImages}
         navDotsProps={{ showNavDots: true, customClass: styles.navDots }}
+        productImagesProps={productImagesProps}
       />
-      <ProductButtons cardData={cardData} customClass={styles.productButtons} />
-      <ProductContent cardData={cardData} customClass={styles.productContent} />
+      {showProductButtons && (
+        <ProductButtons
+          cardData={cardData}
+          customClass={styles.productButtons}
+        />
+      )}
+      <ProductContent
+        cardData={cardData}
+        customClass={styles.productContent}
+        productContentProps={productContentProps}
+      />
     </Link>
   );
 }
