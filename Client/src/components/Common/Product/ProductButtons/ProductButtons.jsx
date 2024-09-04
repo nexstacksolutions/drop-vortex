@@ -1,6 +1,5 @@
 import styles from "./ProductButtons.module.css";
 import classNames from "classnames";
-
 import {
   MdOutlineVisibility,
   MdOutlineShoppingCart,

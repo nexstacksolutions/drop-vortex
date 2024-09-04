@@ -1,4 +1,5 @@
-.productRating {
+.ratingWidget {
+  max-width: max-content;
   gap: 0;
 
   svg {

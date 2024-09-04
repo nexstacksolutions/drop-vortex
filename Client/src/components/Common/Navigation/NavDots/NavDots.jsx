@@ -1,9 +1,7 @@
 import styles from "./NavDots.module.css";
 import classNames from "classnames";
 
-function NavDots({ cardData, activeImageIndex, customClass }) {
-  const { imageUrls } = cardData;
-
+function NavDots({ imageUrls, activeImageIndex, customClass }) {
   return (
     <div className={`${styles.navDots} ${customClass} flex flex-center`}>
       {imageUrls.map((_, index) => (

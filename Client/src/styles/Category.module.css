@@ -1,6 +1,10 @@
 .categoryPage {
   width: 100%;
 
+  & .vendorSection {
+    background-color: var(--white-color);
+  }
+
   & .showcaseGrid {
     padding: var(--spacing-md) var(--spacing-lg);
 
@@ -17,8 +21,14 @@
         width: auto;
       }
 
+      & .productCardV2,
+      .featureCard {
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-base);
+      }
+
       & .productImages {
-        background-color: var(--bg-tertiary);
+        background-color: var(--bg-extra-light);
       }
 
       & .productContent {

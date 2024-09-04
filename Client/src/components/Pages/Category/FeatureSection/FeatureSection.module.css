@@ -5,7 +5,8 @@
 
   & .showcaseGrid {
     width: 32%;
-    padding: 1.3rem 1.5rem 3px;
+    padding: 1.3rem 1.5rem;
+    border-radius: var(--radius-md);
     background-color: var(--white-color);
 
     & .showcaseHeader {
@@ -28,13 +29,14 @@
 
         & .productImages {
           min-height: 14rem;
-          background-color: var(--bg-tertiary);
+          height: 14rem;
         }
 
         & .productContent {
+          position: static;
           width: auto;
           align-items: center;
-          padding: var(--spacing-sm) var(--spacing-md);
+          padding: var(--spacing-sm) 0;
           background-color: var(--white-color);
 
           & div:first-child h4 {

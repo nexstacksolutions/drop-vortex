@@ -1,10 +1,8 @@
-import styles from "./ProductRatings.module.css";
+import styles from "./RatingWidget.module.css";
 import { IoMdStar, IoMdStarHalf, IoMdStarOutline } from "react-icons/io";
 import classNames from "classnames";
 
-function ProductRatings({ cardData, customClass }) {
-  const { averageRating = 0 } = cardData || {};
-
+function RatingWidget({ averageRating, customClass }) {
   const renderStars = () => {
     const stars = [];
     const fullStars = Math.floor(averageRating);
@@ -31,7 +29,7 @@ function ProductRatings({ cardData, customClass }) {
 
   return (
     <div
-      className={classNames(`${styles.productRating} flex flex-center`, {
+      className={classNames(`${styles.ratingWidget} flex flex-center`, {
         [customClass]: customClass,
       })}
     >
@@ -40,4 +38,4 @@ function ProductRatings({ cardData, customClass }) {
   );
 }
 
-export default ProductRatings;
+export default RatingWidget;

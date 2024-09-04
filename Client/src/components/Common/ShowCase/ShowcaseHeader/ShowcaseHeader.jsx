@@ -5,15 +5,13 @@ import FilterTabs from "../../FilterTabs/FilterTabs";
 import DealTimer from "../../DealTimer/DealTimer";
 import classNames from "classnames";
 
-function ShowcaseHeader({ showcaseHeaderProps }) {
-  const {
-    customClass,
-    showcaseName,
-    dealTimerProps,
-    showDealTimer,
-    showFilterTabs,
-  } = showcaseHeaderProps || {};
-
+function ShowcaseHeader({
+  customClass,
+  showcaseName,
+  showDealTimer,
+  showFilterTabs,
+  dealTimerProps,
+}) {
   return (
     <header
       className={classNames(
@@ -24,7 +22,7 @@ function ShowcaseHeader({ showcaseHeaderProps }) {
       )}
     >
       <h2>{showcaseName}</h2>
-      {showDealTimer && <DealTimer dealTimerProps={dealTimerProps} />}
+      {showDealTimer && <DealTimer {...dealTimerProps} />}
       {showFilterTabs ? (
         <FilterTabs />
       ) : (

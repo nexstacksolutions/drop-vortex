@@ -8,7 +8,7 @@ import ProductData from "../../../../api/ProductDetails.json";
 import NavBtns from "../../../Common/Navigation/NavBtns/NavBtns";
 import Divider from "../../../Constant/Divider/Divider";
 import SocialIcons from "../../../Common/SocialIcons/SocialIcons";
-import ProductRating from "../../../Common/Product/ProductRatings/ProductRatings";
+import RatingWidget from "../../../Common/RatingWidget/RatingWidget";
 
 // Breadcrumbs Component
 const BreadCrumbs = memo(() => {
@@ -176,7 +176,7 @@ const ProductSummary = () => {
           <span className={styles.originalPrice}>${originalPrice}</span>
         </div>
         <div className={`${styles.productRating} flex`}>
-          <ProductRating />
+          <RatingWidget />
           <span className={styles.ratingValue}>{averageRating}</span>
           <span className={styles.reviewCount}>({reviewCount})</span>
         </div>

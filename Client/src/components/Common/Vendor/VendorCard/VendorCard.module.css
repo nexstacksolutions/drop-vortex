@@ -1,0 +1,8 @@
+.vendorCard {
+  width: 24%;
+  padding: 2rem;
+  gap: var(--spacing-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background-color: var(--white-color);
+}

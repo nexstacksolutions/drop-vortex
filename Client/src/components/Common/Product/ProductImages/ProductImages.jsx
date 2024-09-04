@@ -3,14 +3,12 @@ import NavDots from "../../Navigation/NavDots/NavDots";
 import styles from "./ProductImages.module.css";
 
 function ProductImages({
-  cardData,
+  customClass,
   currentImage = 0,
-  productImagesProps,
+  imageUrls,
+  showNavDots,
   navDotsProps,
 }) {
-  const { customClass } = productImagesProps || {};
-  const { imageUrls } = cardData;
-
   if (!imageUrls || imageUrls.length === 0) {
     return null; // or render a placeholder image
   }
@@ -27,11 +25,11 @@ function ProductImages({
         alt={`Product image ${currentImage + 1}`}
       />
 
-      {navDotsProps?.showNavDots && (
+      {showNavDots && (
         <NavDots
-          cardData={cardData}
+          imageUrls={imageUrls}
+          {...navDotsProps}
           activeImageIndex={currentImage}
-          customClass={navDotsProps.customClass}
         />
       )}
     </div>

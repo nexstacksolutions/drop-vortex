@@ -10,6 +10,6 @@
     height: 100%;
     object-fit: cover;
     transition: var(--transition-linear);
-    mix-blend-mode: multiply;
+    /* mix-blend-mode: multiply; */
   }
 }

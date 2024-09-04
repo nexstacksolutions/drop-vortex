@@ -3,9 +3,14 @@ import styles from "./ShowcaseWrapper.module.css";
 import NavBtns from "../../Navigation/NavBtns/NavBtns";
 import classNames from "classnames";
 
-function ShowcaseWrapper({ showcaseList, wrapContent, showcaseWrapperProps }) {
-  const { customClass, ShowcaseCard, FeatureBannerV2, showcaseCardProps } =
-    showcaseWrapperProps || {};
+function ShowcaseWrapper({
+  customClass,
+  showcaseList,
+  wrapContent,
+  ShowcaseCard,
+  FeatureBannerV2,
+  showcaseCardProps,
+}) {
   const containerRef = useRef(null);
 
   const handleNext = useCallback(() => {
@@ -32,11 +37,7 @@ function ShowcaseWrapper({ showcaseList, wrapContent, showcaseWrapperProps }) {
       {FeatureBannerV2 && <FeatureBannerV2 />}
 
       {showcaseList?.map((item, index) => (
-        <ShowcaseCard
-          key={index}
-          cardData={item}
-          showcaseCardProps={showcaseCardProps}
-        />
+        <ShowcaseCard key={index} cardData={item} {...showcaseCardProps} />
       ))}
       {showcaseList?.length > 5 && (
         <NavBtns handleNext={handleNext} handlePrev={handlePrev} />

@@ -1,0 +1,44 @@
+.vendorInfo {
+  width: 100%;
+
+  & .vendorImage {
+    width: 7rem;
+    height: 7rem;
+    background-color: var(--bg-light);
+
+    & img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      mix-blend-mode: multiply;
+    }
+  }
+
+  .vendorDetails {
+    flex: 1 1;
+
+    & .vendorPersonal {
+      width: 100%;
+
+      & .vendorName {
+        line-clamp: 1;
+        -webkit-line-clamp: 1;
+        font-size: var(--font-sm);
+        text-align: center;
+      }
+
+      & h4,
+      span {
+        cursor: pointer;
+        transition: var(--transition-base);
+      }
+
+      &:hover {
+        & .vendorName,
+        .productCount {
+          color: var(--accent-color);
+        }
+      }
+    }
+  }
+}

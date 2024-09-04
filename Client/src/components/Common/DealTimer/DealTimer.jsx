@@ -2,8 +2,7 @@ import styles from "./DealTimer.module.css";
 import { useState, useEffect, useCallback } from "react";
 import classNames from "classnames";
 
-function DealTimer({ dealTimerProps, customClass }) {
-  const { endTime } = dealTimerProps || {};
+function DealTimer({ endTime, customClass }) {
   const calculateTimeLeft = useCallback(() => {
     const difference = +new Date(endTime) - +new Date();
     let timeLeft = {};

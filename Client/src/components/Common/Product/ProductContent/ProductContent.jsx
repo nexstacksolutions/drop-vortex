@@ -1,16 +1,17 @@
 import styles from "./ProductContent.module.css";
-import ProductRatings from "../ProductRatings/ProductRatings";
+import RatingWidget from "../../RatingWidget/RatingWidget";
 import { DiscountIcon } from "../../FeatureIcons/FeatureIcons";
 import classNames from "classnames";
 
 function ProductContent(props) {
-  const { cardData, productContentProps } = props;
   const {
+    cardData,
     customClass,
     showVendorNames = true,
     showProductRatings = true,
     showDiscountPercentage = true,
-  } = productContentProps || {};
+  } = props;
+
   const { currentPrice, originalPrice, vendorName, productName } = cardData;
 
   const discountPercentage = originalPrice
@@ -36,7 +37,7 @@ function ProductContent(props) {
           <h4 className={styles.productName}>{productName}</h4>
         </div>
 
-        {showProductRatings && <ProductRatings cardData={cardData} />}
+        {showProductRatings && <RatingWidget {...cardData} />}
 
         <div
           className={`${styles.productPrice} flex justify-start align-center`}

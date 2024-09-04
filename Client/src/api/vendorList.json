@@ -1,0 +1,1937 @@
+[
+  {
+    "vendorId": "1",
+    "vendorName": "Global Supply Co.",
+    "vendorImage": "/images/vendors/vendor-1.jpg",
+    "vendorEmail": "contact@globalsupplyco.com",
+    "storeName": "Global Store",
+    "storeLogo": "/images/vendors/vendor-1.jpg",
+    "averageRating": "4.5",
+    "reviewCount": "1200",
+    "address": "1234 Market St, Cityville, Country",
+    "socialLinks": {
+      "facebook": "https://facebook.com/globalsupplyco",
+      "instagram": "https://instagram.com/globalsupplyco",
+      "twitter": "https://twitter.com/globalsupplyco"
+    },
+    "products": [
+      {
+        "productId": "1",
+        "sku": "GS1001",
+        "imageUrls": ["/images/products/product-1.jpg"],
+        "brand": {
+          "name": "Brand A",
+          "logo": "/images/brands/brand-a.jpg"
+        },
+        "productName": "Smartphone A",
+        "category": "Electronics",
+        "tags": ["smartphone", "electronics"],
+        "averageRating": "4.6",
+        "reviewCount": "200",
+        "currentPrice": "699.99",
+        "originalPrice": "799.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "3-5 Business Days",
+          "shippingCarrier": "DHL"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "White", "priceModifier": 5 }
+            ]
+          },
+          {
+            "type": "Storage",
+            "values": [
+              { "name": "64GB", "priceModifier": 0 },
+              { "name": "128GB", "priceModifier": 50 }
+            ]
+          }
+        ],
+        "featureList": [
+          "High-resolution display",
+          "Long battery life",
+          "Fast processor"
+        ],
+        "description": "A top-of-the-line smartphone with excellent features.",
+        "specifications": {
+          "weight": "150g",
+          "dimensions": "140 x 70 x 7.5 mm",
+          "material": "Aluminum",
+          "warranty": "1 year"
+        },
+        "relatedProducts": [
+          {
+            "productId": "2",
+            "productName": "Smartphone B",
+            "currentPrice": "599.99",
+            "imageUrl": "/images/products/product-2.jpg",
+            "brand": "Brand A",
+            "category": "Electronics"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "10",
+          "discountDescription": "Summer Sale",
+          "validUntil": "2024-09-30",
+          "discountCode": "SUMMER10"
+        }
+      },
+      {
+        "productId": "2",
+        "sku": "GS1002",
+        "imageUrls": ["/images/products/product-2.jpg"],
+        "brand": {
+          "name": "Brand B",
+          "logo": "/images/brands/brand-b.jpg"
+        },
+        "productName": "Laptop B",
+        "category": "Computers",
+        "tags": ["laptop", "computers"],
+        "averageRating": "4.4",
+        "reviewCount": "150",
+        "currentPrice": "999.99",
+        "originalPrice": "1199.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "5-7 Business Days",
+          "shippingCarrier": "FedEx"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Silver", "priceModifier": 0 },
+              { "name": "Gray", "priceModifier": 0 }
+            ]
+          },
+          {
+            "type": "Storage",
+            "values": [
+              { "name": "256GB", "priceModifier": 0 },
+              { "name": "512GB", "priceModifier": 100 }
+            ]
+          }
+        ],
+        "featureList": [
+          "15-inch display",
+          "Lightweight design",
+          "Powerful performance"
+        ],
+        "description": "A versatile laptop perfect for work and entertainment.",
+        "specifications": {
+          "weight": "1.5kg",
+          "dimensions": "350 x 240 x 18 mm",
+          "material": "Aluminum",
+          "warranty": "1 year"
+        },
+        "relatedProducts": [
+          {
+            "productId": "1",
+            "productName": "Smartphone A",
+            "currentPrice": "699.99",
+            "imageUrl": "/images/products/product-1.jpg",
+            "brand": "Brand A",
+            "category": "Electronics"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "15",
+          "discountDescription": "Back to School",
+          "validUntil": "2024-09-15",
+          "discountCode": "SCHOOL15"
+        }
+      },
+      {
+        "productId": "3",
+        "sku": "GS1003",
+        "imageUrls": ["/images/products/product-3.jpg"],
+        "brand": {
+          "name": "Brand C",
+          "logo": "/images/brands/brand-c.jpg"
+        },
+        "productName": "Headphones C",
+        "category": "Audio",
+        "tags": ["headphones", "audio"],
+        "averageRating": "4.7",
+        "reviewCount": "300",
+        "currentPrice": "199.99",
+        "originalPrice": "249.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "10.00",
+          "shippingTime": "2-4 Business Days",
+          "shippingCarrier": "UPS"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "Red", "priceModifier": 10 }
+            ]
+          }
+        ],
+        "featureList": ["Noise-canceling", "Wireless", "Long battery life"],
+        "description": "Experience premium sound quality with these noise-canceling headphones.",
+        "specifications": {
+          "weight": "250g",
+          "dimensions": "180 x 160 x 80 mm",
+          "material": "Plastic",
+          "warranty": "2 years"
+        },
+        "relatedProducts": [
+          {
+            "productId": "2",
+            "productName": "Laptop B",
+            "currentPrice": "999.99",
+            "imageUrl": "/images/products/product-2.jpg",
+            "brand": "Brand B",
+            "category": "Computers"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "20",
+          "discountDescription": "End of Season",
+          "validUntil": "2024-10-01",
+          "discountCode": "SEASON20"
+        }
+      }
+    ]
+  },
+  {
+    "vendorId": "2",
+    "vendorName": "Premium Electronics",
+    "vendorImage": "/images/vendors/vendor-2.jpg",
+    "vendorEmail": "support@premiumelectronics.com",
+    "storeName": "Premium Electronics Store",
+    "storeLogo": "/images/vendors/vendor-2.jpg",
+    "averageRating": "4.8",
+    "reviewCount": "1500",
+    "address": "5678 Tech Ave, Cityville, Country",
+    "socialLinks": {
+      "facebook": "https://facebook.com/premiumelectronics",
+      "instagram": "https://instagram.com/premiumelectronics",
+      "twitter": "https://twitter.com/premiumelectronics"
+    },
+    "products": [
+      {
+        "productId": "4",
+        "sku": "PE2001",
+        "imageUrls": ["/images/products/product-4.jpg"],
+        "brand": {
+          "name": "Brand D",
+          "logo": "/images/brands/brand-d.jpg"
+        },
+        "productName": "Tablet D",
+        "category": "Tablets",
+        "tags": ["tablet", "electronics"],
+        "averageRating": "4.5",
+        "reviewCount": "180",
+        "currentPrice": "499.99",
+        "originalPrice": "599.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "3-5 Business Days",
+          "shippingCarrier": "DHL"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Silver", "priceModifier": 0 },
+              { "name": "Gold", "priceModifier": 20 }
+            ]
+          },
+          {
+            "type": "Storage",
+            "values": [
+              { "name": "64GB", "priceModifier": 0 },
+              { "name": "128GB", "priceModifier": 50 }
+            ]
+          }
+        ],
+        "featureList": [
+          "High-resolution display",
+          "Long battery life",
+          "Portable design"
+        ],
+        "description": "A powerful tablet designed for both work and play.",
+        "specifications": {
+          "weight": "450g",
+          "dimensions": "240 x 170 x 7 mm",
+          "material": "Aluminum",
+          "warranty": "1 year"
+        },
+        "relatedProducts": [
+          {
+            "productId": "5",
+            "productName": "Smartwatch E",
+            "currentPrice": "299.99",
+            "imageUrl": "/images/products/product-5.jpg",
+            "brand": "Brand E",
+            "category": "Wearables"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "15",
+          "discountDescription": "Holiday Sale",
+          "validUntil": "2024-12-25",
+          "discountCode": "HOLIDAY15"
+        }
+      },
+      {
+        "productId": "5",
+        "sku": "PE2002",
+        "imageUrls": ["/images/products/product-5.jpg"],
+        "brand": {
+          "name": "Brand E",
+          "logo": "/images/brands/brand-e.jpg"
+        },
+        "productName": "Smartwatch E",
+        "category": "Wearables",
+        "tags": ["smartwatch", "wearables"],
+        "averageRating": "4.6",
+        "reviewCount": "220",
+        "currentPrice": "299.99",
+        "originalPrice": "349.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "3-5 Business Days",
+          "shippingCarrier": "FedEx"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "White", "priceModifier": 10 }
+            ]
+          },
+          {
+            "type": "Size",
+            "values": [
+              { "name": "38mm", "priceModifier": 0 },
+              { "name": "42mm", "priceModifier": 20 }
+            ]
+          }
+        ],
+        "featureList": ["Heart rate monitor", "GPS", "Water-resistant"],
+        "description": "A versatile smartwatch with advanced health-tracking features.",
+        "specifications": {
+          "weight": "50g",
+          "dimensions": "42 x 36 x 10 mm",
+          "material": "Plastic",
+          "warranty": "2 years"
+        },
+        "relatedProducts": [
+          {
+            "productId": "4",
+            "productName": "Tablet D",
+            "currentPrice": "499.99",
+            "imageUrl": "/images/products/product-4.jpg",
+            "brand": "Brand D",
+            "category": "Tablets"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "10",
+          "discountDescription": "New Year Sale",
+          "validUntil": "2025-01-01",
+          "discountCode": "NEWYEAR10"
+        }
+      },
+      {
+        "productId": "6",
+        "sku": "PE2003",
+        "imageUrls": ["/images/products/product-6.jpg"],
+        "brand": {
+          "name": "Brand F",
+          "logo": "/images/brands/brand-f.jpg"
+        },
+        "productName": "Camera F",
+        "category": "Cameras",
+        "tags": ["camera", "photography"],
+        "averageRating": "4.9",
+        "reviewCount": "350",
+        "currentPrice": "1299.99",
+        "originalPrice": "1499.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "3-5 Business Days",
+          "shippingCarrier": "UPS"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "Silver", "priceModifier": 50 }
+            ]
+          }
+        ],
+        "featureList": [
+          "High-resolution sensor",
+          "4K video recording",
+          "Wi-Fi connectivity"
+        ],
+        "description": "Capture stunning photos and videos with this high-performance camera.",
+        "specifications": {
+          "weight": "600g",
+          "dimensions": "130 x 100 x 80 mm",
+          "material": "Plastic",
+          "warranty": "2 years"
+        },
+        "relatedProducts": [
+          {
+            "productId": "5",
+            "productName": "Smartwatch E",
+            "currentPrice": "299.99",
+            "imageUrl": "/images/products/product-5.jpg",
+            "brand": "Brand E",
+            "category": "Wearables"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "20",
+          "discountDescription": "Clearance Sale",
+          "validUntil": "2024-11-01",
+          "discountCode": "CLEAR20"
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      }
+    ]
+  },
+  {
+    "vendorId": "3",
+    "vendorName": "Tech World",
+    "vendorImage": "/images/vendors/vendor-3.jpg",
+    "vendorEmail": "info@techworld.com",
+    "storeName": "Tech World Store",
+    "storeLogo": "/images/vendors/vendor-3.jpg",
+    "averageRating": "4.7",
+    "reviewCount": "1100",
+    "address": "9012 Gadget Blvd, Cityville, Country",
+    "socialLinks": {
+      "facebook": "https://facebook.com/techworld",
+      "instagram": "https://instagram.com/techworld",
+      "twitter": "https://twitter.com/techworld"
+    },
+    "products": [
+      {
+        "productId": "7",
+        "sku": "TW3001",
+        "imageUrls": ["/images/products/product-7.jpg"],
+        "brand": {
+          "name": "Brand G",
+          "logo": "/images/brands/brand-g.jpg"
+        },
+        "productName": "Gaming Console G",
+        "category": "Gaming",
+        "tags": ["gaming", "console"],
+        "averageRating": "4.8",
+        "reviewCount": "400",
+        "currentPrice": "499.99",
+        "originalPrice": "599.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "3-5 Business Days",
+          "shippingCarrier": "DHL"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "White", "priceModifier": 20 }
+            ]
+          }
+        ],
+        "featureList": ["4K gaming", "HDR support", "1TB storage"],
+        "description": "Experience next-gen gaming with this powerful console.",
+        "specifications": {
+          "weight": "3kg",
+          "dimensions": "300 x 250 x 50 mm",
+          "material": "Plastic",
+          "warranty": "1 year"
+        },
+        "relatedProducts": [
+          {
+            "productId": "8",
+            "productName": "Gaming Headset H",
+            "currentPrice": "79.99",
+            "imageUrl": "/images/products/product-8.jpg",
+            "brand": "Brand H",
+            "category": "Gaming"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "10",
+          "discountDescription": "Gaming Week",
+          "validUntil": "2024-09-10",
+          "discountCode": "GAMING10"
+        }
+      },
+      {
+        "productId": "8",
+        "sku": "TW3002",
+        "imageUrls": ["/images/products/product-8.jpg"],
+        "brand": {
+          "name": "Brand H",
+          "logo": "/images/brands/brand-h.jpg"
+        },
+        "productName": "Gaming Headset H",
+        "category": "Gaming",
+        "tags": ["gaming", "headset"],
+        "averageRating": "4.5",
+        "reviewCount": "250",
+        "currentPrice": "79.99",
+        "originalPrice": "99.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "5-7 Business Days",
+          "shippingCarrier": "FedEx"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "Blue", "priceModifier": 10 }
+            ]
+          }
+        ],
+        "featureList": [
+          "Surround sound",
+          "Noise-canceling mic",
+          "Comfortable design"
+        ],
+        "description": "Enhance your gaming experience with this high-quality headset.",
+        "specifications": {
+          "weight": "300g",
+          "dimensions": "200 x 180 x 100 mm",
+          "material": "Plastic",
+          "warranty": "1 year"
+        },
+        "relatedProducts": [
+          {
+            "productId": "7",
+            "productName": "Gaming Console G",
+            "currentPrice": "499.99",
+            "imageUrl": "/images/products/product-7.jpg",
+            "brand": "Brand G",
+            "category": "Gaming"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "20",
+          "discountDescription": "Weekend Sale",
+          "validUntil": "2024-09-07",
+          "discountCode": "WEEKEND20"
+        }
+      },
+      {
+        "productId": "9",
+        "sku": "TW3003",
+        "imageUrls": ["/images/products/product-9.jpg"],
+        "brand": {
+          "name": "Brand I",
+          "logo": "/images/brands/brand-i.jpg"
+        },
+        "productName": "VR Headset I",
+        "category": "Gaming",
+        "tags": ["vr", "gaming"],
+        "averageRating": "4.7",
+        "reviewCount": "320",
+        "currentPrice": "299.99",
+        "originalPrice": "349.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "3-5 Business Days",
+          "shippingCarrier": "UPS"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "Gray", "priceModifier": 20 }
+            ]
+          }
+        ],
+        "featureList": [
+          "Immersive experience",
+          "Wide field of view",
+          "Adjustable straps"
+        ],
+        "description": "Step into a new reality with this advanced VR headset.",
+        "specifications": {
+          "weight": "400g",
+          "dimensions": "200 x 180 x 110 mm",
+          "material": "Plastic",
+          "warranty": "2 years"
+        },
+        "relatedProducts": [
+          {
+            "productId": "8",
+            "productName": "Gaming Headset H",
+            "currentPrice": "79.99",
+            "imageUrl": "/images/products/product-8.jpg",
+            "brand": "Brand H",
+            "category": "Gaming"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "20",
+          "discountDescription": "Weekend Sale",
+          "validUntil": "2024-09-07",
+          "discountCode": "WEEKEND20"
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      }
+    ]
+  },
+  {
+    "vendorId": "4",
+    "vendorName": "Tech Solutions Inc.",
+    "vendorImage": "/images/vendors/vendor-4.jpg",
+    "vendorEmail": "info@techsolutions.com",
+    "storeName": "Tech Solutions Store",
+    "storeLogo": "/images/vendors/vendor-2.jpg",
+    "averageRating": "4.7",
+    "reviewCount": "1500",
+    "address": "5678 Innovation Way, Tech City, Country",
+    "socialLinks": {
+      "facebook": "https://facebook.com/techsolutions",
+      "instagram": "https://instagram.com/techsolutions",
+      "twitter": "https://twitter.com/techsolutions"
+    },
+    "products": [
+      {
+        "productId": "1",
+        "sku": "TS2001",
+        "imageUrls": ["/images/products/product-10.jpg"],
+        "brand": {
+          "name": "Brand X",
+          "logo": "/images/brands/brand-x.jpg"
+        },
+        "productName": "Tablet X",
+        "category": "Electronics",
+        "tags": ["tablet", "electronics"],
+        "averageRating": "4.5",
+        "reviewCount": "300",
+        "currentPrice": "499.99",
+        "originalPrice": "599.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "3-5 Business Days",
+          "shippingCarrier": "DHL"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "Gold", "priceModifier": 15 }
+            ]
+          },
+          {
+            "type": "Storage",
+            "values": [
+              { "name": "128GB", "priceModifier": 0 },
+              { "name": "256GB", "priceModifier": 100 }
+            ]
+          }
+        ],
+        "featureList": [
+          "10-inch display",
+          "Long battery life",
+          "Lightweight design"
+        ],
+        "description": "A sleek and portable tablet perfect for work and play.",
+        "specifications": {
+          "weight": "450g",
+          "dimensions": "245 x 160 x 7.5 mm",
+          "material": "Metal",
+          "warranty": "1 year"
+        },
+        "relatedProducts": [
+          {
+            "productId": "2",
+            "productName": "Smartwatch Y",
+            "currentPrice": "199.99",
+            "imageUrl": "/images/products/product-3.jpg",
+            "brand": "Brand X",
+            "category": "Wearables"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "15",
+          "discountDescription": "Holiday Sale",
+          "validUntil": "2024-12-25",
+          "discountCode": "HOLIDAY15"
+        }
+      },
+      {
+        "productId": "2",
+        "sku": "TS2002",
+        "imageUrls": ["/images/products/product-11.jpg"],
+        "brand": {
+          "name": "Brand Y",
+          "logo": "/images/brands/brand-y.jpg"
+        },
+        "productName": "Smartwatch Y",
+        "category": "Wearables",
+        "tags": ["smartwatch", "wearables"],
+        "averageRating": "4.3",
+        "reviewCount": "180",
+        "currentPrice": "199.99",
+        "originalPrice": "249.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "3-5 Business Days",
+          "shippingCarrier": "FedEx"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "Rose Gold", "priceModifier": 20 }
+            ]
+          },
+          {
+            "type": "Strap",
+            "values": [
+              { "name": "Silicone", "priceModifier": 0 },
+              { "name": "Leather", "priceModifier": 30 }
+            ]
+          }
+        ],
+        "featureList": [
+          "Heart rate monitor",
+          "Water-resistant",
+          "GPS tracking"
+        ],
+        "description": "A stylish smartwatch that keeps you connected and healthy.",
+        "specifications": {
+          "weight": "50g",
+          "dimensions": "40 x 40 x 12 mm",
+          "material": "Aluminum",
+          "warranty": "2 years"
+        },
+        "relatedProducts": [
+          {
+            "productId": "1",
+            "productName": "Tablet X",
+            "currentPrice": "499.99",
+            "imageUrl": "/images/products/product-2.jpg",
+            "brand": "Brand X",
+            "category": "Electronics"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "20",
+          "discountDescription": "Flash Sale",
+          "validUntil": "2024-09-10",
+          "discountCode": "FLASH20"
+        }
+      },
+      {
+        "productId": "3",
+        "sku": "TS2003",
+        "imageUrls": ["/images/products/product-12.jpg"],
+        "brand": {
+          "name": "Brand Z",
+          "logo": "/images/brands/brand-z.jpg"
+        },
+        "productName": "Wireless Earbuds Z",
+        "category": "Audio",
+        "tags": ["earbuds", "audio"],
+        "averageRating": "4.8",
+        "reviewCount": "400",
+        "currentPrice": "149.99",
+        "originalPrice": "199.99",
+        "currency": "USD",
+        "availability": "In Stock",
+        "shippingInfo": {
+          "shippingCost": "Free",
+          "shippingTime": "2-4 Business Days",
+          "shippingCarrier": "UPS"
+        },
+        "variationAttributes": [
+          {
+            "type": "Color",
+            "values": [
+              { "name": "Black", "priceModifier": 0 },
+              { "name": "White", "priceModifier": 10 }
+            ]
+          }
+        ],
+        "featureList": [
+          "Noise-canceling",
+          "Wireless charging",
+          "Long battery life"
+        ],
+        "description": "Premium wireless earbuds with exceptional sound quality.",
+        "specifications": {
+          "weight": "20g",
+          "dimensions": "25 x 20 x 30 mm",
+          "material": "Plastic",
+          "warranty": "1 year"
+        },
+        "relatedProducts": [
+          {
+            "productId": "2",
+            "productName": "Smartwatch Y",
+            "currentPrice": "199.99",
+            "imageUrl": "/images/products/product-3.jpg",
+            "brand": "Brand Y",
+            "category": "Wearables"
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "25",
+          "discountDescription": "Clearance Sale",
+          "validUntil": "2024-11-01",
+          "discountCode": "CLEAR25"
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      },
+      {
+        "productId": "",
+        "sku": "",
+        "imageUrls": [""],
+        "brand": {
+          "name": "",
+          "logo": ""
+        },
+        "productName": "",
+        "category": "",
+        "tags": [""],
+        "averageRating": "",
+        "reviewCount": "",
+        "currentPrice": "",
+        "originalPrice": "",
+        "currency": "",
+        "availability": "",
+        "shippingInfo": {
+          "shippingCost": "",
+          "shippingTime": "",
+          "shippingCarrier": ""
+        },
+        "variationAttributes": [
+          {
+            "type": "",
+            "values": [{ "name": "", "priceModifier": "" }]
+          }
+        ],
+        "featureList": [""],
+        "description": "",
+        "specifications": {
+          "weight": "",
+          "dimensions": "",
+          "material": "",
+          "warranty": ""
+        },
+        "relatedProducts": [
+          {
+            "productId": "",
+            "productName": "",
+            "currentPrice": "",
+            "imageUrl": "",
+            "brand": "",
+            "category": ""
+          }
+        ],
+        "discountInfo": {
+          "discountPercentage": "",
+          "discountDescription": "",
+          "validUntil": "",
+          "discountCode": ""
+        }
+      }
+    ]
+  }
+]

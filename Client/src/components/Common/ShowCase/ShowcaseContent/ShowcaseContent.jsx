@@ -2,16 +2,14 @@ import styles from "./ShowcaseContent.module.css";
 import ShowcaseWrapper from "../ShowcaseWrapper/ShowcaseWrapper";
 import classNames from "classnames";
 
-function ShowcaseContent({ showcaseContentProps }) {
-  const {
-    customClass,
-    showcaseList,
-    FeatureCard,
-    wrapContent,
-    featureCardProps,
-    showcaseWrapperProps,
-  } = showcaseContentProps || {};
-
+function ShowcaseContent({
+  customClass,
+  showcaseList,
+  FeatureCard,
+  wrapContent,
+  featureCardProps,
+  showcaseWrapperProps,
+}) {
   const updatedShowcaseList = wrapContent
     ? showcaseList.slice(1, Math.min(7, showcaseList.length))
     : showcaseList;
@@ -23,23 +21,20 @@ function ShowcaseContent({ showcaseContentProps }) {
       })}
     >
       {wrapContent && FeatureCard && (
-        <FeatureCard
-          cardData={showcaseList[0]}
-          showcaseCardProps={featureCardProps}
-        />
+        <FeatureCard cardData={showcaseList[0]} {...featureCardProps} />
       )}
 
       <ShowcaseWrapper
         showcaseList={updatedShowcaseList}
         wrapContent={wrapContent}
-        showcaseWrapperProps={showcaseWrapperProps}
+        {...showcaseWrapperProps}
       />
     </section>
   ) : (
     <ShowcaseWrapper
       showcaseList={showcaseList}
       wrapContent={wrapContent}
-      showcaseWrapperProps={showcaseWrapperProps}
+      {...showcaseWrapperProps}
     />
   );
 }

@@ -4,10 +4,10 @@ import ShowcaseContent from "../ShowcaseContent/ShowcaseContent";
 import classNames from "classnames";
 
 function ShowcaseGrid({
+  customClass,
+  showShowcaseHeader = true,
   showcaseHeaderProps,
   showcaseContentProps,
-  showShowcaseHeader = true,
-  customClass,
 }) {
   return (
     <section
@@ -15,10 +15,8 @@ function ShowcaseGrid({
         [customClass]: customClass,
       })}
     >
-      {showShowcaseHeader && (
-        <ShowcaseHeader showcaseHeaderProps={showcaseHeaderProps} />
-      )}
-      <ShowcaseContent showcaseContentProps={showcaseContentProps} />
+      {showShowcaseHeader && <ShowcaseHeader {...showcaseHeaderProps} />}
+      <ShowcaseContent {...showcaseContentProps} />
     </section>
   );
 }

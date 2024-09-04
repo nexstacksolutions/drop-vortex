@@ -6,13 +6,13 @@ import ProductButtons from "../../../Product/ProductButtons/ProductButtons";
 import ProductImages from "../../../Product/ProductImages/ProductImages";
 import classNames from "classnames";
 
-function ProductCard({ cardData, showcaseCardProps }) {
-  const {
-    customClass,
-    productImagesProps,
-    productContentProps,
-    showProductButtons,
-  } = showcaseCardProps || {};
+function ProductCard({
+  cardData,
+  customClass,
+  productImagesProps,
+  productContentProps,
+  showProductButtons = true,
+}) {
   const { imageUrls } = cardData;
   const [currentImage, setCurrentImage] = useState(0);
 
@@ -37,20 +37,11 @@ function ProductCard({ cardData, showcaseCardProps }) {
     >
       <ProductImages
         currentImage={currentImage}
-        cardData={cardData}
-        customClass={styles.productImages}
-        productImagesProps={productImagesProps}
+        {...cardData}
+        {...productImagesProps}
       />
-      {showProductButtons && (
-        <ProductButtons
-          customClass={styles.productButtons}
-          cardData={cardData}
-        />
-      )}
-      <ProductContent
-        cardData={cardData}
-        productContentProps={productContentProps}
-      />
+      {showProductButtons && <ProductButtons cardData={cardData} />}
+      <ProductContent cardData={cardData} {...productContentProps} />
     </Link>
   );
 }
