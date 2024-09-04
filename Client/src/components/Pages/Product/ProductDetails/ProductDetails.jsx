@@ -1,7 +1,7 @@
 import styles from "./ProductDetails.module.css";
 import { useState, memo } from "react";
-import { Link } from "react-router-dom";
-import StoreRatings from "../../../Common/Vendor/StoreRatings/StoreRatings";
+import VendorCard from "../../../Common/Vendor/VendorCard/VendorCard";
+import vendorList from "../../../../api/vendorList.json";
 import classNames from "classnames";
 
 //  Description Component
@@ -106,40 +106,16 @@ const VendorInfo = memo(() => (
   <div className={`${styles.vendorInfoContainer} flex flex-col`}>
     <div className={`${styles.vendorOverview} flex`}>
       <div className={styles.vendorImage}>
-        <img src="https://via.placeholder.com/625x300" alt="Vendor Banner" />
+        <img src="/images/vendors/banner-1.jpg" alt="Vendor Banner" />
       </div>
 
-      <div className={`${styles.vendorDetails} flex flex-col`}>
-        <div className={`${styles.vendorHeader} flex`}>
-          <div className={styles.vendorLogo}>
-            <img src="https://via.placeholder.com/80x80" alt="Vendor Logo" />
-          </div>
-
-          <div className={styles.vendorInfo}>
-            <h4 className={styles.vendorName}>John Doe</h4>
-
-            <div className={styles.vendorRatings}>
-              <StoreRatings />
-            </div>
-          </div>
-        </div>
-
-        <div className={`${styles.contactInfo} flex flex-col`}>
-          <div className={styles.contactDetail}>
-            <span className={styles.label}>Store Name:</span>
-            <span className={styles.value}>Wolmart28 Vendor2</span>
-          </div>
-          <div className={styles.contactDetail}>
-            <span className={styles.label}>Address:</span>
-            <span className={styles.value}>123 Street, USA</span>
-          </div>
-          <div className={styles.contactDetail}>
-            <span className={styles.label}>Phone:</span>
-            <span className={styles.value}>123-456-7890</span>
-          </div>
-        </div>
-        <Link className={styles.visitStoreLink}>Visit Store</Link>
-      </div>
+      <VendorCard
+        cardData={vendorList[0]}
+        showVendorProducts={false}
+        showStoreInfo={true}
+        showStoreLink={true}
+        customClass={styles.vendorCard}
+      />
     </div>
 
     <div className={styles.vendorDesc}>

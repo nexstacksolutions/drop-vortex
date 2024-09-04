@@ -5,4 +5,13 @@
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
   background-color: var(--white-color);
+
+  & .storeLink {
+    max-width: max-content;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-weight: var(--weight-semibold);
+    border-bottom: 2px solid var(--primary-color);
+    transition: var(--transition-base);
+  }
 }

@@ -1,0 +1,17 @@
+.storeInfo {
+  width: 100%;
+  gap: var(--spacing-md);
+
+  & div {
+    max-width: max-content;
+
+    & span:first-child {
+      color: var(--primary-color);
+      font-weight: var(--weight-base);
+    }
+
+    &.storePhone span:last-child {
+      color: var(--accent-color);
+    }
+  }
+}

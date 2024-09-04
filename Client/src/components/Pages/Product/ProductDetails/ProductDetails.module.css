@@ -24,54 +24,74 @@
     }
   }
 
-  & .productDesc {
+  & .sectionContent {
     width: 100%;
-    gap: var(--spacing-xl);
-    padding: var(--spacing-xl) var(--spacing-sm);
+    padding: var(--spacing-lg) 0;
 
-    & .descWrapper {
-      width: 100%;
-      gap: var(--spacing-lg);
-
-      & .textBlock,
-      .imageBlock {
-        flex: 1 1;
-        gap: var(--spacing-xl);
-        font-size: var(--font-sm);
-
-        & li,
-        p {
-          color: var(--secondary-color);
-        }
-
-        & img {
-          width: 100%;
-          max-height: 100%;
-          object-fit: cover;
-        }
-      }
-    }
-
-    & .featureCards {
+    & .productDesc {
       width: 100%;
       gap: var(--spacing-xl);
+      padding: var(--spacing-xl) var(--spacing-sm);
 
-      & .card {
-        flex: 1 1;
+      & .descWrapper {
+        width: 100%;
+        gap: var(--spacing-lg);
 
-        & p {
-          color: var(--secondary-color);
+        & .textBlock,
+        .imageBlock {
+          flex: 1 1;
+          gap: var(--spacing-xl);
+          font-size: var(--font-sm);
+
+          & li,
+          p {
+            color: var(--secondary-color);
+          }
+
+          & img {
+            width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+          }
+        }
+      }
+
+      & .featureCards {
+        width: 100%;
+        gap: var(--spacing-xl);
+
+        & .card {
+          flex: 1 1;
+
+          & p {
+            color: var(--secondary-color);
+          }
         }
       }
     }
-  }
 
-  & .productSpecs {
-    width: 100%;
-    flex-direction: column;
+    & .productSpecs {
+      width: 100%;
+      flex-direction: column;
 
-    & .specItem {
-      flex: 1 1;
+      & .specItem {
+        flex: 1 1;
+      }
+    }
+
+    & .vendorInfoContainer {
+      width: 100%;
+
+      & .vendorCard {
+        background-color: transparent;
+        border: none;
+        width: max-content;
+      }
+
+      & .vendorDesc {
+        margin-top: var(--spacing-lg);
+        text-align: justify;
+      }
     }
   }
 }
