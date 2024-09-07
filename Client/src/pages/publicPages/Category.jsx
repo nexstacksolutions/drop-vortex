@@ -1,13 +1,13 @@
-import styles from "../styles/Category.module.css";
-import CategoryBanner from "../components/Pages/Category/CategoryBanner/CategoryBanner";
-import ProductCard from "../components/Common/ShowCase/ShowcaseCard/ProductCard/ProductCard";
-import ProductCardV2 from "../components/Common/ShowCase/ShowcaseCard/ProductCardV2/ProductCardV2";
-import VendorCard from "../components/Common/Vendor/VendorCard/VendorCard";
-import FeatureSection from "../components/Pages/Category/FeatureSection/FeatureSection";
-import ShowcaseGrid from "../components/Common/ShowCase/ShowcaseGrid/ShowcaseGrid";
-import productData from "../api/ProductDetails.json";
-import productList from "../api/productList.json";
-import vendorList from "../api/vendorList.json";
+import styles from "../../styles/publicPages/Category.module.css";
+import CategoryBanner from "../../components/Pages/Category/CategoryBanner/CategoryBanner";
+import ProductCard from "../../components/Common/ShowCase/ShowcaseCard/ProductCard/ProductCard";
+import ProductCardV2 from "../../components/Common/ShowCase/ShowcaseCard/ProductCardV2/ProductCardV2";
+import VendorCard from "../../components/Common/Vendor/VendorCard/VendorCard";
+import FeatureSection from "../../components/Pages/Category/FeatureSection/FeatureSection";
+import ShowcaseGrid from "../../components/Common/ShowCase/ShowcaseGrid/ShowcaseGrid";
+import productData from "../../api/ProductDetails.json";
+import productList from "../../api/productList.json";
+import vendorList from "../../api/vendorList.json";
 
 function Category() {
   return (

@@ -1,13 +1,13 @@
-import styles from "../styles/Home.module.css";
-import HeroSection from "../components/Pages/Home/HeroSection/HeroSection";
-import FeatureSection from "../components/Pages/Home/FeatureSection/FeatureSection";
-import ShowcaseGrid from "../components/Common/ShowCase/ShowcaseGrid/ShowcaseGrid";
-import PromotionCard from "../components/Common/ShowCase/ShowcaseCard/PromotionCard/PromotionCard";
-import ProductCard from "../components/Common/ShowCase/ShowcaseCard/ProductCard/ProductCard";
-import FeatureBannerV2 from "../components/Common/ShowCase/ShowcaseBanner/FeatureBannerV2/FeatureBannerV2";
-import productList from "../api/productList.json";
-import featureDeals from "../api/featureDeals.json";
-import promoOffers from "../api/promoOffers.json";
+import styles from "../../styles/publicPages/Home.module.css";
+import HeroSection from "../../components/Pages/Home/HeroSection/HeroSection";
+import FeatureSection from "../../components/Pages/Home/FeatureSection/FeatureSection";
+import ShowcaseGrid from "../../components/Common/ShowCase/ShowcaseGrid/ShowcaseGrid";
+import PromotionCard from "../../components/Common/ShowCase/ShowcaseCard/PromotionCard/PromotionCard";
+import ProductCard from "../../components/Common/ShowCase/ShowcaseCard/ProductCard/ProductCard";
+import FeatureBannerV2 from "../../components/Common/ShowCase/ShowcaseBanner/FeatureBannerV2/FeatureBannerV2";
+import productList from "../../api/productList.json";
+import featureDeals from "../../api/featureDeals.json";
+import promoOffers from "../../api/promoOffers.json";
 
 function Home() {
   const { trending, topSelling, topRated } = productList;

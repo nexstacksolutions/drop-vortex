@@ -3,28 +3,44 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 
 // All pages
-const HomePage = lazy(() => import("../pages/Home"));
-const LoginPage = lazy(() => import("../pages/Login"));
-const SignupPage = lazy(() => import("../pages/Signup"));
-const ErrorBoundary = lazy(() => import("../pages/Error"));
-const ProductPage = lazy(() => import("../pages/Product"));
-const CreateProductPage = lazy(() => import("../pages/CreateProduct"));
-const CategoryPage = lazy(() => import("../pages/Category"));
-const SearchPage = lazy(() => import("../pages/Search"));
-const IntegrationsPage = lazy(() => import("../pages/Integrations"));
-const CartPage = lazy(() => import("../pages/Cart"));
-const CheckoutPage = lazy(() => import("../pages/Checkout"));
-const OrderHistoryPage = lazy(() => import("../pages/OrderHistory"));
-const OrderDetailsPage = lazy(() => import("../pages/OrderDetails"));
-const ProfilePage = lazy(() => import("../pages/Profile"));
-const WishlistPage = lazy(() => import("../pages/Wishlist"));
-const ContactPage = lazy(() => import("../pages/Contact"));
-const AboutPage = lazy(() => import("../pages/About"));
-const FAQPage = lazy(() => import("../pages/FAQ"));
-const PrivacyPolicyPage = lazy(() => import("../pages/PrivacyPolicy"));
-const TermsOfServicePage = lazy(() => import("../pages/TermsOfService"));
-const AdminDashboardPage = lazy(() => import("../pages/AdminDashboard"));
-const ProductReviewsPage = lazy(() => import("../pages/ProductReviews"));
+const HomePage = lazy(() => import("../pages/publicPages/Home"));
+const LoginPage = lazy(() => import("../pages/publicPages/Login"));
+const SignupPage = lazy(() => import("../pages/publicPages/Signup"));
+const ErrorBoundary = lazy(() => import("../pages/publicPages/Error"));
+const ProductPage = lazy(() => import("../pages/publicPages/Product"));
+const CreateProductPage = lazy(() =>
+  import("../pages/adminPages/CreateProduct")
+);
+const CategoryPage = lazy(() => import("../pages/publicPages/Category"));
+const SearchPage = lazy(() => import("../pages/publicPages/Search"));
+const IntegrationsPage = lazy(() =>
+  import("../pages/publicPages/Integrations")
+);
+const CartPage = lazy(() => import("../pages/publicPages/Cart"));
+const CheckoutPage = lazy(() => import("../pages/publicPages/Checkout"));
+const OrderHistoryPage = lazy(() =>
+  import("../pages/publicPages/OrderHistory")
+);
+const OrderDetailsPage = lazy(() =>
+  import("../pages/publicPages/OrderDetails")
+);
+const ProfilePage = lazy(() => import("../pages/publicPages/Profile"));
+const WishlistPage = lazy(() => import("../pages/publicPages/Wishlist"));
+const ContactPage = lazy(() => import("../pages/publicPages/Contact"));
+const AboutPage = lazy(() => import("../pages/publicPages/About"));
+const FAQPage = lazy(() => import("../pages/publicPages/FAQ"));
+const PrivacyPolicyPage = lazy(() =>
+  import("../pages/publicPages/PrivacyPolicy")
+);
+const TermsOfServicePage = lazy(() =>
+  import("../pages/publicPages/TermsOfService")
+);
+const AdminDashboardPage = lazy(() =>
+  import("../pages/adminPages/AdminDashboard")
+);
+const ProductReviewsPage = lazy(() =>
+  import("../pages/publicPages/ProductReviews")
+);
 
 // Creating routes
 const router = createBrowserRouter([
