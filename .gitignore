@@ -36,7 +36,6 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 pnpm-lock.json
-pnpm-workspace.yaml
 
 # ==============================
 # Deployment Scripts
@@ -84,4 +83,3 @@ database/data.sql
 # ==============================
 # Root Project Files (optional)
 # ==============================
-/package.json  

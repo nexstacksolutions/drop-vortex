@@ -1,0 +1,20 @@
+{
+  "name": "drop-vortex",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "Client",
+    "Server"
+  ],
+  "scripts": {
+    "install:all": "pnpm install --recursive",
+    "dev:client": "pnpm --filter @drop-vortex/client dev",
+    "dev:server": "pnpm --filter @drop-vortex/server dev",
+    "build:client": "pnpm --filter @drop-vortex/client build",
+    "dev:all": "concurrently \"pnpm run dev:client\" \"pnpm run dev:server\"",
+    "deploy:project": "pnpm deploy.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
