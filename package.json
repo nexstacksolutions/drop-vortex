@@ -3,15 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "Client",
+    "Client/retailer-frontend",
+    "Client/supplier-frontend",
     "Server"
   ],
   "scripts": {
-    "install:all": "pnpm install --recursive",
-    "dev:client": "pnpm --filter @drop-vortex/client dev",
-    "dev:server": "pnpm --filter @drop-vortex/server dev",
-    "build:client": "pnpm --filter @drop-vortex/client build",
-    "dev:all": "concurrently \"pnpm run dev:client\" \"pnpm run dev:server\"",
+    "dev:retailer": "pnpm --filter @drop-vortex/retailer-frontend dev",
+    "dev:supplier": "pnpm --filter @drop-vortex/supplier-frontend dev",
+    "build:retailer": "pnpm --filter @drop-vortex/retailer-frontend build",
+    "build:supplier": "pnpm --filter @drop-vortex/supplier-frontend build",
+    "dev:all": "concurrently \"pnpm run dev:retailer\" \"pnpm run dev:supplier\" \"pnpm run dev:server\"",
     "deploy:project": "pnpm deploy.sh"
   },
   "devDependencies": {
