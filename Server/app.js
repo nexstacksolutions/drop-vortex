@@ -1,11 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
-import productRoutes from "./routes/product.js";
-import categoryRoutes from "./routes/category.js";
-import cartRoutes from "./routes/cart.js";
-import orderRoutes from "./routes/order.js";
-import userRoutes from "./routes/user.js";
-import generalRoutes from "./routes/general.js";
+import publicRoutes from "./routes/public.js";
+import retailerRoutes from "./routes/retailer.js";
+import supplierRoutes from "./routes/supplier.js";
 import ExpressError from "./classes/ExpressError.js";
 import ErrorMiddleware from "./middlewares/Error.js";
 
@@ -19,19 +16,15 @@ app.get("/", (req, res) => {
 });
 
 // Mounting API routes
-app.use("/api/products", productRoutes); // For product-related API
-app.use("/api/categories", categoryRoutes); // For category-related API
-app.use("/api/cart", cartRoutes); // For cart-related API
-app.use("/api/orders", orderRoutes); // For order-related API
-app.use("/api/users", userRoutes); // For user-related API
-app.use("/api", generalRoutes); // For authentication-related API
+app.use("/api/public", publicRoutes); // Routes for public frontend
+app.use("/api/retailer", retailerRoutes); // Routes for retailer frontend
+app.use("/api/supplier", supplierRoutes); // Routes for supplier frontend
 
 // Error handling middleware
 app.all("*", (req, res, next) => {
   next(new ExpressError(404, "Page not found"));
 });
 
-// Error handling middleware
 app.use(ErrorMiddleware);
 
 export default app;
