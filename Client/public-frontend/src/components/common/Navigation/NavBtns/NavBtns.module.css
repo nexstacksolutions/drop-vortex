@@ -1,0 +1,29 @@
+.navBtns {
+  position: absolute;
+  padding: var(--spacing-sm);
+  margin: 0 var(--spacing-md);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  background-color: var(--secondary-bg);
+  transition: var(--transition-base);
+  z-index: 10;
+
+  & svg {
+    font-size: var(--font-sm);
+    color: var(--white-color);
+  }
+
+  &.leftBtn {
+    left: 0;
+  }
+
+  &.rightBtn {
+    right: 0;
+  }
+
+  &:hover {
+    background-color: var(--accent-color);
+  }
+}

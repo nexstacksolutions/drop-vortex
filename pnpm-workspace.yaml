@@ -1,4 +1,5 @@
 packages:
-  - "Client/retailer-frontend" # Retailer frontend (public)
+  - "Client/public-frontend" # Public frontend (main site)
+  - "Client/retailer-frontend" # New Retailer frontend (private)
   - "Client/supplier-frontend" # Supplier frontend (private)
   - "Server" # Shared backend

@@ -1,0 +1,51 @@
+.toggleTheme {
+  position: fixed;
+  bottom: var(--spacing-xl);
+  right: var(--spacing-xl);
+  z-index: 99;
+  width: 7rem;
+  height: 3rem;
+  background: var(--muted-bg);
+  border-radius: 2rem;
+  overflow: hidden;
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--rounded);
+    background-color: var(--secondary-bg);
+    transition: var(--transition-base);
+  }
+
+  & button {
+    border-radius: var(--rounded);
+    width: 3rem;
+    height: 3rem;
+    transition: var(--transition-base);
+    z-index: 10;
+
+    & svg {
+      font-size: var(--font-lg);
+      color: var(--secondary-text);
+    }
+  }
+
+  & .activeBtn svg {
+    color: var(--accent-color);
+  }
+
+  &.lightActive {
+    &::before {
+      transform: translateX(-60%);
+    }
+  }
+
+  &.darkActive {
+    &::before {
+      transform: translateX(60%);
+    }
+  }
+}

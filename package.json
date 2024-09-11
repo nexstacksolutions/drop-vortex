@@ -3,16 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
+    "Client/public-frontend",
     "Client/retailer-frontend",
     "Client/supplier-frontend",
     "Server"
   ],
   "scripts": {
+    "dev:public": "pnpm --filter @drop-vortex/public-frontend dev",
     "dev:retailer": "pnpm --filter @drop-vortex/retailer-frontend dev",
     "dev:supplier": "pnpm --filter @drop-vortex/supplier-frontend dev",
+    "build:public": "pnpm --filter @drop-vortex/public-frontend build",
     "build:retailer": "pnpm --filter @drop-vortex/retailer-frontend build",
     "build:supplier": "pnpm --filter @drop-vortex/supplier-frontend build",
-    "dev:all": "concurrently \"pnpm run dev:retailer\" \"pnpm run dev:supplier\" \"pnpm run dev:server\"",
+    "dev:all": "concurrently \"pnpm run dev:public\" \"pnpm run dev:retailer\" \"pnpm run dev:supplier\" \"pnpm run dev:server\"",
     "deploy:project": "pnpm deploy.sh"
   },
   "devDependencies": {

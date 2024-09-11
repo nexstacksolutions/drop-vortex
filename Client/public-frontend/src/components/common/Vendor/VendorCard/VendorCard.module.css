@@ -1,0 +1,22 @@
+.vendorCard {
+  width: 24%;
+  padding: 2rem;
+  gap: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--white-color);
+  transition: var(--transition-base);
+
+  & .storeLink {
+    max-width: max-content;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-weight: var(--weight-semibold);
+    border-bottom: 2px solid var(--primary-color);
+    transition: var(--transition-base);
+  }
+
+  &:hover {
+    border-color: var(--accent-color);
+  }
+}

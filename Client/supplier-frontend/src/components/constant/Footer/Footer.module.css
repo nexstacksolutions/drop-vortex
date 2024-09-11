@@ -1,0 +1,7 @@
+.footer {
+  width: 100%;
+  text-align: start;
+  background-color: var(--bg-secondary);
+  padding: 6rem var(--spacing-lg) 2.4rem;
+  gap: 6.6rem;
+}

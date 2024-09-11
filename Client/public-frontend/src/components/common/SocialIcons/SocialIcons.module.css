@@ -1,0 +1,24 @@
+.socialIcons {
+  width: max-content;
+
+  & button {
+    cursor: pointer;
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: var(--rounded);
+    border: 1px solid var(--accent-color);
+
+    & svg {
+      color: var(--accent-color);
+      font-size: var(--font-base);
+    }
+
+    &:hover {
+      background-color: var(--accent-color);
+
+      & svg {
+        color: var(--white-color);
+      }
+    }
+  }
+}

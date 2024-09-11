@@ -1,0 +1,22 @@
+.navDots {
+  position: absolute;
+  width: 100%;
+  bottom: var(--spacing-sm);
+  left: 50%;
+  transform: translateX(-50%);
+  gap: calc(var(--spacing-xs) + 2px);
+  opacity: 0;
+  transition: var(--transition-base);
+
+  & .navDot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--rounded);
+    background-color: var(--muted-bg);
+    transition: var(--transition-base);
+
+    &.active {
+      background-color: var(--accent-color);
+    }
+  }
+}
