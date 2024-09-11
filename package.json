@@ -12,6 +12,7 @@
     "dev:public": "pnpm --filter @drop-vortex/public-frontend dev",
     "dev:retailer": "pnpm --filter @drop-vortex/retailer-frontend dev",
     "dev:supplier": "pnpm --filter @drop-vortex/supplier-frontend dev",
+    "dev:server": "pnpm --filter @drop-vortex/server dev",
     "build:public": "pnpm --filter @drop-vortex/public-frontend build",
     "build:retailer": "pnpm --filter @drop-vortex/retailer-frontend build",
     "build:supplier": "pnpm --filter @drop-vortex/supplier-frontend build",
