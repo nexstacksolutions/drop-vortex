@@ -16,7 +16,6 @@ const Guidelines = ({ content, guideType }) => (
   </div>
 );
 
-// Reusable component for form sections
 const FormSection = ({ title, message, children, customClass }) => (
   <section
     className={classNames(styles.formSection, customClass, "flex flex-col")}
@@ -31,7 +30,6 @@ const FormSection = ({ title, message, children, customClass }) => (
   </section>
 );
 
-// Reusable component for handling input fields
 const FormInput = ({
   label,
   name,
@@ -48,79 +46,98 @@ const FormInput = ({
     [name, onChange]
   );
 
+  const formInputId = `${name}-file-upload`;
+
   return (
     <div className={classNames(styles.formInputWrapper, "flex flex-col")}>
-      <label>{label}</label>
-      {type === "select" && (
-        <select name={name} value={value} onChange={onChange}>
-          {options.map((option, index) => (
-            <option key={index} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      )}
-      {type === "textarea" && (
-        <ReactQuill value={value} onChange={handleQuillChange} />
-      )}
-      {type === "radio" && (
-        <div className={classNames(styles.radioGroup, "flex")}>
-          {options.map((option, index) => (
-            <div
-              key={index}
-              className={classNames(styles.radioItem, "flex flex-center")}
-            >
+      <label htmlFor={formInputId}>{label}</label>
+
+      <div className={styles.inputWrapper}>
+        {type === "select" && (
+          <select
+            name={name}
+            id={formInputId}
+            value={value}
+            onChange={onChange}
+          >
+            {options.map((option, index) => (
+              <option key={index} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {type === "textarea" && (
+          <ReactQuill
+            value={value}
+            id={formInputId}
+            onChange={handleQuillChange}
+          />
+        )}
+
+        {type === "radio" && (
+          <div className={classNames(styles.radioGroup, "flex")}>
+            {options.map((option, index) => (
+              <div
+                key={index}
+                className={classNames(styles.radioItem, "flex flex-center")}
+              >
+                <input
+                  type="radio"
+                  id={`${name}${index}`}
+                  name={name}
+                  value={option}
+                  checked={value === option}
+                  onChange={onChange}
+                />
+                <label htmlFor={`${name}${index}`}>{option}</label>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {inputList && name === "shipping.dimensions" && (
+          <div className={classNames(styles.inputGroup, "flex")}>
+            {Object.keys(value).map((dimension, index) => (
               <input
-                type="radio"
-                id={`${name}${index}`}
-                name={name}
-                value={option}
-                checked={value === option}
-                onChange={onChange}
+                key={index}
+                type={type}
+                name={dimension}
+                value={value[dimension]}
+                placeholder={
+                  dimension.charAt(0).toUpperCase() + dimension.slice(1)
+                }
+                onChange={(e) =>
+                  onChange({
+                    target: {
+                      name: "shipping.dimensions",
+                      value: { ...value, [dimension]: e.target.value },
+                    },
+                  })
+                }
               />
-              <label htmlFor={`${name}${index}`}>{option}</label>
-            </div>
-          ))}
-        </div>
-      )}
-      {inputList && name === "packageDimensions" && (
-        <div className={classNames(styles.inputGroup, "flex")}>
-          {Object.keys(value).map((dimension, index) => (
-            <input
-              key={index}
-              type="number"
-              name={dimension}
-              value={value[dimension]}
-              placeholder={
-                dimension.charAt(0).toUpperCase() + dimension.slice(1)
-              }
-              onChange={(e) =>
-                onChange({
-                  target: {
-                    name: "packageDimensions",
-                    value: { ...value, [dimension]: e.target.value },
-                  },
-                })
-              }
-            />
-          ))}
-        </div>
-      )}
-      {!["select", "textarea", "radio"].includes(type) && !inputList && (
-        <input
-          type={type}
-          name={name}
-          value={value}
-          placeholder={placeholder}
-          onChange={onChange}
-        />
-      )}
+            ))}
+          </div>
+        )}
+
+        {!["select", "textarea", "radio"].includes(type) && !inputList && (
+          <input
+            type={type}
+            name={name}
+            id={formInputId}
+            value={value}
+            placeholder={placeholder}
+            onChange={onChange}
+          />
+        )}
+      </div>
+
       {showErr && <p className={styles.errorMsg}>Error message</p>}
     </div>
   );
 };
 
-// Reusable component for handling media inputs
 const MediaInput = ({
   label,
   name,
@@ -132,34 +149,29 @@ const MediaInput = ({
   GuideComponent,
 }) => {
   const [mediaFiles, setMediaFiles] = useState(value || []);
-  const fileInputRef = useRef(null); // Ref for file input
+  const fileInputRef = useRef(null);
 
-  // Handle file selection
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     if (mediaFiles.length + files.length <= maxFiles) {
       const updatedFiles = [...mediaFiles, ...files];
       setMediaFiles(updatedFiles);
       onChange({ target: { name, value: updatedFiles } });
-      // Reset file input to avoid cache issues
       if (fileInputRef.current) {
         fileInputRef.current.value = null;
       }
     }
   };
 
-  // Remove file from the list
   const handleRemoveFile = (index) => {
     const updatedFiles = mediaFiles.filter((_, i) => i !== index);
     setMediaFiles(updatedFiles);
     onChange({ target: { name, value: updatedFiles } });
-    // Reset file input to avoid cache issues
     if (fileInputRef.current) {
       fileInputRef.current.value = null;
     }
   };
 
-  // Generate unique ID for file input
   const fileInputId = `${name}-file-upload`;
 
   return (
@@ -224,7 +236,7 @@ const MediaInput = ({
                 name={name}
                 accept={fileType === "image" ? "image/*" : "video/*"}
                 onChange={handleFileChange}
-                ref={fileInputRef} // Attach ref to file input
+                ref={fileInputRef}
               />
             </div>
           )}
@@ -236,49 +248,111 @@ const MediaInput = ({
   );
 };
 
-// Main product form component
 const ProductForm = ({ customClass }) => {
   const [formData, setFormData] = useState({
-    productName: "",
-    category: "",
-    productImages: [],
-    buyerPromotionImage: [],
-    video: [],
-    brand: "",
-    numberOfPieces: "",
-    powerSource: "",
-    variantName: "",
-    price: "",
-    stock: "",
-    sellerSKU: "",
-    mainDescription: "",
-    productDescription: "",
-    highlights: "",
-    packageWeight: "",
-    packageDimensions: { length: "", width: "", height: "" },
-    dangerousGoods: "",
+    basicInfo: {
+      productName: "",
+      category: "",
+      media: {
+        productImages: [],
+        buyerPromotionImage: [],
+        productVideo: [],
+      },
+    },
+
+    productDetails: {
+      variations: [
+        {
+          type: "",
+          values: [
+            {
+              name: "",
+              priceModifier: "",
+            },
+          ],
+        },
+      ],
+
+      pricing: {
+        current: "",
+        original: "",
+      },
+
+      stock: "",
+      availability: "",
+
+      sku: "",
+    },
+
+    tags: [],
+
+    specifications: {
+      brand: {
+        name: "",
+        logo: "",
+      },
+      numberOfPieces: "",
+      powerSource: "",
+      additionalSpecs: [],
+    },
+
+    description: {
+      main: "",
+      product: "",
+      highlights: "",
+      whatsInBox: "",
+    },
+
+    shipping: {
+      packageWeight: "",
+      dimensions: {
+        length: "",
+        width: "",
+        height: "",
+      },
+      dangerousGoods: "",
+      warranty: {
+        type: "",
+        period: "",
+        policy: "",
+      },
+    },
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prevData) => {
-      if (name === "packageDimensions") {
+      const [section, field, subField] = name.split(".");
+
+      if (subField) {
+        // Handle deeply nested objects like shipping.dimensions
         return {
           ...prevData,
-          [name]: value,
+          [section]: {
+            ...prevData[section],
+            [field]: {
+              ...prevData[section][field],
+              [subField]: value,
+            },
+          },
         };
+      } else if (field) {
+        // Handle second-level fields like basicInfo.productName
+        return {
+          ...prevData,
+          [section]: {
+            ...prevData[section],
+            [field]: value,
+          },
+        };
+      } else {
+        return prevData;
       }
-      return {
-        ...prevData,
-        [name]: value,
-      };
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission logic here
     console.log(formData);
   };
 
@@ -291,59 +365,61 @@ const ProductForm = ({ customClass }) => {
       <FormSection title="Basic Information" customClass={styles.basicInfo}>
         <FormInput
           label="Product Name"
-          name="productName"
+          name="basicInfo.productName"
           type="text"
           placeholder="Ex: Nikon Coolpix A300 Digital Camera"
-          value={formData.productName}
+          value={formData.basicInfo.productName}
           onChange={handleInputChange}
         />
         <FormInput
           label="Category"
-          name="category"
+          name="basicInfo.category"
           type="select"
-          options={["Furniture & Decor", "Lighting", "Table Lamps"]}
-          value={formData.category}
+          options={["Electronics", "Clothing", "Accessories"]}
+          value={formData.basicInfo.category}
           onChange={handleInputChange}
         />
         <MediaInput
           label="Product Images"
-          name="productImages"
-          maxFiles={8}
+          name="basicInfo.media.productImages"
           fileType="image"
-          value={formData.productImages}
-          onChange={handleInputChange}
+          maxFiles={5}
+          value={formData.basicInfo.media.productImages}
+          onChange={(e) => handleInputChange(e)}
+          GuideComponent={
+            <Guidelines
+              content={["Upload images in JPEG/PNG format"]}
+              guideType="info"
+            />
+          }
         />
         <MediaInput
           label="Buyer Promotion Image"
-          name="buyerPromotionImage"
-          maxFiles={1}
+          name="basicInfo.media.buyerPromotionImage"
           fileType="image"
-          value={formData.buyerPromotionImage}
+          maxFiles={1}
+          value={formData.basicInfo.media.buyerPromotionImage}
+          onChange={(e) => handleInputChange(e)}
           GuideComponent={
             <Guidelines
-              content={["White Background Image", "See Example"]}
-              guideType="imageGuidelines"
+              content={["Upload a promotional image for the product"]}
+              guideType="info"
             />
           }
-          onChange={handleInputChange}
         />
         <MediaInput
-          label="Video"
-          name="video"
-          maxFiles={1}
+          label="Product Video"
+          name="basicInfo.media.productVideo"
           fileType="video"
-          value={formData.video}
+          maxFiles={1}
+          value={formData.basicInfo.media.productVideo}
+          onChange={(e) => handleInputChange(e)}
           GuideComponent={
             <Guidelines
-              content={[
-                "Min size: 480x480 px, max length: 60 seconds, max file size: 100MB.",
-                "Supported Format: mp4",
-                "New video may take 36 hrs to approve.",
-              ]}
-              guideType="videoGuidelines"
+              content={["Upload a video showcasing the product"]}
+              guideType="info"
             />
           }
-          onChange={handleInputChange}
         />
       </FormSection>
 
@@ -355,27 +431,44 @@ const ProductForm = ({ customClass }) => {
       >
         <FormInput
           label="Brand"
-          name="brand"
-          type="select"
-          options={["Nikon", "Canon", "Sony"]}
-          value={formData.brand}
+          name="specifications.brand.name"
+          type="text"
+          placeholder="Brand Name"
+          value={formData.specifications.brand.name}
           onChange={handleInputChange}
         />
+
         <FormInput
           label="Number of Pieces"
-          name="numberOfPieces"
-          type="number"
-          placeholder="Please input or select option"
-          value={formData.numberOfPieces}
+          name="specifications.numberOfPieces"
+          type="text"
+          placeholder="Number of Pieces"
+          value={formData.specifications.numberOfPieces}
           onChange={handleInputChange}
         />
         <FormInput
           label="Power Source"
-          name="powerSource"
+          name="specifications.powerSource"
           type="text"
-          placeholder="Please input or select option"
-          value={formData.powerSource}
+          placeholder="Power Source"
+          value={formData.specifications.powerSource}
           onChange={handleInputChange}
+        />
+        <FormInput
+          label="Additional Specifications"
+          name="specifications.additionalSpecs"
+          type="text"
+          placeholder="Additional Specifications"
+          value={formData.specifications.additionalSpecs.join(", ")}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              specifications: {
+                ...formData.specifications,
+                additionalSpecs: e.target.value.split(", "),
+              },
+            })
+          }
         />
       </FormSection>
 
@@ -386,35 +479,51 @@ const ProductForm = ({ customClass }) => {
         customClass={styles.productPSV}
       >
         <FormInput
-          label="Variant Name"
-          name="variantName"
+          label="Variations"
+          name="productDetails.variations"
           type="text"
-          placeholder="Add Variant"
-          value={formData.variantName}
+          placeholder="Ex: Color, Size"
+          value={formData.productDetails.variations}
           onChange={handleInputChange}
         />
         <FormInput
-          label="Price"
-          name="price"
-          type="number"
-          placeholder="Enter price"
-          value={formData.price}
+          label="Pricing"
+          name="productDetails.pricing"
+          type="text"
+          placeholder="Current Price"
+          value={formData.productDetails.pricing.current}
+          onChange={handleInputChange}
+        />
+        <FormInput
+          label="Original Price"
+          name="productDetails.pricing.original"
+          type="text"
+          placeholder="Original Price"
+          value={formData.productDetails.pricing.original}
           onChange={handleInputChange}
         />
         <FormInput
           label="Stock"
-          name="stock"
-          type="number"
-          placeholder="Enter stock"
-          value={formData.stock}
+          name="productDetails.stock"
+          type="text"
+          placeholder="Stock Quantity"
+          value={formData.productDetails.stock}
           onChange={handleInputChange}
         />
         <FormInput
-          label="Seller SKU"
-          name="sellerSKU"
+          label="Availability"
+          name="productDetails.availability"
           type="text"
-          placeholder="Enter Seller SKU"
-          value={formData.sellerSKU}
+          placeholder="Availability Status"
+          value={formData.productDetails.availability}
+          onChange={handleInputChange}
+        />
+        <FormInput
+          label="SKU"
+          name="productDetails.sku"
+          type="text"
+          placeholder="Stock Keeping Unit"
+          value={formData.productDetails.sku}
           onChange={handleInputChange}
         />
       </FormSection>
@@ -423,23 +532,35 @@ const ProductForm = ({ customClass }) => {
       <FormSection title="Product Description" customClass={styles.productDesc}>
         <FormInput
           label="Main Description"
-          name="mainDescription"
+          name="description.main"
           type="textarea"
-          value={formData.mainDescription}
+          value={formData.description.main}
           onChange={handleInputChange}
         />
-        <FormInput
-          label="Product Description"
-          name="productDescription"
-          type="textarea"
-          value={formData.productDescription}
-          onChange={handleInputChange}
-        />
+
         <FormInput
           label="Highlights"
-          name="highlights"
+          name="description.highlights"
           type="textarea"
-          value={formData.highlights}
+          value={formData.description.highlights}
+          onChange={handleInputChange}
+        />
+        <FormInput
+          label="Tags"
+          name="tags"
+          type="text"
+          placeholder="Ex: New, Sale, Bestseller"
+          value={formData.tags.join(", ")}
+          onChange={(e) =>
+            setFormData({ ...formData, tags: e.target.value.split(", ") })
+          }
+        />
+        <FormInput
+          label="What's in the Box"
+          name="description.whatsInBox"
+          type="text"
+          placeholder="Ex: 1x product, 1x accessory"
+          value={formData.description.whatsInBox}
           onChange={handleInputChange}
         />
       </FormSection>
@@ -452,32 +573,60 @@ const ProductForm = ({ customClass }) => {
       >
         <FormInput
           label="Package Weight"
-          name="packageWeight"
+          name="shipping.packageWeight"
           type="number"
           placeholder="0.01 - 300"
-          value={formData.packageWeight}
+          value={formData.shipping.packageWeight}
           onChange={handleInputChange}
         />
         <FormInput
           label="Package Dimensions (L x W x H)"
-          name="packageDimensions"
+          name="shipping.dimensions"
           type="number"
           placeholder="0.01 - 300"
           inputList={3}
-          value={formData.packageDimensions}
+          value={{
+            length: formData.shipping.dimensions.length,
+            width: formData.shipping.dimensions.width,
+            height: formData.shipping.dimensions.height,
+          }}
           onChange={handleInputChange}
         />
         <FormInput
           label="Dangerous Goods"
-          name="dangerousGoods"
+          name="shipping.dangerousGoods"
           type="radio"
           options={["None", "Contains battery / flammables / liquid"]}
-          value={formData.dangerousGoods}
+          value={formData.shipping.dangerousGoods}
+          onChange={handleInputChange}
+        />
+        <FormInput
+          label="Warranty Type"
+          name="shipping.warranty.type"
+          type="text"
+          placeholder="Warranty Type"
+          value={formData.shipping.warranty.type}
+          onChange={handleInputChange}
+        />
+        <FormInput
+          label="Warranty Period"
+          name="shipping.warranty.period"
+          type="text"
+          placeholder="Warranty Period"
+          value={formData.shipping.warranty.period}
+          onChange={handleInputChange}
+        />
+        <FormInput
+          label="Warranty Policy"
+          name="shipping.warranty.policy"
+          type="text"
+          placeholder="Warranty Policy"
+          value={formData.shipping.warranty.policy}
           onChange={handleInputChange}
         />
       </FormSection>
 
-      <button type="submit" className={styles.submitBtn}>
+      <button type="submit" className={styles.submitButton}>
         Submit
       </button>
     </form>

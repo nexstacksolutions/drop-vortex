@@ -115,8 +115,12 @@
       width: 30%;
     }
 
-    & > div:last-child > div {
+    & > div:nth-child(3) > div {
       gap: var(--spacing-md);
+
+      & > div * {
+        cursor: pointer;
+      }
 
       & input {
         width: auto;
