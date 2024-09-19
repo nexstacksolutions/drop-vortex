@@ -1,0 +1,126 @@
+.productForm {
+  width: 100%;
+  gap: var(--spacing-xl);
+
+  & .formSection {
+    flex: 1;
+    background-color: var(--white-color);
+    padding: 1.2rem var(--spacing-md) 2rem;
+    border-radius: var(--radius-md);
+    gap: var(--spacing-md);
+
+    & .sectionHeader p {
+      color: var(--secondary-text);
+    }
+
+    & > div {
+      flex: 1;
+      gap: var(--spacing-md);
+
+      & > div {
+        flex: 1 1 100%;
+      }
+    }
+  }
+
+  & .guideContainer {
+    max-width: max-content;
+
+    & ul li {
+      color: var(--secondary-text);
+    }
+  }
+
+  & .mediaInputContainer {
+    flex: 1;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    background-color: var(--muted-bg);
+
+    & .mediaInputWrapper {
+      max-width: max-content;
+
+      & .mediaPreviewContainer {
+        max-width: max-content;
+
+        & .mediaPreviewItem {
+          position: relative;
+          width: 6rem;
+          height: 6rem;
+          border: var(--border-base-dashed) var(--border-color);
+
+          & img,
+          video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          & .mediaActionsContainer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 0 var(--spacing-xs);
+            background-color: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-base);
+
+            & button svg {
+              font-size: var(--font-lg);
+            }
+          }
+
+          &:hover .mediaActionsContainer {
+            opacity: 1;
+            visibility: visible;
+          }
+        }
+
+        & .addMediaWrapper {
+          width: 6rem;
+          height: 6rem;
+          border: var(--border-base-dashed) var(--border-color);
+
+          & label {
+            width: 100%;
+            height: 100%;
+
+            & svg {
+              font-size: var(--font-lg);
+            }
+          }
+        }
+      }
+    }
+
+    & .videoGuidelines {
+      gap: var(--spacing-xs);
+    }
+  }
+
+  & .productSpec > div {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+
+    & > div {
+      flex: 0 0 48%;
+    }
+  }
+
+  & .productSW > div {
+    & > div:first-child {
+      flex: 0 0 30%;
+      width: 30%;
+    }
+
+    & > div:last-child > div {
+      gap: var(--spacing-md);
+
+      & input {
+        width: auto;
+      }
+    }
+  }
+}

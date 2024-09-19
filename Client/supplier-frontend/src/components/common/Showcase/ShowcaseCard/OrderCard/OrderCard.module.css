@@ -1,0 +1,18 @@
+.orderCard {
+  flex: 1 1;
+
+  & .cardValue {
+    font-size: var(--font-xl);
+    font-weight: var(--weight-semibold);
+    color: var(--accent-color);
+  }
+
+  & .cardTitle {
+    font-weight: var(--weight-normal);
+    gap: var(--spacing-xs);
+
+    &:hover {
+      color: var(--accent-color);
+    }
+  }
+}

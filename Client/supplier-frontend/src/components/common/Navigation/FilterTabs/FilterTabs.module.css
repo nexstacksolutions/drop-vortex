@@ -1,0 +1,48 @@
+.filterTabs {
+  width: 100%;
+  max-width: max-content;
+
+  & button {
+    position: relative;
+    padding: 1.2rem var(--spacing-md);
+    font-size: var(--font-md);
+    color: var(--secondary-text);
+
+    & .tabValueCount {
+      position: absolute;
+      height: 1.6rem;
+      color: #fff;
+      min-width: 16px;
+      border: 0 solid #fff;
+      border-radius: 8px;
+      font-size: 12px;
+      height: 16px;
+      line-height: 16px;
+      padding: 0 4px;
+      text-align: center;
+      top: -0.5em;
+      right: -1rem;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      width: auto;
+      font-size: var(--font-xs);
+      border-radius: var(--rounded);
+      background-color: var(--accent-color);
+    }
+
+    &.activeTab {
+      color: var(--accent-color);
+
+      &::before {
+        content: "";
+        position: absolute;
+        width: calc(100% - var(--spacing-xl));
+        height: 2px;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--accent-color);
+      }
+    }
+  }
+}

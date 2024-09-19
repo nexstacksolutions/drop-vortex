@@ -2,6 +2,14 @@
   width: 100%;
   text-align: start;
   background-color: var(--bg-secondary);
-  padding: 6rem var(--spacing-lg) 2.4rem;
-  gap: 6.6rem;
+  padding: var(--spacing-sm) 0;
+  margin-top: auto;
+
+  & .quickLinks ul {
+    gap: var(--spacing-xl);
+
+    & li a:hover {
+      color: var(--accent-color);
+    }
+  }
 }

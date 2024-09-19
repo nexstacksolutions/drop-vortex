@@ -1,0 +1,8 @@
+.statusSidebar {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  min-width: 65px;
+  max-width: var(--sidebar-width);
+  gap: var(--spacing-md);
+}

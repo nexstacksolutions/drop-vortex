@@ -1,0 +1,40 @@
+@keyframes slideRight {
+  0% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(0.5em);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.showcaseHeader {
+  width: 100%;
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-md);
+
+  & .optBtn {
+    margin-left: auto;
+    gap: var(--spacing-xs);
+  }
+
+  & a:last-child {
+    gap: var(--spacing-sm);
+    display: inline-flex;
+
+    &:hover svg {
+      animation: slideRight var(--animation-base) infinite;
+    }
+  }
+
+  & a {
+    color: var(--feature-color);
+
+    &:hover {
+      color: var(--accent-color);
+    }
+  }
+}

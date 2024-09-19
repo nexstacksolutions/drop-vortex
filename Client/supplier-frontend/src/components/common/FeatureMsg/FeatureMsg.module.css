@@ -1,0 +1,29 @@
+.featureMsg {
+  width: 100%;
+  margin-bottom: auto;
+  padding: calc(var(--spacing-md) - var(--spacing-xs));
+  background-color: var(--muted-bg);
+  border-radius: var(--radius-sm);
+
+  & .msgWrapper {
+    width: calc(100% - var(--spacing-xl));
+    /* gap: var(--spacing-md); */
+
+    & p {
+      line-height: inherit;
+    }
+
+    & a {
+      color: var(--accent-color);
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  & svg {
+    font-size: var(--font-xl);
+    color: var(--accent-color);
+  }
+}

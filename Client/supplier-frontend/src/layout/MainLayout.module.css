@@ -1,0 +1,8 @@
+.mainLayout {
+  flex: 1;
+  max-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: calc(var(--spacing-md) - var(--spacing-xs)) var(--spacing-md);
+  gap: var(--spacing-md);
+}

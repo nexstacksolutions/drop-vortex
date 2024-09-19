@@ -1,0 +1,12 @@
+.vortexAcademy {
+  /* width: 100%; */
+
+  & .showcaseHeader .optBtn {
+    margin: 0;
+    margin-right: auto;
+  }
+
+  & .showcaseWrapper {
+    gap: var(--spacing-md);
+  }
+}

@@ -1,0 +1,20 @@
+.breadcrumbs {
+  width: 100%;
+  max-width: max-content;
+
+  & ul li {
+    & a {
+      color: var(--secondary-text);
+
+      & svg {
+        font-size: var(--font-xs);
+      }
+    }
+
+    &:last-child a {
+      color: var(--primary-text);
+      font-weight: var(--weight-semibold);
+      cursor: auto;
+    }
+  }
+}

@@ -11,7 +11,7 @@ function ErrorBoundary() {
 
   return (
     <main className={`${styles.error} flex flex-center`}>
-      <div className={`${styles.errorWrapper} flex flex-col`}>
+      <section className={`${styles.errorWrapper} flex flex-col`}>
         <div className={styles.errorContent}>
           <h1 className={styles.errorTitle}>
             {error?.status && error?.statusText
@@ -32,7 +32,7 @@ function ErrorBoundary() {
             Go back to Home
           </Link>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

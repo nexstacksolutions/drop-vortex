@@ -1,0 +1,17 @@
+.showcaseHeader {
+  width: 100%;
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-md);
+
+  & .headerWrapper {
+    width: 100%;
+  }
+
+  & a {
+    color: var(--feature-color);
+
+    &:hover {
+      color: var(--accent-color);
+    }
+  }
+}

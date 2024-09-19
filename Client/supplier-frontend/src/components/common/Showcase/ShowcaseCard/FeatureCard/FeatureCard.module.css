@@ -1,0 +1,13 @@
+.featureCard {
+  flex: 1 1;
+
+  & img {
+    width: 3.2rem;
+    height: 3.2rem;
+    object-fit: cover;
+  }
+
+  &:hover {
+    color: var(--accent-color);
+  }
+}

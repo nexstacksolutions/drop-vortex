@@ -5,4 +5,5 @@
   text-align: start;
   overflow: hidden;
   gap: 0;
+  display: flex;
 }

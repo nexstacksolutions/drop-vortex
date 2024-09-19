@@ -1,0 +1,31 @@
+.eduCard {
+  flex: 1 1;
+
+  & .cardImage {
+    width: 100%;
+
+    & img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  & .cardContent {
+    width: 100%;
+
+    & .cardTitle {
+      line-clamp: 1;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      overflow: hidden;
+      font-weight: var(--weight-normal);
+
+      &:hover {
+        color: var(--accent-color);
+      }
+    }
+  }
+}
