@@ -9,10 +9,6 @@
     border-radius: var(--radius-md);
     gap: var(--spacing-md);
 
-    & .sectionHeader p {
-      color: var(--secondary-text);
-    }
-
     & > div {
       flex: 1;
       gap: var(--spacing-md);
@@ -21,13 +17,21 @@
         flex: 1 1 100%;
       }
     }
-  }
 
-  & .guideContainer {
-    max-width: max-content;
-
-    & ul li {
+    & .sectionHeader p {
       color: var(--secondary-text);
+    }
+
+    & .showMoreBtn {
+      transition: var(--transition-base);
+
+      & svg {
+        transition: var(--transition-base);
+      }
+
+      &.showMoreBtnActive svg {
+        transform: rotate(180deg);
+      }
     }
   }
 
@@ -94,8 +98,81 @@
       }
     }
 
-    & .videoGuidelines {
-      gap: var(--spacing-xs);
+    & .guideContainer {
+      max-width: max-content;
+
+      & ul {
+        gap: var(--spacing-xs);
+
+        & li {
+          color: var(--secondary-text);
+        }
+      }
+    }
+  }
+
+  & .productVariationsWrapper {
+    width: 100%;
+
+    & .variationItem {
+      flex: 1;
+      gap: var(--spacing-md);
+
+      & .variationHeader {
+        width: 100%;
+        gap: var(--spacing-md);
+
+        & .variationTitle {
+          font-weight: var(--weight-semibold);
+        }
+
+        & .variationInfo span:last-child {
+          color: var(--secondary-text);
+        }
+
+        & .variationDetails p {
+          color: var(--secondary-text);
+        }
+      }
+
+      & .variationBody {
+        width: 100%;
+
+        & .variantWrapper {
+          width: 100%;
+          gap: var(--spacing-md);
+          background-color: var(--muted-bg);
+          padding: var(--spacing-sm) var(--spacing-md);
+          border-radius: var(--radius-md);
+
+          & .formInput {
+            width: 30%;
+
+            & label {
+              display: none;
+            }
+          }
+
+          & .mediaInput {
+            padding: 0;
+            background-color: transparent;
+            max-width: max-content;
+
+            & > label {
+              display: none;
+            }
+
+            & > div > div > div {
+              width: 4rem;
+              height: 4rem;
+            }
+          }
+
+          & .variantActions {
+            margin-left: auto;
+          }
+        }
+      }
     }
   }
 

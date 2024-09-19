@@ -3,11 +3,11 @@ import "react-quill/dist/quill.snow.css";
 import { useState, useCallback, useRef } from "react";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
-import { FaPlus } from "react-icons/fa6";
-import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
+import { FaPlus, FaAngleDown } from "react-icons/fa6";
+import { RiDeleteBin5Line, RiEdit2Line, RiMenuFill } from "react-icons/ri";
 
 const Guidelines = ({ content, guideType }) => (
-  <div className={`${styles[guideType]} ${styles.guideContainer}`}>
+  <div className={classNames(styles.guideContainer, styles[guideType])}>
     <ul>
       {content.map((item, index) => (
         <li key={index}>{item}</li>
@@ -16,7 +16,13 @@ const Guidelines = ({ content, guideType }) => (
   </div>
 );
 
-const FormSection = ({ title, message, children, customClass }) => (
+const FormSection = ({
+  title,
+  message,
+  children,
+  customClass,
+  showMoreBtnProps,
+}) => (
   <section
     className={classNames(styles.formSection, customClass, "flex flex-col")}
   >
@@ -27,6 +33,7 @@ const FormSection = ({ title, message, children, customClass }) => (
     <div className={classNames(styles.sectionContent, "flex flex-col")}>
       {children}
     </div>
+    {showMoreBtnProps && <ShowMoreBtn {...showMoreBtnProps} />}
   </section>
 );
 
@@ -39,6 +46,7 @@ const FormInput = ({
   value,
   onChange,
   inputList,
+  customClass,
   showErr = false,
 }) => {
   const handleQuillChange = useCallback(
@@ -46,10 +54,14 @@ const FormInput = ({
     [name, onChange]
   );
 
-  const formInputId = `${name}-file-upload`;
+  const formInputId = `${name}-form-input`;
 
   return (
-    <div className={classNames(styles.formInputWrapper, "flex flex-col")}>
+    <div
+      className={classNames(styles.formInputWrapper, "flex flex-col", {
+        [customClass]: customClass,
+      })}
+    >
       <label htmlFor={formInputId}>{label}</label>
 
       <div className={styles.inputWrapper}>
@@ -146,22 +158,24 @@ const MediaInput = ({
   value,
   onChange,
   showErr,
+  customClass,
   GuideComponent,
 }) => {
   const [mediaFiles, setMediaFiles] = useState(value || []);
   const fileInputRef = useRef(null);
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (mediaFiles.length + files.length <= maxFiles) {
-      const updatedFiles = [...mediaFiles, ...files];
-      setMediaFiles(updatedFiles);
-      onChange({ target: { name, value: updatedFiles } });
-      if (fileInputRef.current) {
-        fileInputRef.current.value = null;
+  const handleFileChange = useCallback(
+    (e) => {
+      const files = Array.from(e.target.files);
+      if (mediaFiles.length + files.length <= maxFiles) {
+        const updatedFiles = [...mediaFiles, ...files];
+        setMediaFiles(updatedFiles);
+        onChange({ target: { name, value: updatedFiles } });
+        if (fileInputRef.current) fileInputRef.current.value = null;
       }
-    }
-  };
+    },
+    [mediaFiles, maxFiles, onChange, name]
+  );
 
   const handleRemoveFile = (index) => {
     const updatedFiles = mediaFiles.filter((_, i) => i !== index);
@@ -175,7 +189,11 @@ const MediaInput = ({
   const fileInputId = `${name}-file-upload`;
 
   return (
-    <div className={classNames(styles.mediaInputContainer, "flex flex-col")}>
+    <div
+      className={classNames(styles.mediaInputContainer, "flex flex-col", {
+        [customClass]: customClass,
+      })}
+    >
       <label>{label}</label>
       <div
         className={classNames(styles.mediaInputWrapper, "flex align-center")}
@@ -248,6 +266,103 @@ const MediaInput = ({
   );
 };
 
+const ShowMoreBtn = ({
+  btnText = "Show More",
+  handleShowMore,
+  section,
+  showMoreOptions,
+}) => {
+  return (
+    <button
+      onClick={handleShowMore}
+      className={classNames(styles.showMoreBtn, {
+        [styles.showMoreBtnActive]: showMoreOptions[section],
+      })}
+    >
+      <span> {!showMoreOptions[section] ? btnText : "Show Less"}</span>
+      <FaAngleDown />
+    </button>
+  );
+};
+
+const ProductVariations = ({ variations, onChange }) => {
+  const handleInputChange = (e, variationIndex, valueIndex, field) => {
+    const { name, value } = e.target;
+    // Call the parent `onChange` handler, passing in the updated value
+    onChange(variationIndex, valueIndex, field, value);
+  };
+
+  const handleMediaChange = (newMedia, variationIndex, valueIndex) => {
+    // Call the parent `onChange` handler with the updated media input
+    onChange(variationIndex, valueIndex, "productImages", newMedia);
+  };
+
+  return (
+    <div className={`${styles.productVariationsWrapper} flex flex-col`}>
+      {variations.map((variation, index) => (
+        <div key={index} className={`${styles.variationItem} flex flex-col`}>
+          <div className={`${styles.variationHeader} flex flex-col`}>
+            <span className={styles.variationTitle}>{`Variant${
+              index + 1
+            }`}</span>
+            <div className={`${styles.variationInfo} flex flex-col`}>
+              <span className={styles.variationName}>Variant Name</span>
+              <span className={styles.variationType}>{variation.type}</span>
+            </div>
+            <div className={`${styles.variationDetails} flex flex-col`}>
+              <span>Total Variants</span>
+              <p>Add Image. Max 8 images for each variant.</p>
+            </div>
+          </div>
+          <div className={`${styles.variationBody} flex flex-col`}>
+            {variation.values.map((value, vIndex) => (
+              <div
+                key={vIndex}
+                className={`${styles.variantWrapper} flex align-center`}
+              >
+                <FormInput
+                  name="productDetails.variations"
+                  type="text"
+                  placeholder="Please type or select"
+                  value={value.name}
+                  onChange={(e) => handleInputChange(e, index, vIndex, "name")}
+                  customClass={styles.formInput}
+                />
+                <MediaInput
+                  name="productDetails.variations"
+                  fileType="image"
+                  maxFiles={5}
+                  value={value.productImages}
+                  onChange={(newMedia) =>
+                    handleMediaChange(newMedia, index, vIndex)
+                  }
+                  customClass={styles.mediaInput}
+                />
+                <div className={`${styles.variantActions} flex justify-end`}>
+                  <button type="button" className={styles.actionButton}>
+                    <RiDeleteBin5Line />
+                  </button>
+                  <button type="button" className={styles.actionButton}>
+                    <RiMenuFill />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const ProductPriceStockWrapper = () => {
+  return (
+    <div className={styles.productPriceStockWrapper}>
+      <h1></h1>
+    </div>
+  );
+};
+
 const ProductForm = ({ customClass }) => {
   const [formData, setFormData] = useState({
     basicInfo: {
@@ -263,13 +378,8 @@ const ProductForm = ({ customClass }) => {
     productDetails: {
       variations: [
         {
-          type: "",
-          values: [
-            {
-              name: "",
-              priceModifier: "",
-            },
-          ],
+          type: "Color Family",
+          values: [{ name: "", productImages: [], priceModifier: "" }],
         },
       ],
 
@@ -319,41 +429,59 @@ const ProductForm = ({ customClass }) => {
     },
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => {
-      const [section, field, subField] = name.split(".");
+  const [showMoreOptions, setShowMoreOptions] = useState({
+    warranty: false,
+    additionalSpecs: false,
+    description: false,
+  });
 
-      if (subField) {
-        // Handle deeply nested objects like shipping.dimensions
-        return {
-          ...prevData,
-          [section]: {
-            ...prevData[section],
-            [field]: {
-              ...prevData[section][field],
-              [subField]: value,
-            },
-          },
-        };
-      } else if (field) {
-        // Handle second-level fields like basicInfo.productName
-        return {
-          ...prevData,
-          [section]: {
-            ...prevData[section],
-            [field]: value,
-          },
-        };
-      } else {
-        return prevData;
-      }
+  const handleNestedInputChange = (e, setState) => {
+    const { name, value } = e.target;
+    setState((prevData) => {
+      const keys = name.split(".");
+      let updatedData = { ...prevData };
+      let current = updatedData;
+
+      keys.forEach((key, index) => {
+        if (index === keys.length - 1) {
+          current[key] = value;
+        } else {
+          current = current[key];
+        }
+      });
+      return updatedData;
     });
+  };
+
+  const handleInputChange = (e) => {
+    handleNestedInputChange(e, setFormData);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
+  };
+
+  const handleShowMore = (section) => {
+    setShowMoreOptions((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const handleVariationChange = (
+    variationIndex,
+    valueIndex,
+    field,
+    newValue
+  ) => {
+    // Create a copy of formData
+    const updatedFormData = { ...formData };
+
+    // Update the specific variation field
+    updatedFormData.productDetails.variations[variationIndex].values[
+      valueIndex
+    ][field] = newValue;
+
+    // Set the new formData with updated variations
+    setFormData(updatedFormData);
   };
 
   return (
@@ -386,12 +514,6 @@ const ProductForm = ({ customClass }) => {
           maxFiles={5}
           value={formData.basicInfo.media.productImages}
           onChange={(e) => handleInputChange(e)}
-          GuideComponent={
-            <Guidelines
-              content={["Upload images in JPEG/PNG format"]}
-              guideType="info"
-            />
-          }
         />
         <MediaInput
           label="Buyer Promotion Image"
@@ -402,8 +524,8 @@ const ProductForm = ({ customClass }) => {
           onChange={(e) => handleInputChange(e)}
           GuideComponent={
             <Guidelines
-              content={["Upload a promotional image for the product"]}
-              guideType="info"
+              content={["White Background Image", "See Example"]}
+              guideType="imageGuidelines"
             />
           }
         />
@@ -416,8 +538,12 @@ const ProductForm = ({ customClass }) => {
           onChange={(e) => handleInputChange(e)}
           GuideComponent={
             <Guidelines
-              content={["Upload a video showcasing the product"]}
-              guideType="info"
+              content={[
+                "Min size: 480x480 px. max video length: 60 seconds. max file size: 100MB.",
+                "Supported Format: mp4",
+                "New Video might take up to 36 hrs to be approved",
+              ]}
+              guideType="videoGuidelines"
             />
           }
         />
@@ -427,6 +553,11 @@ const ProductForm = ({ customClass }) => {
       <FormSection
         title="Product Specification"
         message="Fill more product specification will increase product searchability."
+        showMoreBtnProps={{
+          handleShowMore: () => handleShowMore("additionalSpecs"),
+          section: "additionalSpecs",
+          showMoreOptions,
+        }}
         customClass={styles.productSpec}
       >
         <FormInput
@@ -454,22 +585,25 @@ const ProductForm = ({ customClass }) => {
           value={formData.specifications.powerSource}
           onChange={handleInputChange}
         />
-        <FormInput
-          label="Additional Specifications"
-          name="specifications.additionalSpecs"
-          type="text"
-          placeholder="Additional Specifications"
-          value={formData.specifications.additionalSpecs.join(", ")}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              specifications: {
-                ...formData.specifications,
-                additionalSpecs: e.target.value.split(", "),
-              },
-            })
-          }
-        />
+
+        {showMoreOptions.additionalSpecs && (
+          <FormInput
+            label="Additional Specifications"
+            name="specifications.additionalSpecs"
+            type="text"
+            placeholder="Additional Specifications"
+            value={formData.specifications.additionalSpecs.join(", ")}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                specifications: {
+                  ...formData.specifications,
+                  additionalSpecs: e.target.value.split(", "),
+                },
+              })
+            }
+          />
+        )}
       </FormSection>
 
       {/* Price, Stock & Variants Section */}
@@ -478,58 +612,22 @@ const ProductForm = ({ customClass }) => {
         message="You can add variants to a product that has more than one option, such as size or color."
         customClass={styles.productPSV}
       >
-        <FormInput
-          label="Variations"
-          name="productDetails.variations"
-          type="text"
-          placeholder="Ex: Color, Size"
-          value={formData.productDetails.variations}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Pricing"
-          name="productDetails.pricing"
-          type="text"
-          placeholder="Current Price"
-          value={formData.productDetails.pricing.current}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Original Price"
-          name="productDetails.pricing.original"
-          type="text"
-          placeholder="Original Price"
-          value={formData.productDetails.pricing.original}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Stock"
-          name="productDetails.stock"
-          type="text"
-          placeholder="Stock Quantity"
-          value={formData.productDetails.stock}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Availability"
-          name="productDetails.availability"
-          type="text"
-          placeholder="Availability Status"
-          value={formData.productDetails.availability}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="SKU"
-          name="productDetails.sku"
-          type="text"
-          placeholder="Stock Keeping Unit"
-          value={formData.productDetails.sku}
-          onChange={handleInputChange}
+        <ProductVariations
+          variations={formData.productDetails.variations}
+          onChange={handleVariationChange}
         />
       </FormSection>
 
       {/* Product Description Section */}
-      <FormSection title="Product Description" customClass={styles.productDesc}>
+      <FormSection
+        title="Product Description"
+        showMoreBtnProps={{
+          handleShowMore: () => handleShowMore("description"),
+          section: "description",
+          showMoreOptions,
+        }}
+        customClass={styles.productDesc}
+      >
         <FormInput
           label="Main Description"
           name="description.main"
@@ -545,30 +643,40 @@ const ProductForm = ({ customClass }) => {
           value={formData.description.highlights}
           onChange={handleInputChange}
         />
-        <FormInput
-          label="Tags"
-          name="tags"
-          type="text"
-          placeholder="Ex: New, Sale, Bestseller"
-          value={formData.tags.join(", ")}
-          onChange={(e) =>
-            setFormData({ ...formData, tags: e.target.value.split(", ") })
-          }
-        />
-        <FormInput
-          label="What's in the Box"
-          name="description.whatsInBox"
-          type="text"
-          placeholder="Ex: 1x product, 1x accessory"
-          value={formData.description.whatsInBox}
-          onChange={handleInputChange}
-        />
+        {showMoreOptions.description && (
+          <>
+            <FormInput
+              label="Tags"
+              name="tags"
+              type="text"
+              placeholder="Ex: New, Sale, Bestseller"
+              value={formData.tags.join(", ")}
+              onChange={(e) =>
+                setFormData({ ...formData, tags: e.target.value.split(", ") })
+              }
+            />
+            <FormInput
+              label="What's in the Box"
+              name="description.whatsInBox"
+              type="text"
+              placeholder="Ex: 1x product, 1x accessory"
+              value={formData.description.whatsInBox}
+              onChange={handleInputChange}
+            />
+          </>
+        )}
       </FormSection>
 
       {/* Shipping & Warranty Section */}
       <FormSection
         title="Shipping & Warranty"
         message="Switch to enter different package dimensions & weight for variations"
+        showMoreBtnProps={{
+          btnText: "More Warranty Settings",
+          handleShowMore: () => handleShowMore("warranty"),
+          section: "warranty",
+          showMoreOptions,
+        }}
         customClass={styles.productSW}
       >
         <FormInput
@@ -600,30 +708,34 @@ const ProductForm = ({ customClass }) => {
           value={formData.shipping.dangerousGoods}
           onChange={handleInputChange}
         />
-        <FormInput
-          label="Warranty Type"
-          name="shipping.warranty.type"
-          type="text"
-          placeholder="Warranty Type"
-          value={formData.shipping.warranty.type}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Warranty Period"
-          name="shipping.warranty.period"
-          type="text"
-          placeholder="Warranty Period"
-          value={formData.shipping.warranty.period}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Warranty Policy"
-          name="shipping.warranty.policy"
-          type="text"
-          placeholder="Warranty Policy"
-          value={formData.shipping.warranty.policy}
-          onChange={handleInputChange}
-        />
+        {showMoreOptions.warranty && (
+          <>
+            <FormInput
+              label="Warranty Type"
+              name="shipping.warranty.type"
+              type="text"
+              placeholder="Warranty Type"
+              value={formData.shipping.warranty.type}
+              onChange={handleInputChange}
+            />
+            <FormInput
+              label="Warranty Period"
+              name="shipping.warranty.period"
+              type="text"
+              placeholder="Warranty Period"
+              value={formData.shipping.warranty.period}
+              onChange={handleInputChange}
+            />
+            <FormInput
+              label="Warranty Policy"
+              name="shipping.warranty.policy"
+              type="text"
+              placeholder="Warranty Policy"
+              value={formData.shipping.warranty.policy}
+              onChange={handleInputChange}
+            />
+          </>
+        )}
       </FormSection>
 
       <button type="submit" className={styles.submitButton}>
