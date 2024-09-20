@@ -48,6 +48,7 @@ const FormInput = ({
   inputList,
   customClass,
   showErr = false,
+  onKeyDown, // Add this prop
 }) => {
   const handleQuillChange = useCallback(
     (content) => onChange({ target: { name, value: content } }),
@@ -62,7 +63,7 @@ const FormInput = ({
         [customClass]: customClass,
       })}
     >
-      <label htmlFor={formInputId}>{label}</label>
+      {label && <label htmlFor={formInputId}>{label}</label>}
 
       <div className={styles.inputWrapper}>
         {type === "select" && (
@@ -141,6 +142,7 @@ const FormInput = ({
             value={value}
             placeholder={placeholder}
             onChange={onChange}
+            onKeyDown={onKeyDown} // Add onKeyDown here
           />
         )}
       </div>
@@ -194,7 +196,7 @@ const MediaInput = ({
         [customClass]: customClass,
       })}
     >
-      <label>{label}</label>
+      {label && <label>{label}</label>}
       <div
         className={classNames(styles.mediaInputWrapper, "flex align-center")}
       >
@@ -285,7 +287,25 @@ const ShowMoreBtn = ({
   );
 };
 
-const ProductVariations = ({ variations, onChange }) => {
+const VariantItem = ({
+  showVariantActions = true,
+  handleAddVariantItem,
+  variantData,
+  variationIndex,
+  valueIndex,
+  addVariantImages,
+  onChange,
+}) => {
+  // Local state to track input value for new variant
+  const [inputValue, setInputValue] = useState(variantData.name || "");
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && inputValue.trim() !== "") {
+      handleAddVariantItem(inputValue, variationIndex);
+      setInputValue("");
+    }
+  };
+
   const handleInputChange = (e, variationIndex, valueIndex, field) => {
     const { name, value } = e.target;
     // Call the parent `onChange` handler, passing in the updated value
@@ -298,56 +318,92 @@ const ProductVariations = ({ variations, onChange }) => {
   };
 
   return (
+    <div className={`${styles.variantItem} flex align-center`}>
+      <FormInput
+        name="variantName"
+        type="text"
+        placeholder="Please type or select"
+        value={onChange ? variantData.name : inputValue} // If editing, use onChange; else use local state
+        onChange={(e) =>
+          onChange
+            ? handleInputChange(e, variationIndex, valueIndex, "name")
+            : setInputValue(e.target.value)
+        }
+        onKeyDown={handleKeyDown}
+        customClass={styles.formInput}
+      />
+
+      {addVariantImages && (
+        <MediaInput
+          name="variantImages"
+          fileType="image"
+          maxFiles={5}
+          value={variantData.productImages || []}
+          onChange={(newMedia) =>
+            handleMediaChange(newMedia, variationIndex, valueIndex)
+          }
+          customClass={styles.mediaInput}
+        />
+      )}
+
+      {showVariantActions && (
+        <div className={`${styles.variantActions} flex justify-end`}>
+          <button type="button" className={styles.actionButton}>
+            <RiDeleteBin5Line />
+          </button>
+          <button type="button" className={styles.actionButton}>
+            <RiMenuFill />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ProductVariations = ({ variations, onChange, handleAddVariantItem }) => {
+  return (
     <div className={`${styles.productVariationsWrapper} flex flex-col`}>
-      {variations.map((variation, index) => (
-        <div key={index} className={`${styles.variationItem} flex flex-col`}>
+      {variations.map((variation, variationIndex) => (
+        <div
+          key={variationIndex}
+          className={`${styles.variationItem} flex flex-col`}
+        >
           <div className={`${styles.variationHeader} flex flex-col`}>
-            <span className={styles.variationTitle}>{`Variant${
-              index + 1
+            <span className={styles.variationTitle}>{`Variant ${
+              variationIndex + 1
             }`}</span>
             <div className={`${styles.variationInfo} flex flex-col`}>
               <span className={styles.variationName}>Variant Name</span>
               <span className={styles.variationType}>{variation.type}</span>
             </div>
-            <div className={`${styles.variationDetails} flex flex-col`}>
-              <span>Total Variants</span>
-              <p>Add Image. Max 8 images for each variant.</p>
-            </div>
           </div>
+
           <div className={`${styles.variationBody} flex flex-col`}>
-            {variation.values.map((value, vIndex) => (
-              <div
-                key={vIndex}
-                className={`${styles.variantWrapper} flex align-center`}
-              >
-                <FormInput
-                  name="productDetails.variations"
-                  type="text"
-                  placeholder="Please type or select"
-                  value={value.name}
-                  onChange={(e) => handleInputChange(e, index, vIndex, "name")}
-                  customClass={styles.formInput}
+            {/* Show all the values in variation.values array */}
+            <div className={`${styles.variantWrapper} flex flex-col`}>
+              {variation.values.map((variantData, valueIndex) => (
+                <VariantItem
+                  key={valueIndex}
+                  variations={variations}
+                  variantData={variantData}
+                  onChange={onChange}
+                  variationIndex={variationIndex}
+                  valueIndex={valueIndex}
+                  addVariantImages={true} // Toggle based on logic
                 />
-                <MediaInput
-                  name="productDetails.variations"
-                  fileType="image"
-                  maxFiles={5}
-                  value={value.productImages}
-                  onChange={(newMedia) =>
-                    handleMediaChange(newMedia, index, vIndex)
-                  }
-                  customClass={styles.mediaInput}
-                />
-                <div className={`${styles.variantActions} flex justify-end`}>
-                  <button type="button" className={styles.actionButton}>
-                    <RiDeleteBin5Line />
-                  </button>
-                  <button type="button" className={styles.actionButton}>
-                    <RiMenuFill />
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Add new value input */}
+            <VariantItem
+              showVariantActions={false}
+              handleAddVariantItem={(inputValue) =>
+                handleAddVariantItem(inputValue, variationIndex)
+              }
+              variantData={{ name: "" }} // Empty object for new input
+              variationIndex={variationIndex}
+              addVariantImages={false} // No image input for new entries
+            />
           </div>
         </div>
       ))}
@@ -355,10 +411,79 @@ const ProductVariations = ({ variations, onChange }) => {
   );
 };
 
-const ProductPriceStockWrapper = () => {
+const ProductPriceStockWrapper = ({ variations }) => {
+  const generateVariationRows = () => {
+    if (!variations.length) return [];
+
+    return variations[0].values.map((_, index) => {
+      const variationRow = {};
+      variations.forEach((variation) => {
+        variationRow[variation.type] = variation.values[index]?.name || "";
+      });
+      return variationRow;
+    });
+  };
+
+  const generateVariationColumns = () => {
+    if (!variations.length) return [];
+
+    return variations.map((variation) => variation.type);
+  };
+
+  const variationRows = generateVariationRows();
+  const variationColumns = generateVariationColumns();
+
   return (
-    <div className={styles.productPriceStockWrapper}>
-      <h1></h1>
+    <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
+      <h3>Price & Stock</h3>
+      <div className={styles.priceStockTable}>
+        <table>
+          <thead>
+            <tr>
+              {variationColumns.length &&
+                variationColumns.map((variantType, index) => (
+                  <th key={index}>{variantType}</th>
+                ))}
+              <th>Price</th>
+              <th>Special Price</th>
+              <th>Stock</th>
+              <th>Seller SKU</th>
+              <th>Free Items</th>
+              <th>Availability</th>
+            </tr>
+          </thead>
+          <tbody>
+            {variationRows.map((rowValues, rowIndex) => (
+              <tr key={rowIndex}>
+                {Object.keys(rowValues).map((key, colIndex) => (
+                  <td key={colIndex}>{rowValues[key]}</td>
+                ))}
+                <td>
+                  <input type="text" placeholder="Price" />
+                </td>
+                <td>
+                  <div className={styles.specialPriceWrapper}>Add</div>
+                </td>
+                <td>
+                  <input type="text" placeholder="Stock" />
+                </td>
+                <td>
+                  <input type="text" placeholder="Seller SKU" />
+                </td>
+                <td>
+                  <input type="text" placeholder="Free Items" />
+                </td>
+                <td>
+                  <label className={styles.switch}>
+                    <input type="checkbox" />
+                    <span className={styles.slider}></span>
+                  </label>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
@@ -379,7 +504,7 @@ const ProductForm = ({ customClass }) => {
       variations: [
         {
           type: "Color Family",
-          values: [{ name: "", productImages: [], priceModifier: "" }],
+          values: [],
         },
       ],
 
@@ -459,7 +584,6 @@ const ProductForm = ({ customClass }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
   };
 
   const handleShowMore = (section) => {
@@ -482,6 +606,34 @@ const ProductForm = ({ customClass }) => {
 
     // Set the new formData with updated variations
     setFormData(updatedFormData);
+  };
+
+  const handleAddVariantItem = (inputValue, variationIndex) => {
+    const newVariant = {
+      name: inputValue,
+      productImages: [], // Empty productImages if necessary
+    };
+
+    console.log("newVariant", newVariant);
+
+    // Use functional setState to ensure you're working with the latest state
+    setFormData((prevData) => {
+      const updatedVariations = [...prevData.productDetails.variations];
+
+      // Append the new variant to the existing values array
+      updatedVariations[variationIndex].values = [
+        ...updatedVariations[variationIndex].values,
+        newVariant,
+      ];
+
+      return {
+        ...prevData,
+        productDetails: {
+          ...prevData.productDetails,
+          variations: updatedVariations,
+        },
+      };
+    });
   };
 
   return (
@@ -615,6 +767,11 @@ const ProductForm = ({ customClass }) => {
         <ProductVariations
           variations={formData.productDetails.variations}
           onChange={handleVariationChange}
+          handleAddVariantItem={handleAddVariantItem} // Pass the handler
+        />
+
+        <ProductPriceStockWrapper
+          variations={formData.productDetails.variations}
         />
       </FormSection>
 

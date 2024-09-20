@@ -130,8 +130,12 @@
           color: var(--secondary-text);
         }
 
-        & .variationDetails p {
-          color: var(--secondary-text);
+        & .variationDetails label {
+          font-weight: var(--weight-base);
+
+          & span:last-child {
+            color: var(--secondary-text);
+          }
         }
       }
 
@@ -140,37 +144,63 @@
 
         & .variantWrapper {
           width: 100%;
-          gap: var(--spacing-md);
-          background-color: var(--muted-bg);
-          padding: var(--spacing-sm) var(--spacing-md);
-          border-radius: var(--radius-md);
 
-          & .formInput {
-            width: 30%;
+          & .variantItem {
+            width: 100%;
+            gap: var(--spacing-md);
+            background-color: var(--muted-bg);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
 
-            & label {
-              display: none;
-            }
-          }
-
-          & .mediaInput {
-            padding: 0;
-            background-color: transparent;
-            max-width: max-content;
-
-            & > label {
-              display: none;
+            & .formInput {
+              width: 30%;
             }
 
-            & > div > div > div {
-              width: 4rem;
-              height: 4rem;
+            & .mediaInput {
+              padding: 0;
+              background-color: transparent;
+              max-width: max-content;
+
+              & > div > div > div {
+                width: 4rem;
+                height: 4rem;
+              }
+            }
+
+            & .variantActions {
+              margin-left: auto;
             }
           }
+        }
+      }
+    }
+  }
 
-          & .variantActions {
-            margin-left: auto;
-          }
+  & .productPriceStockWrapper {
+    width: 100%;
+
+    & .priceStockTable {
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+
+      & table {
+        width: 100%;
+        width: max-content;
+        border-collapse: collapse;
+
+        & th,
+        td {
+          padding: 10px;
+          border: var(--border-sm);
+          text-align: center;
+
+          /* &:last-child {
+            position: sticky;
+            right: 0px;
+            background-color: var(--white-color);
+            box-shadow: var(--shadow-base);
+          } */
         }
       }
     }
