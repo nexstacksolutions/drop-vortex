@@ -5,16 +5,20 @@ import ReactQuill from "react-quill";
 import classNames from "classnames";
 import { FaPlus, FaAngleDown } from "react-icons/fa6";
 import { RiDeleteBin5Line, RiEdit2Line, RiMenuFill } from "react-icons/ri";
+import { useEffect } from "react";
 
-const Guidelines = ({ content, guideType }) => (
-  <div className={classNames(styles.guideContainer, styles[guideType])}>
-    <ul>
-      {content.map((item, index) => (
-        <li key={index}>{item}</li>
-      ))}
-    </ul>
-  </div>
-);
+const Guidelines = ({ content, guideType }) => {
+  if (!content.length) return null;
+  return (
+    <div className={classNames(styles.guideContainer, styles[guideType])}>
+      <ul>
+        {content.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 const FormSection = ({
   title,
@@ -55,6 +59,7 @@ const generateInputByType = ({
   formInputId,
   name,
   value,
+  checked,
   placeholder,
   onChange,
   options,
@@ -62,6 +67,30 @@ const generateInputByType = ({
   inputList,
   customOnKeyDown,
 }) => {
+  if (inputList && name === "shipping.dimensions") {
+    return (
+      <div className={classNames(styles.inputGroup, "flex")}>
+        {Object.keys(value).map((dimension, index) => (
+          <input
+            key={index}
+            type={type}
+            name={dimension}
+            value={value[dimension]}
+            placeholder={dimension.charAt(0).toUpperCase() + dimension.slice(1)}
+            onChange={(e) =>
+              onChange({
+                target: {
+                  name: "shipping.dimensions",
+                  value: { ...value, [dimension]: e.target.value },
+                },
+              })
+            }
+          />
+        ))}
+      </div>
+    );
+  }
+
   switch (type) {
     case "select":
       return (
@@ -103,34 +132,13 @@ const generateInputByType = ({
         </div>
       );
     default:
-      return inputList && name === "shipping.dimensions" ? (
-        <div className={classNames(styles.inputGroup, "flex")}>
-          {Object.keys(value).map((dimension, index) => (
-            <input
-              key={index}
-              type={type}
-              name={dimension}
-              value={value[dimension]}
-              placeholder={
-                dimension.charAt(0).toUpperCase() + dimension.slice(1)
-              }
-              onChange={(e) =>
-                onChange({
-                  target: {
-                    name: "shipping.dimensions",
-                    value: { ...value, [dimension]: e.target.value },
-                  },
-                })
-              }
-            />
-          ))}
-        </div>
-      ) : (
+      return (
         <input
           type={type}
           name={name}
           id={formInputId}
           value={value}
+          checked={checked}
           placeholder={placeholder}
           onChange={onChange}
           onKeyDown={customOnKeyDown}
@@ -146,6 +154,7 @@ const FormInput = ({
   placeholder,
   options,
   value,
+  checked,
   onChange,
   inputList,
   customClass,
@@ -169,6 +178,7 @@ const FormInput = ({
         formInputId,
         name,
         value,
+        checked,
         placeholder,
         onChange,
         options,
@@ -181,6 +191,16 @@ const FormInput = ({
   );
 };
 
+const renderMediaFiles = (mediaFiles, fileType, handleRemoveFile) =>
+  mediaFiles.map((file, index) => (
+    <MediaPreviewItem
+      key={index}
+      file={file}
+      fileType={fileType}
+      onRemove={() => handleRemoveFile(index)}
+    />
+  ));
+
 const MediaInput = ({
   label,
   name,
@@ -188,6 +208,7 @@ const MediaInput = ({
   fileType,
   value,
   onChange,
+  resetTrigger,
   customClass,
   showErr,
   GuideComponent,
@@ -215,6 +236,13 @@ const MediaInput = ({
     if (fileInputRef.current) fileInputRef.current.value = null;
   };
 
+  useEffect(() => {
+    if (resetTrigger) {
+      setMediaFiles([]);
+      onChange({ target: { name, value: [] } });
+    }
+  }, [resetTrigger, name, onChange]);
+
   const fileInputId = `${name}-file-upload`;
 
   return (
@@ -229,14 +257,7 @@ const MediaInput = ({
         className={classNames(styles.mediaInputWrapper, "flex align-center")}
       >
         <div className={classNames(styles.mediaPreviewContainer, "flex")}>
-          {mediaFiles.map((file, index) => (
-            <MediaPreviewItem
-              key={index}
-              file={file}
-              fileType={fileType}
-              onRemove={() => handleRemoveFile(index)}
-            />
-          ))}
+          {renderMediaFiles(mediaFiles, fileType, handleRemoveFile)}
           {mediaFiles.length < maxFiles && (
             <div className={styles.addMediaWrapper}>
               <label htmlFor={fileInputId} className="flex flex-center">
@@ -325,6 +346,7 @@ const VariantItem = ({
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [mediaFiles, setMediaFiles] = useState([]);
+  const [resetTrigger, setResetTrigger] = useState(false);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && inputValue.trim()) {
@@ -333,6 +355,8 @@ const VariantItem = ({
       handleAddVariantItem(inputValue, variantImages, variationIndex);
       setInputValue("");
       setMediaFiles([]);
+      setResetTrigger(!resetTrigger);
+      setTimeout(() => setResetTrigger(false), 0);
     }
   };
 
@@ -363,6 +387,7 @@ const VariantItem = ({
           fileType="image"
           maxFiles={5}
           value={variantData?.variantImages || mediaFiles}
+          resetTrigger={resetTrigger}
           onChange={(newMedia) =>
             onChange
               ? onChange(variationIndex, valueIndex, "productImages", newMedia)
@@ -391,7 +416,7 @@ const ProductVariations = ({ variations, onChange, handleAddVariantItem }) => {
 
   return (
     <div className={`${styles.productVariationsWrapper} flex flex-col`}>
-      {variations.map((variation, variationIndex) => (
+      {variations.map(({ type, values }, variationIndex) => (
         <div
           key={variationIndex}
           className={`${styles.variationItem} flex flex-col`}
@@ -402,7 +427,7 @@ const ProductVariations = ({ variations, onChange, handleAddVariantItem }) => {
             </span>
             <div className={`${styles.variationInfo} flex flex-col`}>
               <span className={styles.variationName}>Variant Name</span>
-              <span className={styles.variationType}>{variation.type}</span>
+              <span className={styles.variationType}>{type}</span>
             </div>
             <div className={`${styles.variationDetails} flex flex-col`}>
               <span>Total Variants</span>
@@ -411,7 +436,7 @@ const ProductVariations = ({ variations, onChange, handleAddVariantItem }) => {
                   name="showImageCheckbox"
                   id="showImageCheckbox"
                   type="checkbox"
-                  value={setShowVariantImages}
+                  checked={showVariantImages}
                   onChange={(e) => setShowVariantImages(e.target.checked)}
                 />
                 <label
@@ -427,7 +452,7 @@ const ProductVariations = ({ variations, onChange, handleAddVariantItem }) => {
 
           <div className={`${styles.variationBody} flex flex-col`}>
             <div className={`${styles.variantWrapper} flex flex-col`}>
-              {variation.values.map((variantData, valueIndex) => (
+              {values.map((variantData, valueIndex) => (
                 <VariantItem
                   key={valueIndex}
                   variantData={variantData}
@@ -466,50 +491,60 @@ const ProductPriceStockWrapper = ({ variations }) => {
 
   const variationColumns = variations.map((variation) => variation.type);
 
+  const renderTableHeaders = (columns, additionalHeaders) => (
+    <thead>
+      <tr>
+        {columns.map((column, index) => (
+          <th key={index}>{column}</th>
+        ))}
+        {additionalHeaders.map((header, index) => (
+          <th key={index}>{header}</th>
+        ))}
+      </tr>
+    </thead>
+  );
+
+  const renderTableRows = (rows, placeholders) => (
+    <tbody>
+      {rows.map((rowValues, rowIndex) => (
+        <tr key={rowIndex}>
+          {Object.values(rowValues).map((value, colIndex) => (
+            <td key={colIndex}>{value}</td>
+          ))}
+          {placeholders.map((placeholder, index) => (
+            <td key={index}>
+              <input type="text" placeholder={placeholder} />
+            </td>
+          ))}
+          <td>
+            <label className={styles.switch}>
+              <input type="checkbox" />
+              <span className={styles.slider}></span>
+            </label>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  );
+
   return (
     <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
       <div className={styles.priceStockTable}>
         <table>
-          <thead>
-            <tr>
-              {variationColumns.map((variantType, index) => (
-                <th key={index}>{variantType}</th>
-              ))}
-              {[
-                "Price",
-                "Special Price",
-                "Stock",
-                "Seller SKU",
-                "Free Items",
-                "Availability",
-              ].map((header, index) => (
-                <th key={index}>{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {variationRows.map((rowValues, rowIndex) => (
-              <tr key={rowIndex}>
-                {Object.values(rowValues).map((value, colIndex) => (
-                  <td key={colIndex}>{value}</td>
-                ))}
-                {["Price", "Stock", "Seller SKU", "Free Items"].map(
-                  (placeholder, index) => (
-                    <td key={index}>
-                      <input type="text" placeholder={placeholder} />
-                    </td>
-                  )
-                )}
-                <td>
-                  <label className={styles.switch}>
-                    <input type="checkbox" />
-                    <span className={styles.slider}></span>
-                  </label>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          {renderTableHeaders(variationColumns, [
+            "Price",
+            "Stock",
+            "Seller SKU",
+            "Free Items",
+            "Availability",
+          ])}
+          {renderTableRows(variationRows, [
+            "Price",
+            "Stock",
+            "Seller SKU",
+            "Free Items",
+          ])}
         </table>
       </div>
     </div>
@@ -588,26 +623,21 @@ const ProductForm = ({ customClass }) => {
     description: false,
   });
 
-  const handleNestedInputChange = (e, setState) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setState((prevData) => {
+    setFormData((prevData) => {
+      const updatedData = { ...prevData };
       const keys = name.split(".");
-      let updatedData = { ...prevData };
-      let current = updatedData;
-
-      keys.forEach((key, index) => {
-        if (index === keys.length - 1) {
-          current[key] = value;
+      keys.reduce((acc, key, idx) => {
+        if (idx === keys.length - 1) {
+          acc[key] = value;
         } else {
-          current = current[key];
+          if (!acc[key]) acc[key] = {}; // Handle missing nested objects
         }
-      });
+        return acc[key];
+      }, updatedData);
       return updatedData;
     });
-  };
-
-  const handleInputChange = (e) => {
-    handleNestedInputChange(e, setFormData);
   };
 
   const handleSubmit = (e) => {
@@ -618,23 +648,22 @@ const ProductForm = ({ customClass }) => {
     setShowMoreOptions((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const handleVariationChange = (
-    variationIndex,
-    valueIndex,
-    field,
-    newValue
-  ) => {
-    // Create a copy of formData
-    const updatedFormData = { ...formData };
-
-    // Update the specific variation field
-    updatedFormData.productDetails.variations[variationIndex].values[
-      valueIndex
-    ][field] = newValue;
-
-    // Set the new formData with updated variations
-    setFormData(updatedFormData);
-  };
+  const handleVariationChange = useCallback(
+    (variationIndex, valueIndex, field, newValue) => {
+      setFormData((prevData) => {
+        const updatedVariations = [...prevData.productDetails.variations];
+        updatedVariations[variationIndex].values[valueIndex][field] = newValue;
+        return {
+          ...prevData,
+          productDetails: {
+            ...prevData.productDetails,
+            variations: updatedVariations,
+          },
+        };
+      });
+    },
+    []
+  );
 
   const handleAddVariantItem = (inputValue, variantImages, variationIndex) => {
     console.log(inputValue, variantImages, variationIndex);
