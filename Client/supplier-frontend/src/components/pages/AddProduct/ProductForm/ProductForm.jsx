@@ -383,14 +383,18 @@ const VariantItem = ({
 
       {showVariantImages && (
         <MediaInput
-          name="variantImages"
+          name={
+            onChange
+              ? `variantImages-${variationIndex}-${valueIndex}`
+              : "addVariantItem"
+          }
           fileType="image"
           maxFiles={5}
           value={variantData?.variantImages || mediaFiles}
           resetTrigger={resetTrigger}
           onChange={(newMedia) =>
             onChange
-              ? onChange(variationIndex, valueIndex, "productImages", newMedia)
+              ? onChange(variationIndex, valueIndex, "variantImages", newMedia)
               : setMediaFiles(newMedia)
           }
           customClass={styles.mediaInput}
@@ -652,7 +656,15 @@ const ProductForm = ({ customClass }) => {
     (variationIndex, valueIndex, field, newValue) => {
       setFormData((prevData) => {
         const updatedVariations = [...prevData.productDetails.variations];
+
+        // Ensure we have valid structure in the variations
+        if (!updatedVariations[variationIndex].values[valueIndex]) {
+          updatedVariations[variationIndex].values[valueIndex] = {};
+        }
+
+        // Update specific field (like 'variantImages') at the given index
         updatedVariations[variationIndex].values[valueIndex][field] = newValue;
+
         return {
           ...prevData,
           productDetails: {
