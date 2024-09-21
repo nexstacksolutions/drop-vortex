@@ -550,10 +550,15 @@ const TableRows = ({
               ({ placeholder, name, type = "text" }, index) => (
                 <td key={`additional-col-${index}`}>
                   <FormInput
-                    name={name}
+                    name={`productDetails.variations[0].values[${rowIndex}].${name}`}
                     type={type}
                     placeholder={placeholder}
-                    value={get(formData, name) || ""}
+                    value={
+                      get(
+                        formData.productDetails.variations[0].values[rowIndex],
+                        name
+                      ) || ""
+                    }
                     onChange={onChange}
                   />
                 </td>
@@ -654,8 +659,6 @@ const ProductPriceStockWrapper = ({ variations = [], formData, onChange }) => {
             variationRows={variationRows}
             variationColumns={variationColumns}
             additionalHeaders={additionalHeaders}
-            formData={formData}
-            onChange={onChange}
           />
           <TableRows
             variationRows={variationRows}
@@ -697,7 +700,7 @@ const ProductForm = ({ customClass }) => {
 
       stock: "",
       availability: "",
-
+      freeItems: "",
       sku: "",
     },
 
@@ -757,6 +760,8 @@ const ProductForm = ({ customClass }) => {
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
+
+    console.log("input change", name, value);
 
     setFormData((prevData) => {
       const updatedData = { ...prevData };
@@ -836,6 +841,7 @@ const ProductForm = ({ customClass }) => {
         },
         stock: "",
         availability: "",
+        freeItems: "",
         sku: "",
         packageWeight: "",
         dimensions: {
