@@ -334,7 +334,6 @@ const ShowMoreBtn = ({
 };
 
 const VariantItem = ({
-  showVariantActions = true,
   handleAddVariantItem,
   handleRemoveVariantItem,
   variantData,
@@ -379,24 +378,21 @@ const VariantItem = ({
     ]
   );
 
-  const handleInputChange = (e, field) => {
-    const { value } = e.target;
-    onChange(variationIndex, valueIndex, field, value);
-  };
-
   const updatedValueIndex =
     valueIndex === undefined ? "addVariantItem" : valueIndex;
+
+  const updatedInputName = `productDetails.variations[${variationIndex}].values[${updatedValueIndex}]`;
 
   return (
     <div className={`${styles.variantItem} flex align-center`}>
       <FormInput
-        name={`productDetails.variations-${variationIndex}-${updatedValueIndex}-name`}
+        name={`${updatedInputName}.name`}
         type="text"
         placeholder="Please type or select"
         value={(variantData && variantData.name) || inputValue}
         onChange={
           onChange
-            ? (e) => handleInputChange(e, "name")
+            ? onChange
             : (e) => setState({ ...state, inputValue: e.target.value })
         }
         onKeyDown={handleKeyDown}
@@ -405,21 +401,21 @@ const VariantItem = ({
 
       {showVariantImages && (
         <MediaInput
-          name={`productDetails.variations-${variationIndex}-${updatedValueIndex}-variantImages`}
+          name={`${updatedInputName}.variantImages`}
           fileType="image"
           maxFiles={5}
           value={variantData?.variantImages || variantImages}
           resetTrigger={resetTrigger}
           onChange={(newMedia) =>
             onChange
-              ? onChange(variationIndex, valueIndex, "variantImages", newMedia)
+              ? onChange(newMedia)
               : setState({ ...state, variantImages: newMedia?.target?.value })
           }
           customClass={styles.mediaInput}
         />
       )}
 
-      {showVariantActions && (
+      {onChange && (
         <div className={`${styles.variantActions} flex justify-end`}>
           <button
             onClick={() => handleRemoveVariantItem(variationIndex, valueIndex)}
@@ -497,10 +493,7 @@ const ProductVariations = ({
             </div>
 
             <VariantItem
-              showVariantActions={false}
-              handleAddVariantItem={(inputValue, variantImages) =>
-                handleAddVariantItem(inputValue, variantImages, variationIndex)
-              }
+              handleAddVariantItem={handleAddVariantItem}
               variationIndex={variationIndex}
               showVariantImages={showVariantImages}
             />
@@ -588,22 +581,18 @@ const TableRows = ({
 };
 
 const ProductPriceStockWrapper = ({ variations = [], formData, onChange }) => {
-  // Memoize the variationRows and variationColumns computations
-  const variationRows = useMemo(() => {
-    if (variations.length === 0) return [];
-
-    // Find the maximum length of the 'values' array across all variations
-    const maxValuesLength = Math.max(...variations.map((v) => v.values.length));
-
-    // Create rows based on the longest variation set
-    return Array.from({ length: maxValuesLength }, (_, index) =>
-      variations.reduce((acc, variation) => {
-        // Safely access the value at the current index or default to an empty object
-        acc[variation.type] = variation.values[index]?.name || "";
-        return acc;
-      }, {})
-    );
-  }, [variations]);
+  // Temporarily remove useMemo to test
+  const variationRows =
+    variations.length > 0
+      ? Array.from(
+          { length: Math.max(...variations.map((v) => v.values.length)) },
+          (_, index) =>
+            variations.reduce((acc, variation) => {
+              acc[variation.type] = variation.values[index]?.name || "";
+              return acc;
+            }, {})
+        )
+      : [];
 
   const variationColumns = useMemo(() => {
     return variations.map((variation) => variation.type);
@@ -796,32 +785,6 @@ const ProductForm = ({ customClass }) => {
       [section]: !prev[section],
     }));
   };
-
-  const handleVariationChange = useCallback(
-    (variationIndex, valueIndex, field, newValue) => {
-      setFormData((prevData) => {
-        const updatedVariations = [...prevData.productDetails.variations];
-
-        // Ensure we have valid structure in the variations
-        if (!updatedVariations[variationIndex].values[valueIndex]) {
-          updatedVariations[variationIndex].values[valueIndex] = {};
-        }
-
-        // Update specific field (like 'variantImages') at the given index
-        updatedVariations[variationIndex].values[valueIndex][field] =
-          newValue?.target?.value || newValue;
-
-        return {
-          ...prevData,
-          productDetails: {
-            ...prevData.productDetails,
-            variations: updatedVariations,
-          },
-        };
-      });
-    },
-    []
-  );
 
   const handleAddVariantItem = useCallback(
     (inputValue, variantImages, variationIndex) => {
@@ -1022,7 +985,7 @@ const ProductForm = ({ customClass }) => {
       >
         <ProductVariations
           variations={formData.productDetails.variations}
-          onChange={handleVariationChange}
+          onChange={(e) => handleInputChange(e)}
           handleAddVariantItem={handleAddVariantItem}
           handleRemoveVariantItem={handleRemoveVariantItem}
         />
