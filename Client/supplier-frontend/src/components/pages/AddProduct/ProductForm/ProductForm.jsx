@@ -545,7 +545,7 @@ const TableRows = ({
               ({ placeholder, fieldName, inputType = "text" }, index) => (
                 <td key={`additional-col-${index}`}>
                   <FormInput
-                    name={`productDetails.variations[0].values[${rowIndex}].${fieldName}`}
+                    name={`productDetails.variations[0].values[${rowIndex}]${fieldName}`}
                     type={inputType}
                     placeholder={placeholder}
                     value={
@@ -582,7 +582,12 @@ const TableRows = ({
   );
 };
 
-const ProductPriceStockWrapper = ({ variations, formData, onChange }) => {
+const ProductPriceStockWrapper = ({
+  variations,
+  formData,
+  onChange,
+  handleApplyToAll,
+}) => {
   const variationNames = variations.map((variation) =>
     variation.values.map((v) => v.name).join(",")
   );
@@ -660,7 +665,7 @@ const ProductPriceStockWrapper = ({ variations, formData, onChange }) => {
             .map(({ placeholder, fieldName, inputType = "text" }, index) => (
               <FormInput
                 key={`non-row-${fieldName}-${index}`}
-                name={fieldName}
+                name={`productDetails${fieldName}`}
                 type={inputType}
                 placeholder={placeholder}
                 value={get(formData.productDetails, fieldName)}
@@ -668,7 +673,10 @@ const ProductPriceStockWrapper = ({ variations, formData, onChange }) => {
                 className={styles.variationInputField}
               />
             ))}
-          <button className={`${styles.applyToAllButton} primary-btn`}>
+          <button
+            onClick={handleApplyToAll}
+            className={`${styles.applyToAllButton} primary-btn`}
+          >
             Apply to All
           </button>
         </div>
@@ -707,22 +715,20 @@ const ProductForm = ({ customClass }) => {
     },
 
     productDetails: {
+      pricing: {
+        current: "",
+        original: "",
+      },
+      stock: "",
+      availability: "",
+      sku: "",
+
       variations: [
         {
           type: "Color Family",
           values: [],
         },
       ],
-
-      pricing: {
-        current: "",
-        original: "",
-      },
-
-      stock: "",
-      availability: "",
-      freeItems: "",
-      sku: "",
     },
 
     specifications: {
@@ -800,8 +806,6 @@ const ProductForm = ({ customClass }) => {
     });
   }, []);
 
-  const multiInputChange = useCallback(() => {}, []);
-
   const debouncedChange = useMemo(
     () => debounce((e) => handleInputChange(e), 300),
     [handleInputChange]
@@ -809,8 +813,6 @@ const ProductForm = ({ customClass }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log(formData);
   };
 
   const toggleShowMoreOption = (section) => {
@@ -892,6 +894,42 @@ const ProductForm = ({ customClass }) => {
       };
     });
   }, []);
+
+  const handleApplyToAll = (e) => {
+    // Extract current values from the outer fields
+    const pricing = get(formData.productDetails, "pricing");
+    const stock = get(formData.productDetails, "stock");
+    const sku = get(formData.productDetails, "sku");
+
+    console.log("Extract", pricing, stock, sku);
+
+    // Update all variations selectively
+    const updatedVariations = formData.productDetails.variations.map(
+      (variation) => {
+        return {
+          ...variation,
+          values: variation.values.map((value) => ({
+            ...value,
+            pricing: {
+              current: pricing.current || value.pricing.current,
+              original: pricing.original || value.pricing.original,
+            },
+            stock: stock !== "" ? stock : value.stock,
+            sku: sku !== "" ? sku : value.sku,
+          })),
+        };
+      }
+    );
+
+    // Update formData with new variations
+    setFormData((prevData) => ({
+      ...prevData,
+      productDetails: {
+        ...prevData.productDetails,
+        variations: updatedVariations,
+      },
+    }));
+  };
 
   return (
     <form
@@ -1027,6 +1065,7 @@ const ProductForm = ({ customClass }) => {
         <ProductPriceStockWrapper
           variations={formData.productDetails.variations}
           formData={formData}
+          handleApplyToAll={handleApplyToAll}
           onChange={(e) => handleInputChange(e)}
         />
       </FormSection>
