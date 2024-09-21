@@ -1,11 +1,11 @@
 import styles from "./ProductForm.module.css";
 import "react-quill/dist/quill.snow.css";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
 import { FaPlus, FaAngleDown } from "react-icons/fa6";
 import { RiDeleteBin5Line, RiEdit2Line, RiMenuFill } from "react-icons/ri";
-import { useEffect } from "react";
 
 const Guidelines = ({ content, guideType }) => {
   if (!content.length) return null;
@@ -338,6 +338,7 @@ const ShowMoreBtn = ({
 const VariantItem = ({
   showVariantActions = true,
   handleAddVariantItem,
+  handleRemoveVariantItem,
   variantData,
   variationIndex,
   valueIndex,
@@ -403,10 +404,14 @@ const VariantItem = ({
 
       {showVariantActions && (
         <div className={`${styles.variantActions} flex justify-end`}>
-          <button type="button" className={styles.actionButton}>
+          <button
+            onClick={() => handleRemoveVariantItem(variationIndex, valueIndex)}
+            type="button"
+            className={styles.removeVariant}
+          >
             <RiDeleteBin5Line />
           </button>
-          <button type="button" className={styles.actionButton}>
+          <button type="button" className={styles.moveVariant}>
             <RiMenuFill />
           </button>
         </div>
@@ -415,7 +420,12 @@ const VariantItem = ({
   );
 };
 
-const ProductVariations = ({ variations, onChange, handleAddVariantItem }) => {
+const ProductVariations = ({
+  variations,
+  onChange,
+  handleAddVariantItem,
+  handleRemoveVariantItem,
+}) => {
   const [showVariantImages, setShowVariantImages] = useState(false);
 
   return (
@@ -458,12 +468,13 @@ const ProductVariations = ({ variations, onChange, handleAddVariantItem }) => {
             <div className={`${styles.variantWrapper} flex flex-col`}>
               {values.map((variantData, valueIndex) => (
                 <VariantItem
-                  key={valueIndex}
+                  key={`${variationIndex}-${variantData.id}`}
                   variantData={variantData}
                   onChange={onChange}
                   variationIndex={variationIndex}
                   valueIndex={valueIndex}
                   showVariantImages={showVariantImages}
+                  handleRemoveVariantItem={handleRemoveVariantItem}
                 />
               ))}
             </div>
@@ -695,26 +706,38 @@ const ProductForm = ({ customClass }) => {
   );
 
   const handleAddVariantItem = (inputValue, variantImages, variationIndex) => {
-    console.log(inputValue, variantImages, variationIndex);
-
     const newVariant = {
+      id: uuidv4(),
       name: inputValue,
       variantImages: variantImages || [],
     };
 
     setFormData((prevData) => {
       const updatedVariations = [...prevData.productDetails.variations];
-
-      if (!updatedVariations[variationIndex]) {
-        console.error(`Variation at index ${variationIndex} does not exist`);
-        return prevData;
-      }
-
-      if (!Array.isArray(updatedVariations[variationIndex].values)) {
-        updatedVariations[variationIndex].values = [];
-      }
-
       updatedVariations[variationIndex].values.push(newVariant);
+
+      return {
+        ...prevData,
+        productDetails: {
+          ...prevData.productDetails,
+          variations: updatedVariations,
+        },
+      };
+    });
+  };
+
+  const handleRemoveVariantItem = (variationIndex, valueIndex) => {
+    setFormData((prevData) => {
+      const updatedVariations = [...prevData.productDetails.variations];
+      const updatedValues = [...updatedVariations[variationIndex].values];
+
+      updatedValues.splice(valueIndex, 1);
+
+      // Update the cloned variation with the modified values array
+      updatedVariations[variationIndex] = {
+        ...updatedVariations[variationIndex],
+        values: updatedValues,
+      };
 
       return {
         ...prevData,
@@ -857,7 +880,8 @@ const ProductForm = ({ customClass }) => {
         <ProductVariations
           variations={formData.productDetails.variations}
           onChange={handleVariationChange}
-          handleAddVariantItem={handleAddVariantItem} // Pass the handler
+          handleAddVariantItem={handleAddVariantItem}
+          handleRemoveVariantItem={handleRemoveVariantItem}
         />
 
         <ProductPriceStockWrapper
