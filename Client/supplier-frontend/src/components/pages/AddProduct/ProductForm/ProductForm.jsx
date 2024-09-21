@@ -507,17 +507,17 @@ const ProductVariations = ({
 // Table header component
 const TableHeaders = ({
   variationRows,
-  variationColumns,
-  additionalHeaders,
+  variationColumnNames,
+  additionalHeaderNames,
 }) => (
   <thead>
     <tr>
       {variationRows.length > 0 &&
-        variationColumns.map((heading, colIndex) => (
-          <th key={colIndex}>{heading}</th>
+        variationColumnNames.map((columnName, columnIndex) => (
+          <th key={columnIndex}>{columnName}</th>
         ))}
-      {additionalHeaders.map((heading, headerIndex) => (
-        <th key={headerIndex}>{heading}</th>
+      {additionalHeaderNames.map((headerName, headerIndex) => (
+        <th key={headerIndex}>{headerName}</th>
       ))}
     </tr>
   </thead>
@@ -526,30 +526,32 @@ const TableHeaders = ({
 // Table row component
 const TableRows = ({
   variationRows,
-  variationColumns,
-  additionalValues,
+  variationColumnNames,
+  additionalInputFields,
   formData,
   onChange,
 }) => {
   return (
     <tbody>
       {variationRows.length > 0 ? (
-        variationRows.map((values, rowIndex) => (
+        variationRows.map((rowValues, rowIndex) => (
           <tr key={`variation-row-${rowIndex}`}>
-            {variationColumns.map((val, colIndex) => (
-              <td key={`variation-col-${colIndex}`}>{values[val]}</td>
+            {variationColumnNames.map((columnName, columnIndex) => (
+              <td key={`variation-col-${columnIndex}`}>
+                {rowValues[columnName]}
+              </td>
             ))}
-            {additionalValues.map(
-              ({ placeholder, name, type = "text" }, index) => (
+            {additionalInputFields.map(
+              ({ placeholder, fieldName, inputType = "text" }, index) => (
                 <td key={`additional-col-${index}`}>
                   <FormInput
-                    name={`productDetails.variations[0].values[${rowIndex}].${name}`}
-                    type={type}
+                    name={`productDetails.variations[0].values[${rowIndex}].${fieldName}`}
+                    type={inputType}
                     placeholder={placeholder}
                     value={
                       get(
                         formData.productDetails.variations[0].values[rowIndex],
-                        name
+                        fieldName
                       ) || ""
                     }
                     onChange={onChange}
@@ -561,14 +563,14 @@ const TableRows = ({
         ))
       ) : (
         <tr>
-          {additionalValues.map(
-            ({ placeholder, name, type = "text" }, index) => (
-              <td key={`non-row-${name}-${index}`}>
+          {additionalInputFields.map(
+            ({ placeholder, fieldName, inputType = "text" }, index) => (
+              <td key={`non-row-${fieldName}-${index}`}>
                 <FormInput
-                  name={name}
-                  type={type}
+                  name={fieldName}
+                  type={inputType}
                   placeholder={placeholder}
-                  value={get(formData, name)}
+                  value={get(formData, fieldName)}
                   onChange={onChange}
                 />
               </td>
@@ -580,25 +582,30 @@ const TableRows = ({
   );
 };
 
-const ProductPriceStockWrapper = ({ variations = [], formData, onChange }) => {
-  // Temporarily remove useMemo to test
-  const variationRows =
-    variations.length > 0
-      ? Array.from(
-          { length: Math.max(...variations.map((v) => v.values.length)) },
-          (_, index) =>
-            variations.reduce((acc, variation) => {
-              acc[variation.type] = variation.values[index]?.name || "";
-              return acc;
-            }, {})
-        )
-      : [];
+const ProductPriceStockWrapper = ({ variations, formData, onChange }) => {
+  const variationNames = variations.map((variation) =>
+    variation.values.map((v) => v.name).join(",")
+  );
 
-  const variationColumns = useMemo(() => {
+  const variationRows = useMemo(() => {
+    if (variations.length === 0) return [];
+
+    const maxValuesLength = Math.max(...variations.map((v) => v.values.length));
+
+    return Array.from({ length: maxValuesLength }, (_, index) =>
+      variations.reduce((acc, variation) => {
+        acc[variation.type] = variation.values[index]?.name || "";
+        return acc;
+      }, {})
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variations, variationNames]);
+
+  const variationColumnNames = useMemo(() => {
     return variations.map((variation) => variation.type);
   }, [variations]);
 
-  const additionalHeaders = [
+  const additionalHeaderNames = [
     "Price",
     "Special Price",
     "Stock",
@@ -607,34 +614,38 @@ const ProductPriceStockWrapper = ({ variations = [], formData, onChange }) => {
     "Availability",
   ];
 
-  const additionalValues = [
+  const additionalInputFields = [
     {
-      name: `${
+      fieldName: `${
         !variationRows.length > 0 ? "productDetails" : ""
       }.pricing.current`,
       placeholder: "Price",
     },
     {
-      name: `${
+      fieldName: `${
         !variationRows.length > 0 ? "productDetails" : ""
       }.pricing.original`,
       placeholder: "Special Price",
     },
     {
-      name: `${!variationRows.length > 0 ? "productDetails" : ""}.stock`,
+      fieldName: `${!variationRows.length > 0 ? "productDetails" : ""}.stock`,
       placeholder: "Stock",
     },
     {
-      name: `${!variationRows.length > 0 ? "productDetails" : ""}.sku`,
+      fieldName: `${!variationRows.length > 0 ? "productDetails" : ""}.sku`,
       placeholder: "Seller SKU",
     },
     {
-      name: `${!variationRows.length > 0 ? "productDetails" : ""}.freeItems`,
+      fieldName: `${
+        !variationRows.length > 0 ? "productDetails" : ""
+      }.freeItems`,
       placeholder: "Free Items",
     },
     {
-      name: `${!variationRows.length > 0 ? "productDetails" : ""}.availability`,
-      type: "checkbox",
+      fieldName: `${
+        !variationRows.length > 0 ? "productDetails" : ""
+      }.availability`,
+      inputType: "checkbox",
     },
   ];
 
@@ -642,17 +653,38 @@ const ProductPriceStockWrapper = ({ variations = [], formData, onChange }) => {
   return (
     <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
-      <div className={styles.priceStockTable}>
-        <table>
+      {variationRows.length > 0 && (
+        <div className={`${styles.variationInputContainer} flex`}>
+          {additionalInputFields
+            .slice(0, 4)
+            .map(({ placeholder, fieldName, inputType = "text" }, index) => (
+              <FormInput
+                key={`non-row-${fieldName}-${index}`}
+                name={fieldName}
+                type={inputType}
+                placeholder={placeholder}
+                value={get(formData.productDetails, fieldName)}
+                onChange={onChange}
+                className={styles.variationInputField}
+              />
+            ))}
+          <button className={`${styles.applyToAllButton} primary-btn`}>
+            Apply to All
+          </button>
+        </div>
+      )}
+
+      <div className={styles.variantTableWrapper}>
+        <table className={styles.variantTable}>
           <TableHeaders
             variationRows={variationRows}
-            variationColumns={variationColumns}
-            additionalHeaders={additionalHeaders}
+            variationColumnNames={variationColumnNames}
+            additionalHeaderNames={additionalHeaderNames}
           />
           <TableRows
             variationRows={variationRows}
-            variationColumns={variationColumns}
-            additionalValues={additionalValues}
+            variationColumnNames={variationColumnNames}
+            additionalInputFields={additionalInputFields}
             formData={formData}
             onChange={onChange}
           />
@@ -767,6 +799,8 @@ const ProductForm = ({ customClass }) => {
       return updatedData;
     });
   }, []);
+
+  const multiInputChange = useCallback(() => {}, []);
 
   const debouncedChange = useMemo(
     () => debounce((e) => handleInputChange(e), 300),
@@ -1111,7 +1145,7 @@ const ProductForm = ({ customClass }) => {
         )}
       </FormSection>
 
-      <button type="submit" className={styles.submitButton}>
+      <button type="submit" className={`${styles.submitButton} primary-btn`}>
         Submit
       </button>
     </form>
