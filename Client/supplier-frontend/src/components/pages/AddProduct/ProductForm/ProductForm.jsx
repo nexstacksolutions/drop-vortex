@@ -545,7 +545,7 @@ const TableRows = ({
               ({ placeholder, fieldName, inputType = "text" }, index) => (
                 <td key={`additional-col-${index}`}>
                   <FormInput
-                    name={`productDetails.variations[0].values[${rowIndex}]${fieldName}`}
+                    name={`productDetails.variations[0].values[${rowIndex}].${fieldName}`}
                     type={inputType}
                     placeholder={placeholder}
                     value={
@@ -622,34 +622,34 @@ const ProductPriceStockWrapper = ({
   const additionalInputFields = [
     {
       fieldName: `${
-        !variationRows.length > 0 ? "productDetails" : ""
-      }.pricing.current`,
+        !variationRows.length > 0 ? "productDetails." : ""
+      }pricing.current`,
       placeholder: "Price",
     },
     {
       fieldName: `${
-        !variationRows.length > 0 ? "productDetails" : ""
-      }.pricing.original`,
+        !variationRows.length > 0 ? "productDetails." : ""
+      }pricing.original`,
       placeholder: "Special Price",
     },
     {
-      fieldName: `${!variationRows.length > 0 ? "productDetails" : ""}.stock`,
+      fieldName: `${!variationRows.length > 0 ? "productDetails." : ""}stock`,
       placeholder: "Stock",
     },
     {
-      fieldName: `${!variationRows.length > 0 ? "productDetails" : ""}.sku`,
+      fieldName: `${!variationRows.length > 0 ? "productDetails." : ""}sku`,
       placeholder: "Seller SKU",
     },
     {
       fieldName: `${
-        !variationRows.length > 0 ? "productDetails" : ""
-      }.freeItems`,
+        !variationRows.length > 0 ? "productDetails." : ""
+      }freeItems`,
       placeholder: "Free Items",
     },
     {
       fieldName: `${
-        !variationRows.length > 0 ? "productDetails" : ""
-      }.availability`,
+        !variationRows.length > 0 ? "productDetails." : ""
+      }availability`,
       inputType: "checkbox",
     },
   ];
@@ -665,7 +665,7 @@ const ProductPriceStockWrapper = ({
             .map(({ placeholder, fieldName, inputType = "text" }, index) => (
               <FormInput
                 key={`non-row-${fieldName}-${index}`}
-                name={`productDetails${fieldName}`}
+                name={`productDetails.${fieldName}`}
                 type={inputType}
                 placeholder={placeholder}
                 value={get(formData.productDetails, fieldName)}
@@ -721,6 +721,7 @@ const ProductForm = ({ customClass }) => {
       },
       stock: "",
       availability: "",
+      freeItems: "",
       sku: "",
 
       variations: [
@@ -900,8 +901,6 @@ const ProductForm = ({ customClass }) => {
     const pricing = get(formData.productDetails, "pricing");
     const stock = get(formData.productDetails, "stock");
     const sku = get(formData.productDetails, "sku");
-
-    console.log("Extract", pricing, stock, sku);
 
     // Update all variations selectively
     const updatedVariations = formData.productDetails.variations.map(
