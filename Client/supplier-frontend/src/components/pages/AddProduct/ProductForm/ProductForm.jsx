@@ -511,7 +511,7 @@ const ProductVariations = ({
   );
 };
 
-const ProductPriceStockWrapper = ({ variations = [] }) => {
+const ProductPriceStockWrapper = ({ variations = [], onChange }) => {
   // Memoize the variationRows and variationColumns computations
   const variationRows = useMemo(() => {
     return variations.length
@@ -563,12 +563,12 @@ const ProductPriceStockWrapper = ({ variations = [] }) => {
       {rows.length > 0 ? (
         rows.map((row, idx) => (
           <tr key={idx}>
-            {Object.values(row).map((val, i) => (
-              <td key={i}>{val}</td>
+            {variationColumns.map((val, i) => (
+              <td key={i}>{row[val]}</td>
             ))}
             {placeholders.map((placeholder) => (
               <td key={placeholder}>
-                <input type="text" placeholder={placeholder} />
+                <input type="text" />
               </td>
             ))}
             <td>
