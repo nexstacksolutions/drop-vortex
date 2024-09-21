@@ -514,14 +514,19 @@ const ProductVariations = ({
 const ProductPriceStockWrapper = ({ variations = [], onChange }) => {
   // Memoize the variationRows and variationColumns computations
   const variationRows = useMemo(() => {
-    return variations.length
-      ? variations[0].values.map((_, index) =>
-          variations.reduce((acc, variation) => {
-            acc[variation.type] = variation.values[index]?.name || "";
-            return acc;
-          }, {})
-        )
-      : [];
+    if (variations.length === 0) return [];
+
+    // Find the maximum length of the 'values' array across all variations
+    const maxValuesLength = Math.max(...variations.map((v) => v.values.length));
+
+    // Create rows based on the longest variation set
+    return Array.from({ length: maxValuesLength }, (_, index) =>
+      variations.reduce((acc, variation) => {
+        // Safely access the value at the current index or default to an empty object
+        acc[variation.type] = variation.values[index]?.name || "";
+        return acc;
+      }, {})
+    );
   }, [variations]);
 
   const variationColumns = useMemo(() => {
