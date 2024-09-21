@@ -2,8 +2,8 @@ import styles from "./ProductForm.module.css";
 import "react-quill/dist/quill.snow.css";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import set from "lodash.set";
 import debounce from "lodash/debounce";
+import { set, get } from "lodash";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
 import { FaPlus, FaAngleDown } from "react-icons/fa6";
@@ -511,7 +511,78 @@ const ProductVariations = ({
   );
 };
 
-const ProductPriceStockWrapper = ({ variations = [], onChange }) => {
+// Table header component
+const TableHeaders = ({
+  variationRows,
+  variationColumns,
+  additionalHeaders,
+}) => (
+  <thead>
+    <tr>
+      {variationRows.length > 0 &&
+        variationColumns.map((heading, colIndex) => (
+          <th key={colIndex}>{heading}</th>
+        ))}
+      {additionalHeaders.map((heading, headerIndex) => (
+        <th key={headerIndex}>{heading}</th>
+      ))}
+    </tr>
+  </thead>
+);
+
+// Table row component
+const TableRows = ({
+  variationRows,
+  variationColumns,
+  additionalValues,
+  formData,
+  onChange,
+}) => {
+  return (
+    <tbody>
+      {variationRows.length > 0 ? (
+        variationRows.map((values, rowIndex) => (
+          <tr key={`variation-row-${rowIndex}`}>
+            {variationColumns.map((val, colIndex) => (
+              <td key={`variation-col-${colIndex}`}>{values[val]}</td>
+            ))}
+            {additionalValues.map(
+              ({ placeholder, name, type = "text" }, index) => (
+                <td key={`additional-col-${index}`}>
+                  <FormInput
+                    name={name}
+                    type={type}
+                    placeholder={placeholder}
+                    value={get(formData, name) || ""}
+                    onChange={onChange}
+                  />
+                </td>
+              )
+            )}
+          </tr>
+        ))
+      ) : (
+        <tr>
+          {additionalValues.map(
+            ({ placeholder, name, type = "text" }, index) => (
+              <td key={`non-row-${name}-${index}`}>
+                <FormInput
+                  name={name}
+                  type={type}
+                  placeholder={placeholder}
+                  value={get(formData, name)}
+                  onChange={onChange}
+                />
+              </td>
+            )
+          )}
+        </tr>
+      )}
+    </tbody>
+  );
+};
+
+const ProductPriceStockWrapper = ({ variations = [], formData, onChange }) => {
   // Memoize the variationRows and variationColumns computations
   const variationRows = useMemo(() => {
     if (variations.length === 0) return [];
@@ -542,65 +613,36 @@ const ProductPriceStockWrapper = ({ variations = [], onChange }) => {
     "Availability",
   ];
 
-  const placeholders = [
-    "Price",
-    "Special Price",
-    "Stock",
-    "Seller SKU",
-    "Free Items",
+  const additionalValues = [
+    {
+      name: `${
+        !variationRows.length > 0 ? "productDetails" : ""
+      }.pricing.current`,
+      placeholder: "Price",
+    },
+    {
+      name: `${
+        !variationRows.length > 0 ? "productDetails" : ""
+      }.pricing.original`,
+      placeholder: "Special Price",
+    },
+    {
+      name: `${!variationRows.length > 0 ? "productDetails" : ""}.stock`,
+      placeholder: "Stock",
+    },
+    {
+      name: `${!variationRows.length > 0 ? "productDetails" : ""}.sku`,
+      placeholder: "Seller SKU",
+    },
+    {
+      name: `${!variationRows.length > 0 ? "productDetails" : ""}.freeItems`,
+      placeholder: "Free Items",
+    },
+    {
+      name: `${!variationRows.length > 0 ? "productDetails" : ""}.availability`,
+      type: "checkbox",
+    },
   ];
-
-  // Table header component
-  const TableHeaders = ({ rows, columns, additionalHeaders }) => (
-    <thead>
-      <tr>
-        {rows.length > 0 && columns.map((col) => <th key={col}>{col}</th>)}
-        {additionalHeaders.map((header) => (
-          <th key={header}>{header}</th>
-        ))}
-      </tr>
-    </thead>
-  );
-
-  // Table row component
-  const TableRows = ({ rows, placeholders }) => (
-    <tbody>
-      {rows.length > 0 ? (
-        rows.map((row, idx) => (
-          <tr key={idx}>
-            {variationColumns.map((val, i) => (
-              <td key={i}>{row[val]}</td>
-            ))}
-            {placeholders.map((placeholder) => (
-              <td key={placeholder}>
-                <input type="text" />
-              </td>
-            ))}
-            <td>
-              <label className={styles.switch}>
-                <input type="checkbox" />
-                <span className={styles.slider}></span>
-              </label>
-            </td>
-          </tr>
-        ))
-      ) : (
-        <tr>
-          {placeholders.map((placeholder) => (
-            <td key={placeholder}>
-              <input type="text" placeholder={placeholder} />
-            </td>
-          ))}
-          <td>
-            <label className={styles.switch}>
-              <input type="checkbox" />
-              <span className={styles.slider}></span>
-            </label>
-          </td>
-        </tr>
-      )}
-    </tbody>
-  );
 
   // Render the entire table
   return (
@@ -609,11 +651,19 @@ const ProductPriceStockWrapper = ({ variations = [], onChange }) => {
       <div className={styles.priceStockTable}>
         <table>
           <TableHeaders
-            rows={variationRows}
-            columns={variationColumns}
+            variationRows={variationRows}
+            variationColumns={variationColumns}
             additionalHeaders={additionalHeaders}
+            formData={formData}
+            onChange={onChange}
           />
-          <TableRows rows={variationRows} placeholders={placeholders} />
+          <TableRows
+            variationRows={variationRows}
+            variationColumns={variationColumns}
+            additionalValues={additionalValues}
+            formData={formData}
+            onChange={onChange}
+          />
         </table>
       </div>
     </div>
@@ -705,7 +755,7 @@ const ProductForm = ({ customClass }) => {
     },
   ];
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
 
     setFormData((prevData) => {
@@ -722,15 +772,17 @@ const ProductForm = ({ customClass }) => {
 
       return updatedData;
     });
-  };
+  }, []);
 
   const debouncedChange = useMemo(
     () => debounce((e) => handleInputChange(e), 300),
-    []
+    [handleInputChange]
   );
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    console.log(formData);
   };
 
   const toggleShowMoreOption = (section) => {
@@ -971,6 +1023,8 @@ const ProductForm = ({ customClass }) => {
 
         <ProductPriceStockWrapper
           variations={formData.productDetails.variations}
+          formData={formData}
+          onChange={(e) => handleInputChange(e)}
         />
       </FormSection>
 
