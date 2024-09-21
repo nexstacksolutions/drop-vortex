@@ -44,7 +44,7 @@
     & .mediaInputWrapper {
       max-width: max-content;
 
-      & .mediaPreviewContainer {
+      & .mediaPreviewWrapper {
         max-width: max-content;
 
         & .mediaPreviewItem {
@@ -87,6 +87,9 @@
           border: var(--border-base-dashed) var(--border-color);
 
           & label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             width: 100%;
             height: 100%;
 

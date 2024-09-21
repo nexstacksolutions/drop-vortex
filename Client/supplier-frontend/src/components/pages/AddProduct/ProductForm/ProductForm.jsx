@@ -2,10 +2,13 @@ import styles from "./ProductForm.module.css";
 import "react-quill/dist/quill.snow.css";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import set from "lodash.set";
+import debounce from "lodash/debounce";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
 import { FaPlus, FaAngleDown } from "react-icons/fa6";
 import { RiDeleteBin5Line, RiEdit2Line, RiMenuFill } from "react-icons/ri";
+import { useMemo } from "react";
 
 const Guidelines = ({ content, guideType }) => {
   if (!content.length) return null;
@@ -61,6 +64,8 @@ const generateInputByType = ({
   value,
   checked,
   placeholder,
+  fileType,
+  inputRef,
   onChange,
   options,
   handleQuillChange,
@@ -69,7 +74,7 @@ const generateInputByType = ({
 }) => {
   if (inputList && name === "shipping.dimensions") {
     return (
-      <div className={classNames(styles.inputGroup, "flex")}>
+      <div className={`${styles.inputGroup} flex`}>
         {Object.keys(value).map((dimension, index) => (
           <input
             key={index}
@@ -80,7 +85,7 @@ const generateInputByType = ({
             onChange={(e) =>
               onChange({
                 target: {
-                  name: "shipping.dimensions",
+                  name: name,
                   value: { ...value, [dimension]: e.target.value },
                 },
               })
@@ -119,7 +124,7 @@ const generateInputByType = ({
               className={classNames(styles.radioItem, "flex flex-center")}
             >
               <input
-                type="radio"
+                type={type}
                 id={`${name}${index}`}
                 name={name}
                 value={option}
@@ -140,7 +145,9 @@ const generateInputByType = ({
           value={value}
           checked={checked}
           placeholder={placeholder}
+          accept={fileType === "image" ? "image/*" : "video/*"}
           onChange={onChange}
+          ref={inputRef}
           onKeyDown={customOnKeyDown}
         />
       );
@@ -151,12 +158,14 @@ const FormInput = ({
   label,
   name,
   type,
+  fileType,
   placeholder,
   options,
   value,
   checked,
   onChange,
   inputList,
+  inputRef,
   customClass,
   showErr = false,
   onKeyDown,
@@ -175,6 +184,7 @@ const FormInput = ({
     >
       {generateInputByType({
         type,
+        fileType,
         formInputId,
         name,
         value,
@@ -184,6 +194,7 @@ const FormInput = ({
         options,
         handleQuillChange,
         inputList,
+        inputRef,
         customOnKeyDown: onKeyDown,
       })}
       {showErr && <p className={styles.errorMsg}>Error message</p>}
@@ -249,29 +260,21 @@ const MediaInput = ({
     <InputWrapper
       label={label}
       formInputId={fileInputId}
-      customClass={classNames(styles.mediaInputContainer, {
-        [customClass]: customClass,
-      })}
+      customClass={classNames(styles.mediaInputContainer, customClass)}
     >
-      <div
-        className={classNames(styles.mediaInputWrapper, "flex align-center")}
-      >
-        <div className={classNames(styles.mediaPreviewContainer, "flex")}>
+      <div className={`${styles.mediaInputWrapper} flex align-center`}>
+        <div className={`${styles.mediaPreviewWrapper} flex`}>
           {renderMediaFiles(mediaFiles, fileType, handleRemoveFile)}
           {mediaFiles.length < maxFiles && (
-            <div className={styles.addMediaWrapper}>
-              <label htmlFor={fileInputId} className="flex flex-center">
-                <FaPlus />
-              </label>
-              <input
-                type="file"
-                id={fileInputId}
-                name={name}
-                accept={fileType === "image" ? "image/*" : "video/*"}
-                onChange={handleFileChange}
-                ref={fileInputRef}
-              />
-            </div>
+            <FormInput
+              label={<FaPlus />}
+              name={name}
+              type="file"
+              fileType="image"
+              inputRef={fileInputRef}
+              onChange={handleFileChange}
+              customClass={styles.addMediaWrapper}
+            />
           )}
         </div>
         {GuideComponent}
@@ -282,7 +285,7 @@ const MediaInput = ({
 };
 
 const MediaPreviewItem = ({ file, fileType, onRemove }) => (
-  <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
+  <div className={`${styles.mediaPreviewItem} flex flex-center`}>
     {fileType === "image" ? (
       <img
         src={URL.createObjectURL(file)}
@@ -296,12 +299,7 @@ const MediaPreviewItem = ({ file, fileType, onRemove }) => (
         className={styles.mediaVideo}
       />
     )}
-    <div
-      className={classNames(
-        styles.mediaActionsContainer,
-        "flex justify-between"
-      )}
-    >
+    <div className={`${styles.mediaActionsContainer} flex justify-between`}>
       <button
         type="button"
         onClick={onRemove}
@@ -347,31 +345,38 @@ const VariantItem = ({
 }) => {
   const [state, setState] = useState({
     inputValue: "",
-    mediaFiles: [],
+    variantImages: [],
     resetTrigger: false,
   });
 
-  const { inputValue, mediaFiles, resetTrigger } = state;
+  const { inputValue, variantImages, resetTrigger } = state;
+
+  const resetVariantForm = useCallback(() => {
+    setState({
+      inputValue: "",
+      variantImages: [],
+      resetTrigger: !resetTrigger,
+    });
+    setTimeout(
+      () => setState((prevState) => ({ ...prevState, resetTrigger: false })),
+      0
+    );
+  }, [resetTrigger]);
 
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === "Enter" && inputValue.trim()) {
-        const variantImages = mediaFiles?.target?.value || [];
-
         handleAddVariantItem(inputValue, variantImages, variationIndex);
-        setState({
-          inputValue: "",
-          mediaFiles: [],
-          resetTrigger: !resetTrigger,
-        });
-        setTimeout(
-          () =>
-            setState((prevState) => ({ ...prevState, resetTrigger: false })),
-          0
-        );
+        resetVariantForm();
       }
     },
-    [inputValue, mediaFiles, resetTrigger, variationIndex, handleAddVariantItem]
+    [
+      inputValue,
+      variantImages,
+      resetVariantForm,
+      variationIndex,
+      handleAddVariantItem,
+    ]
   );
 
   const handleInputChange = (e, field) => {
@@ -379,10 +384,13 @@ const VariantItem = ({
     onChange(variationIndex, valueIndex, field, value);
   };
 
+  const updatedValueIndex =
+    valueIndex === undefined ? "addVariantItem" : valueIndex;
+
   return (
     <div className={`${styles.variantItem} flex align-center`}>
       <FormInput
-        name="variantName"
+        name={`productDetails.variations-${variationIndex}-${updatedValueIndex}-name`}
         type="text"
         placeholder="Please type or select"
         value={(variantData && variantData.name) || inputValue}
@@ -397,25 +405,15 @@ const VariantItem = ({
 
       {showVariantImages && (
         <MediaInput
-          name={
-            onChange
-              ? `variantImages-${variationIndex}-${valueIndex}`
-              : "addVariantItem"
-          }
+          name={`productDetails.variations-${variationIndex}-${updatedValueIndex}-variantImages`}
           fileType="image"
           maxFiles={5}
-          value={variantData?.variantImages || mediaFiles}
+          value={variantData?.variantImages || variantImages}
           resetTrigger={resetTrigger}
-          onChange={
-            (newMedia) =>
-              onChange
-                ? onChange(
-                    variationIndex,
-                    valueIndex,
-                    "variantImages",
-                    newMedia
-                  )
-                : setState({ ...state, mediaFiles: newMedia }) // Update state correctly
+          onChange={(newMedia) =>
+            onChange
+              ? onChange(variationIndex, valueIndex, "variantImages", newMedia)
+              : setState({ ...state, variantImages: newMedia?.target?.value })
           }
           customClass={styles.mediaInput}
         />
@@ -513,17 +511,22 @@ const ProductVariations = ({
   );
 };
 
-const ProductPriceStockWrapper = ({ variations }) => {
-  const variationRows = variations.length
-    ? variations[0].values.map((_, index) =>
-        variations.reduce((acc, variation) => {
-          acc[variation.type] = variation.values[index]?.name || "";
-          return acc;
-        }, {})
-      )
-    : [];
+const ProductPriceStockWrapper = ({ variations = [] }) => {
+  // Memoize the variationRows and variationColumns computations
+  const variationRows = useMemo(() => {
+    return variations.length
+      ? variations[0].values.map((_, index) =>
+          variations.reduce((acc, variation) => {
+            acc[variation.type] = variation.values[index]?.name || "";
+            return acc;
+          }, {})
+        )
+      : [];
+  }, [variations]);
 
-  const variationColumns = variations.map((variation) => variation.type);
+  const variationColumns = useMemo(() => {
+    return variations.map((variation) => variation.type);
+  }, [variations]);
 
   const additionalHeaders = [
     "Price",
@@ -531,7 +534,9 @@ const ProductPriceStockWrapper = ({ variations }) => {
     "Stock",
     "Seller SKU",
     "Free Items",
+    "Availability",
   ];
+
   const placeholders = [
     "Price",
     "Special Price",
@@ -540,18 +545,20 @@ const ProductPriceStockWrapper = ({ variations }) => {
     "Free Items",
   ];
 
-  const renderTableHeaders = (rows, columns, additionalHeaders) => (
+  // Table header component
+  const TableHeaders = ({ rows, columns, additionalHeaders }) => (
     <thead>
       <tr>
-        {rows.length > 0 && columns.map((col, idx) => <th key={idx}>{col}</th>)}
-        {additionalHeaders.map((header, idx) => (
-          <th key={idx}>{header}</th>
+        {rows.length > 0 && columns.map((col) => <th key={col}>{col}</th>)}
+        {additionalHeaders.map((header) => (
+          <th key={header}>{header}</th>
         ))}
       </tr>
     </thead>
   );
 
-  const renderTableRows = (rows, placeholders) => (
+  // Table row component
+  const TableRows = ({ rows, placeholders }) => (
     <tbody>
       {rows.length > 0 ? (
         rows.map((row, idx) => (
@@ -559,8 +566,8 @@ const ProductPriceStockWrapper = ({ variations }) => {
             {Object.values(row).map((val, i) => (
               <td key={i}>{val}</td>
             ))}
-            {placeholders.map((placeholder, i) => (
-              <td key={i}>
+            {placeholders.map((placeholder) => (
+              <td key={placeholder}>
                 <input type="text" placeholder={placeholder} />
               </td>
             ))}
@@ -574,8 +581,8 @@ const ProductPriceStockWrapper = ({ variations }) => {
         ))
       ) : (
         <tr>
-          {placeholders.map((placeholder, idx) => (
-            <td key={idx}>
+          {placeholders.map((placeholder) => (
+            <td key={placeholder}>
               <input type="text" placeholder={placeholder} />
             </td>
           ))}
@@ -590,23 +597,19 @@ const ProductPriceStockWrapper = ({ variations }) => {
     </tbody>
   );
 
-  const renderTable = (columns, rows, additionalHeaders, placeholders) => (
-    <>
-      {renderTableHeaders(rows, columns, additionalHeaders)}
-      {renderTableRows(rows, placeholders)}
-    </>
-  );
-
+  // Render the entire table
   return (
     <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
       <div className={styles.priceStockTable}>
-        {renderTable(
-          variationColumns,
-          variationRows,
-          additionalHeaders,
-          placeholders
-        )}
+        <table>
+          <TableHeaders
+            rows={variationRows}
+            columns={variationColumns}
+            additionalHeaders={additionalHeaders}
+          />
+          <TableRows rows={variationRows} placeholders={placeholders} />
+        </table>
       </div>
     </div>
   );
@@ -643,8 +646,6 @@ const ProductForm = ({ customClass }) => {
       sku: "",
     },
 
-    tags: [],
-
     specifications: {
       brand: {
         name: "",
@@ -657,8 +658,8 @@ const ProductForm = ({ customClass }) => {
 
     description: {
       main: "",
-      product: "",
       highlights: "",
+      tags: [],
       whatsInBox: "",
     },
 
@@ -701,27 +702,37 @@ const ProductForm = ({ customClass }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prevData) => {
       const updatedData = { ...prevData };
-      const keys = name.split(".");
-      keys.reduce((acc, key, idx) => {
-        if (idx === keys.length - 1) {
-          acc[key] = value;
-        } else {
-          if (!acc[key]) acc[key] = {}; // Handle missing nested objects
-        }
-        return acc[key];
-      }, updatedData);
+
+      // Check if the field is for tags
+      if (name === "description.tags") {
+        updatedData.description.tags = value
+          .split(",")
+          .map((tag) => tag.trim());
+      } else {
+        set(updatedData, name, value);
+      }
+
       return updatedData;
     });
   };
+
+  const debouncedChange = useMemo(
+    () => debounce((e) => handleInputChange(e), 300),
+    []
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
   };
 
-  const handleShowMore = (section) => {
-    setShowMoreOptions((prev) => ({ ...prev, [section]: !prev[section] }));
+  const toggleShowMoreOption = (section) => {
+    setShowMoreOptions((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
   };
 
   const handleVariationChange = useCallback(
@@ -735,7 +746,8 @@ const ProductForm = ({ customClass }) => {
         }
 
         // Update specific field (like 'variantImages') at the given index
-        updatedVariations[variationIndex].values[valueIndex][field] = newValue;
+        updatedVariations[variationIndex].values[valueIndex][field] =
+          newValue?.target?.value || newValue;
 
         return {
           ...prevData,
@@ -749,35 +761,63 @@ const ProductForm = ({ customClass }) => {
     []
   );
 
-  const handleAddVariantItem = (inputValue, variantImages, variationIndex) => {
-    const newVariant = {
-      id: uuidv4(),
-      name: inputValue,
-      variantImages: variantImages || [],
-    };
+  const handleAddVariantItem = useCallback(
+    (inputValue, variantImages, variationIndex) => {
+      // Validate the input
+      if (!inputValue.trim()) {
+        console.error("Variant name cannot be empty");
+        return;
+      }
 
-    setFormData((prevData) => {
-      const updatedVariations = [...prevData.productDetails.variations];
-      updatedVariations[variationIndex].values.push(newVariant);
-
-      return {
-        ...prevData,
-        productDetails: {
-          ...prevData.productDetails,
-          variations: updatedVariations,
+      const newVariant = {
+        id: uuidv4(),
+        name: inputValue,
+        variantImages: Array.isArray(variantImages) ? variantImages : [],
+        pricing: {
+          current: "",
+          original: "",
+        },
+        stock: "",
+        availability: "",
+        sku: "",
+        packageWeight: "",
+        dimensions: {
+          length: "",
+          width: "",
+          height: "",
         },
       };
-    });
-  };
 
-  const handleRemoveVariantItem = (variationIndex, valueIndex) => {
+      setFormData((prevData) => {
+        const { productDetails } = prevData;
+        const updatedVariations = [...productDetails.variations];
+
+        // Ensure that the variation index is valid
+        if (!updatedVariations[variationIndex]) {
+          console.error(`No variation found at index ${variationIndex}`);
+          return prevData;
+        }
+
+        updatedVariations[variationIndex].values.push(newVariant);
+
+        return {
+          ...prevData,
+          productDetails: {
+            ...productDetails,
+            variations: updatedVariations,
+          },
+        };
+      });
+    },
+    []
+  );
+
+  const handleRemoveVariantItem = useCallback((variationIndex, valueIndex) => {
     setFormData((prevData) => {
       const updatedVariations = [...prevData.productDetails.variations];
       const updatedValues = [...updatedVariations[variationIndex].values];
-
       updatedValues.splice(valueIndex, 1);
 
-      // Update the cloned variation with the modified values array
       updatedVariations[variationIndex] = {
         ...updatedVariations[variationIndex],
         values: updatedValues,
@@ -791,7 +831,7 @@ const ProductForm = ({ customClass }) => {
         },
       };
     });
-  };
+  }, []);
 
   return (
     <form
@@ -859,7 +899,7 @@ const ProductForm = ({ customClass }) => {
         title="Product Specification"
         message="Fill more product specification will increase product searchability."
         showMoreBtnProps={{
-          handleShowMore: () => handleShowMore("additionalSpecs"),
+          handleShowMore: () => toggleShowMoreOption("additionalSpecs"),
           section: "additionalSpecs",
           showMoreOptions,
         }}
@@ -933,7 +973,7 @@ const ProductForm = ({ customClass }) => {
       <FormSection
         title="Product Description"
         showMoreBtnProps={{
-          handleShowMore: () => handleShowMore("description"),
+          handleShowMore: () => toggleShowMoreOption("description"),
           section: "description",
           showMoreOptions,
         }}
@@ -944,7 +984,7 @@ const ProductForm = ({ customClass }) => {
           name="description.main"
           type="textarea"
           value={formData.description.main}
-          onChange={handleInputChange}
+          onChange={debouncedChange}
         />
 
         <FormInput
@@ -952,19 +992,17 @@ const ProductForm = ({ customClass }) => {
           name="description.highlights"
           type="textarea"
           value={formData.description.highlights}
-          onChange={handleInputChange}
+          onChange={debouncedChange}
         />
         {showMoreOptions.description && (
           <>
             <FormInput
               label="Tags"
-              name="tags"
+              name="description.tags"
               type="text"
               placeholder="Ex: New, Sale, Bestseller"
-              value={formData.tags.join(", ")}
-              onChange={(e) =>
-                setFormData({ ...formData, tags: e.target.value.split(", ") })
-              }
+              value={formData.description.tags.join(", ")}
+              onChange={handleInputChange}
             />
             <FormInput
               label="What's in the Box"
@@ -984,7 +1022,7 @@ const ProductForm = ({ customClass }) => {
         message="Switch to enter different package dimensions & weight for variations"
         showMoreBtnProps={{
           btnText: "More Warranty Settings",
-          handleShowMore: () => handleShowMore("warranty"),
+          handleShowMore: () => toggleShowMoreOption("warranty"),
           section: "warranty",
           showMoreOptions,
         }}
@@ -1004,11 +1042,7 @@ const ProductForm = ({ customClass }) => {
           type="number"
           placeholder="0.01 - 300"
           inputList={3}
-          value={{
-            length: formData.shipping.dimensions.length,
-            width: formData.shipping.dimensions.width,
-            height: formData.shipping.dimensions.height,
-          }}
+          value={formData.shipping.dimensions}
           onChange={handleInputChange}
         />
         <FormInput
