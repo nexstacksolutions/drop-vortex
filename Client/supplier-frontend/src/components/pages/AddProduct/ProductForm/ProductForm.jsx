@@ -345,21 +345,34 @@ const VariantItem = ({
   showVariantImages,
   onChange,
 }) => {
-  const [inputValue, setInputValue] = useState("");
-  const [mediaFiles, setMediaFiles] = useState([]);
-  const [resetTrigger, setResetTrigger] = useState(false);
+  const [state, setState] = useState({
+    inputValue: "",
+    mediaFiles: [],
+    resetTrigger: false,
+  });
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && inputValue.trim()) {
-      const variantImages = mediaFiles?.target?.value || [];
+  const { inputValue, mediaFiles, resetTrigger } = state;
 
-      handleAddVariantItem(inputValue, variantImages, variationIndex);
-      setInputValue("");
-      setMediaFiles([]);
-      setResetTrigger(!resetTrigger);
-      setTimeout(() => setResetTrigger(false), 0);
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter" && inputValue.trim()) {
+        const variantImages = mediaFiles?.target?.value || [];
+
+        handleAddVariantItem(inputValue, variantImages, variationIndex);
+        setState({
+          inputValue: "",
+          mediaFiles: [],
+          resetTrigger: !resetTrigger,
+        });
+        setTimeout(
+          () =>
+            setState((prevState) => ({ ...prevState, resetTrigger: false })),
+          0
+        );
+      }
+    },
+    [inputValue, mediaFiles, resetTrigger, variationIndex, handleAddVariantItem]
+  );
 
   const handleInputChange = (e, field) => {
     const { value } = e.target;
@@ -373,10 +386,10 @@ const VariantItem = ({
         type="text"
         placeholder="Please type or select"
         value={(variantData && variantData.name) || inputValue}
-        onChange={(e) =>
+        onChange={
           onChange
-            ? handleInputChange(e, "name")
-            : setInputValue(e.target.value)
+            ? (e) => handleInputChange(e, "name")
+            : (e) => setState({ ...state, inputValue: e.target.value })
         }
         onKeyDown={handleKeyDown}
         customClass={styles.formInput}
@@ -393,10 +406,16 @@ const VariantItem = ({
           maxFiles={5}
           value={variantData?.variantImages || mediaFiles}
           resetTrigger={resetTrigger}
-          onChange={(newMedia) =>
-            onChange
-              ? onChange(variationIndex, valueIndex, "variantImages", newMedia)
-              : setMediaFiles(newMedia)
+          onChange={
+            (newMedia) =>
+              onChange
+                ? onChange(
+                    variationIndex,
+                    valueIndex,
+                    "variantImages",
+                    newMedia
+                  )
+                : setState({ ...state, mediaFiles: newMedia }) // Update state correctly
           }
           customClass={styles.mediaInput}
         />
@@ -506,13 +525,27 @@ const ProductPriceStockWrapper = ({ variations }) => {
 
   const variationColumns = variations.map((variation) => variation.type);
 
-  const renderTableHeaders = (columns, additionalHeaders) => (
+  const additionalHeaders = [
+    "Price",
+    "Special Price",
+    "Stock",
+    "Seller SKU",
+    "Free Items",
+  ];
+  const placeholders = [
+    "Price",
+    "Special Price",
+    "Stock",
+    "Seller SKU",
+    "Free Items",
+  ];
+
+  const renderTableHeaders = (rows, columns, additionalHeaders) => (
     <thead>
       <tr>
-        {variationRows.length > 0 &&
-          columns.map((column, index) => <th key={index}>{column}</th>)}
-        {additionalHeaders.map((header, index) => (
-          <th key={index}>{header}</th>
+        {rows.length > 0 && columns.map((col, idx) => <th key={idx}>{col}</th>)}
+        {additionalHeaders.map((header, idx) => (
+          <th key={idx}>{header}</th>
         ))}
       </tr>
     </thead>
@@ -521,13 +554,13 @@ const ProductPriceStockWrapper = ({ variations }) => {
   const renderTableRows = (rows, placeholders) => (
     <tbody>
       {rows.length > 0 ? (
-        rows.map((rowValues, rowIndex) => (
-          <tr key={rowIndex}>
-            {Object.values(rowValues).map((value, colIndex) => (
-              <td key={colIndex}>{value}</td>
+        rows.map((row, idx) => (
+          <tr key={idx}>
+            {Object.values(row).map((val, i) => (
+              <td key={i}>{val}</td>
             ))}
-            {placeholders.map((placeholder, index) => (
-              <td key={index}>
+            {placeholders.map((placeholder, i) => (
+              <td key={i}>
                 <input type="text" placeholder={placeholder} />
               </td>
             ))}
@@ -541,8 +574,8 @@ const ProductPriceStockWrapper = ({ variations }) => {
         ))
       ) : (
         <tr>
-          {placeholders.map((placeholder, index) => (
-            <td key={index}>
+          {placeholders.map((placeholder, idx) => (
+            <td key={idx}>
               <input type="text" placeholder={placeholder} />
             </td>
           ))}
@@ -557,27 +590,23 @@ const ProductPriceStockWrapper = ({ variations }) => {
     </tbody>
   );
 
+  const renderTable = (columns, rows, additionalHeaders, placeholders) => (
+    <>
+      {renderTableHeaders(rows, columns, additionalHeaders)}
+      {renderTableRows(rows, placeholders)}
+    </>
+  );
+
   return (
     <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
       <div className={styles.priceStockTable}>
-        <table>
-          {renderTableHeaders(variationColumns, [
-            "Price",
-            "Special Price",
-            "Stock",
-            "Seller SKU",
-            "Free Items",
-            "Availability",
-          ])}
-          {renderTableRows(variationRows, [
-            "Price",
-            "Special Price",
-            "Stock",
-            "Seller SKU",
-            "Free Items",
-          ])}
-        </table>
+        {renderTable(
+          variationColumns,
+          variationRows,
+          additionalHeaders,
+          placeholders
+        )}
       </div>
     </div>
   );
@@ -654,6 +683,21 @@ const ProductForm = ({ customClass }) => {
     additionalSpecs: false,
     description: false,
   });
+
+  const basicInfoFields = [
+    {
+      label: "Product Name",
+      name: "basicInfo.productName",
+      type: "text",
+      placeholder: "Nikon Coolpix A300",
+    },
+    {
+      label: "Category",
+      name: "basicInfo.category",
+      type: "select",
+      options: ["Electronics", "Clothing", "Accessories"],
+    },
+  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -756,22 +800,18 @@ const ProductForm = ({ customClass }) => {
     >
       {/* Basic Information Section */}
       <FormSection title="Basic Information" customClass={styles.basicInfo}>
-        <FormInput
-          label="Product Name"
-          name="basicInfo.productName"
-          type="text"
-          placeholder="Ex: Nikon Coolpix A300 Digital Camera"
-          value={formData.basicInfo.productName}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Category"
-          name="basicInfo.category"
-          type="select"
-          options={["Electronics", "Clothing", "Accessories"]}
-          value={formData.basicInfo.category}
-          onChange={handleInputChange}
-        />
+        {basicInfoFields.map(({ label, name, type, ...rest }) => (
+          <FormInput
+            key={name}
+            label={label}
+            name={name}
+            type={type}
+            {...rest}
+            value={formData[name]}
+            onChange={handleInputChange}
+          />
+        ))}
+
         <MediaInput
           label="Product Images"
           name="basicInfo.media.productImages"
