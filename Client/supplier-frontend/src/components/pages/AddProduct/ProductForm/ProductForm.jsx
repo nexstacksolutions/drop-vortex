@@ -498,9 +498,8 @@ const ProductPriceStockWrapper = ({ variations }) => {
   const renderTableHeaders = (columns, additionalHeaders) => (
     <thead>
       <tr>
-        {columns.map((column, index) => (
-          <th key={index}>{column}</th>
-        ))}
+        {variationRows.length > 0 &&
+          columns.map((column, index) => <th key={index}>{column}</th>)}
         {additionalHeaders.map((header, index) => (
           <th key={index}>{header}</th>
         ))}
@@ -510,11 +509,27 @@ const ProductPriceStockWrapper = ({ variations }) => {
 
   const renderTableRows = (rows, placeholders) => (
     <tbody>
-      {rows.map((rowValues, rowIndex) => (
-        <tr key={rowIndex}>
-          {Object.values(rowValues).map((value, colIndex) => (
-            <td key={colIndex}>{value}</td>
-          ))}
+      {rows.length > 0 ? (
+        rows.map((rowValues, rowIndex) => (
+          <tr key={rowIndex}>
+            {Object.values(rowValues).map((value, colIndex) => (
+              <td key={colIndex}>{value}</td>
+            ))}
+            {placeholders.map((placeholder, index) => (
+              <td key={index}>
+                <input type="text" placeholder={placeholder} />
+              </td>
+            ))}
+            <td>
+              <label className={styles.switch}>
+                <input type="checkbox" />
+                <span className={styles.slider}></span>
+              </label>
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr>
           {placeholders.map((placeholder, index) => (
             <td key={index}>
               <input type="text" placeholder={placeholder} />
@@ -527,7 +542,7 @@ const ProductPriceStockWrapper = ({ variations }) => {
             </label>
           </td>
         </tr>
-      ))}
+      )}
     </tbody>
   );
 
@@ -538,6 +553,7 @@ const ProductPriceStockWrapper = ({ variations }) => {
         <table>
           {renderTableHeaders(variationColumns, [
             "Price",
+            "Special Price",
             "Stock",
             "Seller SKU",
             "Free Items",
@@ -545,6 +561,7 @@ const ProductPriceStockWrapper = ({ variations }) => {
           ])}
           {renderTableRows(variationRows, [
             "Price",
+            "Special Price",
             "Stock",
             "Seller SKU",
             "Free Items",
