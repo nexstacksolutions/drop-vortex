@@ -22,20 +22,31 @@
       color: var(--secondary-text);
     }
 
-    & .sectionContent .formInputWrapper .inputWrapper {
-      border: var(--border-sm);
+    & .sectionContent .formInputWrapper {
       position: relative;
 
-      & input {
-        border: none;
-        flex: 1 1;
-      }
+      & .inputWrapper {
+        position: relative;
+        border: var(--border-sm);
+        border-radius: var(--radius-sm);
+        transition: var(--transition-base);
 
-      & .rangeDisplay {
-        position: absolute;
-        right: var(--spacing-md);
-        color: var(--secondary-text);
-        font-size: var(--font-xs);
+        & input {
+          border: none;
+          flex: 1 1;
+        }
+
+        & .suffixDisplay {
+          position: absolute;
+          gap: var(--spacing-xs);
+          right: var(--spacing-md);
+          color: var(--secondary-text);
+          font-size: var(--font-xs);
+        }
+
+        &:focus-within {
+          border-color: var(--accent-color);
+        }
       }
     }
 
@@ -132,6 +143,48 @@
           color: var(--secondary-text);
         }
       }
+    }
+  }
+
+  & .dropdownInputContainer {
+    flex: 1;
+
+    & .dropdownInputWrapper {
+      width: 100%;
+      position: absolute;
+      border: var(--border-sm);
+      border-radius: var(--radius-sm);
+      padding: var(--spacing-sm) 0;
+      background-color: var(--white-color);
+      top: 110%;
+      left: 0;
+      z-index: 10;
+
+      & .dropdownList {
+        flex: 1;
+        position: relative;
+        max-height: 25rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        & .dropdownItem {
+          flex: 1;
+          padding: var(--spacing-sm) var(--spacing-md);
+
+          &:hover {
+            background-color: var(--muted-bg);
+          }
+        }
+
+        & .noOptions {
+          flex: 1;
+          padding: 0 var(--spacing-md);
+        }
+      }
+    }
+
+    &.dropdownInputFocused > div > div:last-child svg {
+      transform: rotate(180deg);
     }
   }
 
@@ -249,6 +302,10 @@
     & > div:first-child {
       flex: 0 0 30%;
       width: 30%;
+    }
+
+    & .inputGroup input:focus {
+      border-color: var(--accent-color);
     }
 
     & > div:nth-child(3) > div {

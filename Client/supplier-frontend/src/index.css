@@ -39,6 +39,8 @@ body {
   --feature-color-light: #f97316;
   --muted-bg-light: #e5e7eb;
   --border-color-light: #d1d5db;
+  --scrollbar-bg-light: transparent;
+  --scrollbar-thumb-bg-light: #e0e0e0;
 
   /* Dark Mode Palette */
   --primary-bg-dark: #1e1e1e;
@@ -52,6 +54,11 @@ body {
   --feature-color-dark: #f97316;
   --muted-bg-dark: #292929;
   --border-color-dark: #444444;
+  --scrollbar-bg-dark: transparent;
+  --scrollbar-thumb-bg-dark: #424242;
+
+  /* scrollbar */
+  --scrollbar-bg: transparent;
 
   /* Typography */
   --family-base: "Poppins", sans-serif;
@@ -125,6 +132,8 @@ body {
   --feature-color: var(--feature-color-dark);
   --muted-bg: var(--muted-bg-dark);
   --border-color: var(--border-color-dark);
+  --scrollbar-bg: var(--scrollbar-bg-dark);
+  --scrollbar-thumb-bg: var(--scrollbar-thumb-bg-dark);
 }
 
 /* Light Mode */
@@ -140,6 +149,8 @@ body {
   --feature-color: var(--feature-color-light);
   --muted-bg: var(--muted-bg-light);
   --border-color: var(--border-color-light);
+  --scrollbar-bg: var(--scrollbar-bg-light);
+  --scrollbar-thumb-bg: var(--scrollbar-thumb-bg-light);
 }
 
 /* Apply transition to theme changes */
@@ -246,6 +257,12 @@ ul {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  transition: var(--transition-base);
+}
+
+/* icons */
+svg {
+  transition: var(--transition-base);
 }
 
 /* Forms */
@@ -258,6 +275,7 @@ textarea {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--primary-text);
+  transition: var(--transition-base);
   outline: none;
   background-color: transparent;
 }
@@ -278,6 +296,7 @@ input::-webkit-inner-spin-button {
 label {
   display: block;
   font-weight: var(--weight-bold);
+  transition: var(--transition-base);
 }
 
 /* Layout */
@@ -296,6 +315,12 @@ main {
   align-items: center;
   gap: 3rem;
   text-align: start;
+}
+
+/* Custom Scrollbar for WebKit Browsers (Chrome, Safari, Edge) */
+.custom-scrollbar {
+  /* scrollbar-width: thin; */
+  scrollbar-color: var(--scrollbar-thumb-bg) var(--scrollbar-bg);
 }
 
 /* Utility Classes */

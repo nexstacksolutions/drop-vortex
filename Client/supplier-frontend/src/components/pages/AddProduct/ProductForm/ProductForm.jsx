@@ -10,7 +10,7 @@ import { FaPlus, FaAngleDown } from "react-icons/fa6";
 import { RiDeleteBin5Line, RiEdit2Line, RiMenuFill } from "react-icons/ri";
 import { useMemo } from "react";
 
-const Guidelines = ({ content, guideType }) => {
+function Guidelines({ content, guideType }) {
   if (!content.length) return null;
   return (
     <div className={classNames(styles.guideContainer, styles[guideType])}>
@@ -21,57 +21,72 @@ const Guidelines = ({ content, guideType }) => {
       </ul>
     </div>
   );
-};
+}
 
-const FormSection = ({
+function FormSection({
   title,
   message,
   children,
   customClass,
   showMoreBtnProps,
-}) => (
-  <section
-    className={classNames(styles.formSection, customClass, "flex flex-col")}
-  >
-    <div className={styles.sectionHeader}>
-      <h2>{title}</h2>
-      {message && <p>{message}</p>}
-    </div>
-    <div className={classNames(styles.sectionContent, "flex flex-col")}>
+}) {
+  return (
+    <section
+      className={classNames(styles.formSection, customClass, "flex flex-col")}
+    >
+      <div className={styles.sectionHeader}>
+        <h2>{title}</h2>
+        {message && <p>{message}</p>}
+      </div>
+      <div className={classNames(styles.sectionContent, "flex flex-col")}>
+        {children}
+      </div>
+      {showMoreBtnProps && <ShowMoreBtn {...showMoreBtnProps} />}
+    </section>
+  );
+}
+
+function InputWrapper({
+  children,
+  label,
+  formInputId,
+  showErr = false,
+  customClass,
+}) {
+  return (
+    <div
+      className={classNames(
+        styles.formInputWrapper,
+        "flex flex-col",
+        customClass
+      )}
+    >
+      {label && <label htmlFor={formInputId}>{label}</label>}
       {children}
+      {showErr && <p className={styles.errorMsg}>Error message</p>}
     </div>
-    {showMoreBtnProps && <ShowMoreBtn {...showMoreBtnProps} />}
-  </section>
-);
+  );
+}
 
-const InputWrapper = ({ children, label, formInputId, customClass }) => (
-  <div
-    className={classNames(
-      styles.formInputWrapper,
-      "flex flex-col",
-      customClass
-    )}
-  >
-    {label && <label htmlFor={formInputId}>{label}</label>}
-    {children}
-  </div>
-);
-
-const generateInputByType = ({
+function generateInputByType({
   type,
   formInputId,
   name,
   value,
-  maxValue,
+  suffixDisplay,
   placeholder,
   fileType,
   inputRef,
   onChange,
+  onFocus,
+  onBlur,
   options,
   handleQuillChange,
   inputList,
-  customOnKeyDown,
-}) => {
+  onKeyDown,
+}) {
+  const { icon, maxValue } = suffixDisplay || {};
+
   if (inputList && name === "shipping.dimensions") {
     return (
       <div className={`${styles.inputGroup} flex`}>
@@ -158,71 +173,52 @@ const generateInputByType = ({
                 ? onChange
                 : (e) => onChange({ target: { name, value: e.target.checked } })
             }
+            onFocus={onFocus}
+            onBlur={onBlur}
             ref={inputRef?.current && inputRef}
-            onKeyDown={customOnKeyDown && customOnKeyDown}
+            onKeyDown={onKeyDown && onKeyDown}
           />
-          {maxValue && (
-            <div className={styles.rangeDisplay}>
-              <span>{value?.length}</span> / <span>{maxValue}</span>
+          {suffixDisplay && (
+            <div className={`${styles.suffixDisplay} flex`}>
+              {maxValue && (
+                <>
+                  <span>{value?.length}</span> / <span>{maxValue}</span>
+                </>
+              )}
+
+              {icon && icon}
             </div>
           )}
         </div>
       );
   }
-};
+}
 
-const FormInput = ({
-  label,
-  name,
-  type,
-  fileType,
-  placeholder,
-  options,
-  value,
-  maxValue,
-  checked,
-  onChange,
-  inputList,
-  inputRef,
-  customClass,
-  showErr = false,
-  onKeyDown,
-}) => {
+function FormInput(props) {
+  const { customClass, wrapInput = true, label, name, onChange } = props;
+
   const formInputId = `${name}-form-input`;
   const handleQuillChange = useCallback(
     (content) => onChange({ target: { name, value: content } }),
     [name, onChange]
   );
 
-  return (
+  return wrapInput ? (
     <InputWrapper
       label={label}
       formInputId={formInputId}
       customClass={customClass}
+      showErr={props?.showErr}
     >
-      {generateInputByType({
-        type,
-        fileType,
-        formInputId,
-        name,
-        value,
-        maxValue,
-        checked,
-        placeholder,
-        onChange,
-        options,
-        handleQuillChange,
-        inputList,
-        inputRef,
-        customOnKeyDown: onKeyDown,
-      })}
-      {showErr && <p className={styles.errorMsg}>Error message</p>}
+      {generateInputByType({ ...props, handleQuillChange, formInputId })}
     </InputWrapper>
+  ) : (
+    generateInputByType({ ...props, handleQuillChange, formInputId })
   );
-};
+}
 
-const renderMediaFiles = (mediaFiles, fileType, handleRemoveFile) =>
-  mediaFiles.map((file, index) => (
+function renderMediaFiles(mediaFiles, fileType, handleRemoveFile) {
+  return mediaFiles.map((file, index) => (
     <MediaPreviewItem
       key={index}
       file={file}
@@ -230,19 +226,20 @@ const renderMediaFiles = (mediaFiles, fileType, handleRemoveFile) =>
       onRemove={() => handleRemoveFile(index)}
     />
   ));
+}
 
-const MediaInput = ({
+function MediaInput({
   label,
   name,
   maxFiles,
+  type = "file",
   fileType,
   value,
   onChange,
   resetTrigger,
   customClass,
-  showErr,
   GuideComponent,
-}) => {
+}) {
   const [mediaFiles, setMediaFiles] = useState(value || []);
   const fileInputRef = useRef(null);
 
@@ -288,8 +285,8 @@ const MediaInput = ({
             <FormInput
               label={<FaPlus />}
               name={name}
-              type="file"
-              fileType="image"
+              type={type}
+              fileType={fileType}
               inputRef={fileInputRef}
               onChange={handleFileChange}
               customClass={styles.addMediaWrapper}
@@ -298,47 +295,104 @@ const MediaInput = ({
         </div>
         {GuideComponent}
       </div>
-      {showErr && <p className={styles.errorMsg}>Error message</p>}
     </InputWrapper>
   );
-};
+}
 
-const MediaPreviewItem = ({ file, fileType, onRemove }) => (
-  <div className={`${styles.mediaPreviewItem} flex flex-center`}>
-    {fileType === "image" ? (
-      <img
-        src={URL.createObjectURL(file)}
-        alt="Media preview"
-        className={styles.mediaImage}
-      />
-    ) : (
-      <video
-        src={URL.createObjectURL(file)}
-        controls
-        className={styles.mediaVideo}
-      />
-    )}
-    <div className={`${styles.mediaActionsContainer} flex justify-between`}>
-      <button
-        type="button"
-        onClick={onRemove}
-        className={styles.removeMediaBtn}
-      >
-        <RiDeleteBin5Line />
-      </button>
-      <button type="button" className={styles.editMediaBtn}>
-        <RiEdit2Line />
-      </button>
+function MediaPreviewItem({ file, fileType, onRemove }) {
+  return (
+    <div className={`${styles.mediaPreviewItem} flex flex-center`}>
+      {fileType === "image" ? (
+        <img
+          src={URL.createObjectURL(file)}
+          alt="Media preview"
+          className={styles.mediaImage}
+        />
+      ) : (
+        <video
+          src={URL.createObjectURL(file)}
+          controls
+          className={styles.mediaVideo}
+        />
+      )}
+      <div className={`${styles.mediaActionsContainer} flex justify-between`}>
+        <button
+          type="button"
+          onClick={onRemove}
+          className={styles.removeMediaBtn}
+        >
+          <RiDeleteBin5Line />
+        </button>
+        <button type="button" className={styles.editMediaBtn}>
+          <RiEdit2Line />
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-const ShowMoreBtn = ({
+function DropdownInput(props) {
+  const { customClass, label, name, options, value } = props || {};
+  const [isFocused, setIsFocused] = useState(false);
+  const dropdownInputId = `${name}-dropdown-input`;
+
+  // Handle input focus
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  // Handle input blur
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
+  // Filter options based on the input value
+  const filteredOptions = options.filter((option) =>
+    option.toLowerCase().includes(value.toLowerCase())
+  );
+
+  return (
+    <InputWrapper
+      label={label}
+      formInputId={dropdownInputId}
+      customClass={classNames(styles.dropdownInputContainer, customClass, {
+        [styles.dropdownInputFocused]: isFocused,
+      })}
+    >
+      <FormInput
+        {...props}
+        wrapInput={false}
+        suffixDisplay={{ icon: <FaAngleDown /> }}
+        onFocus={handleFocus} // Trigger dropdown on focus
+        onBlur={handleBlur} // Close dropdown on blur
+      />
+
+      {/* Dropdown menu that shows when input is focused */}
+      {isFocused && (
+        <div className={`${styles.dropdownInputWrapper} flex align-center`}>
+          <ul className={`${styles.dropdownList} custom-scrollbar-sm`}>
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option, index) => (
+                <li key={index} className={styles.dropdownItem}>
+                  {option}
+                </li>
+              ))
+            ) : (
+              <li className={styles.noOptions}>No options found</li>
+            )}
+          </ul>
+        </div>
+      )}
+    </InputWrapper>
+  );
+}
+
+function ShowMoreBtn({
   btnText = "Show More",
   handleShowMore,
   section,
   showMoreOptions,
-}) => {
+}) {
   return (
     <button
       onClick={handleShowMore}
@@ -350,9 +404,9 @@ const ShowMoreBtn = ({
       <FaAngleDown />
     </button>
   );
-};
+}
 
-const VariantItem = ({
+function VariantItem({
   handleAddVariantItem,
   handleRemoveVariantItem,
   variantData,
@@ -360,7 +414,7 @@ const VariantItem = ({
   valueIndex,
   showVariantImages,
   onChange,
-}) => {
+}) {
   const [state, setState] = useState({
     inputValue: "",
     variantImages: [],
@@ -450,14 +504,14 @@ const VariantItem = ({
       )}
     </div>
   );
-};
+}
 
-const ProductVariations = ({
+function ProductVariations({
   variations,
   onChange,
   handleAddVariantItem,
   handleRemoveVariantItem,
-}) => {
+}) {
   const [showVariantImages, setShowVariantImages] = useState(false);
 
   return (
@@ -521,35 +575,37 @@ const ProductVariations = ({
       ))}
     </div>
   );
-};
+}
 
 // Table header component
-const TableHeaders = ({
+function TableHeaders({
   variationRows,
   variationColumnNames,
   additionalHeaderNames,
-}) => (
-  <thead>
-    <tr>
-      {variationRows.length > 0 &&
-        variationColumnNames.map((columnName, columnIndex) => (
-          <th key={columnIndex}>{columnName}</th>
+}) {
+  return (
+    <thead>
+      <tr>
+        {variationRows.length > 0 &&
+          variationColumnNames.map((columnName, columnIndex) => (
+            <th key={columnIndex}>{columnName}</th>
+          ))}
+        {additionalHeaderNames.map((headerName, headerIndex) => (
+          <th key={headerIndex}>{headerName}</th>
         ))}
-      {additionalHeaderNames.map((headerName, headerIndex) => (
-        <th key={headerIndex}>{headerName}</th>
-      ))}
-    </tr>
-  </thead>
-);
+      </tr>
+    </thead>
+  );
+}
 
 // Table row component
-const TableRows = ({
+function TableRows({
   variationRows,
   variationColumnNames,
   additionalInputFields,
   formData,
   onChange,
-}) => {
+}) {
   return (
     <tbody>
       {variationRows.length > 0 ? (
@@ -570,7 +626,7 @@ const TableRows = ({
                     name={`productDetails.variations[0].values[${rowIndex}].${fieldName}`}
                     type={inputType}
                     placeholder={placeholder}
-                    maxValue={maxValue}
+                    suffixDisplay={{ maxValue }}
                     value={get(
                       formData.productDetails.variations[0].values[rowIndex],
                       fieldName
@@ -595,7 +651,7 @@ const TableRows = ({
                   type={inputType}
                   placeholder={placeholder}
                   value={get(formData, fieldName)}
-                  maxValue={maxValue}
+                  suffixDisplay={{ maxValue }}
                   onChange={onChange}
                 />
               </td>
@@ -605,14 +661,14 @@ const TableRows = ({
       )}
     </tbody>
   );
-};
+}
 
-const ProductPriceStockWrapper = ({
+function ProductPriceStockWrapper({
   variations,
   formData,
   onChange,
   handleApplyToAll,
-}) => {
+}) {
   const variationNames = variations.map((variation) =>
     variation.values.map((v) => v.name).join(",")
   );
@@ -699,7 +755,7 @@ const ProductPriceStockWrapper = ({
                   type={inputType}
                   placeholder={placeholder}
                   value={get(formData.productDetails, fieldName)}
-                  maxValue={maxValue}
+                  suffixDisplay={{ maxValue }}
                   onChange={onChange}
                   className={styles.variationInputField}
                 />
@@ -732,9 +788,9 @@ const ProductPriceStockWrapper = ({
       </div>
     </div>
   );
-};
+}
 
-const ProductForm = ({ customClass }) => {
+function ProductForm({ customClass }) {
   const [formData, setFormData] = useState({
     basicInfo: {
       productName: "",
@@ -814,7 +870,8 @@ const ProductForm = ({ customClass }) => {
     {
       label: "Category",
       name: "basicInfo.category",
-      type: "select",
+      type: "text",
+      placeholder: "Please select category or search with keyword",
       options: [
         "Electronics",
         "Clothing",
@@ -992,18 +1049,30 @@ const ProductForm = ({ customClass }) => {
     >
       {/* Basic Information Section */}
       <FormSection title="Basic Information" customClass={styles.basicInfo}>
-        {basicInfoFields.map(({ label, name, maxValue, type, ...rest }) => (
-          <FormInput
-            key={name}
-            label={label}
-            name={name}
-            type={type}
-            {...rest}
-            value={get(formData, name)}
-            maxValue={maxValue}
-            onChange={handleInputChange}
-          />
-        ))}
+        {basicInfoFields.map(({ label, name, maxValue, type, ...rest }, i) =>
+          i < 1 ? (
+            <FormInput
+              key={name}
+              label={label}
+              name={name}
+              type={type}
+              {...rest}
+              value={get(formData, name)}
+              suffixDisplay={{ maxValue }}
+              onChange={handleInputChange}
+            />
+          ) : (
+            <DropdownInput
+              key={name}
+              label={label}
+              name={name}
+              type={type}
+              {...rest}
+              value={get(formData, name)}
+              onChange={handleInputChange}
+            />
+          )
+        )}
 
         <MediaInput
           label="Product Images"
@@ -1240,6 +1309,6 @@ const ProductForm = ({ customClass }) => {
       </button>
     </form>
   );
-};
+}
 
 export default ProductForm;
