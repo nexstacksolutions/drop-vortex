@@ -62,7 +62,7 @@ const generateInputByType = ({
   formInputId,
   name,
   value,
-  checked,
+  maxValue,
   placeholder,
   fileType,
   inputRef,
@@ -136,20 +136,37 @@ const generateInputByType = ({
           ))}
         </div>
       );
+
     default:
       return (
-        <input
-          type={type}
-          name={name}
-          id={formInputId}
-          value={value}
-          checked={checked}
-          placeholder={placeholder}
-          accept={fileType === "image" ? "image/*" : "video/*"}
-          onChange={onChange}
-          ref={inputRef}
-          onKeyDown={customOnKeyDown}
-        />
+        <div
+          className={classNames(
+            styles.inputWrapper,
+            "flex align-center justify-between"
+          )}
+        >
+          <input
+            type={type}
+            name={name}
+            id={formInputId}
+            value={value}
+            checked={value}
+            placeholder={placeholder && placeholder}
+            accept={fileType && (fileType === "image" ? "image/*" : "video/*")}
+            onChange={
+              type !== "checkbox"
+                ? onChange
+                : (e) => onChange({ target: { name, value: e.target.checked } })
+            }
+            ref={inputRef?.current && inputRef}
+            onKeyDown={customOnKeyDown && customOnKeyDown}
+          />
+          {maxValue && (
+            <div className={styles.rangeDisplay}>
+              <span>{value?.length}</span> / <span>{maxValue}</span>
+            </div>
+          )}
+        </div>
       );
   }
 };
@@ -162,6 +179,7 @@ const FormInput = ({
   placeholder,
   options,
   value,
+  maxValue,
   checked,
   onChange,
   inputList,
@@ -188,6 +206,7 @@ const FormInput = ({
         formInputId,
         name,
         value,
+        maxValue,
         checked,
         placeholder,
         onChange,
@@ -463,8 +482,8 @@ const ProductVariations = ({
                   name="showImageCheckbox"
                   id="showImageCheckbox"
                   type="checkbox"
-                  checked={showVariantImages}
-                  onChange={(e) => setShowVariantImages(e.target.checked)}
+                  value={showVariantImages}
+                  onChange={(e) => setShowVariantImages(e.target.value)}
                 />
                 <label
                   htmlFor="showImageCheckbox-form-input"
@@ -542,18 +561,20 @@ const TableRows = ({
               </td>
             ))}
             {additionalInputFields.map(
-              ({ placeholder, fieldName, inputType = "text" }, index) => (
+              (
+                { placeholder, fieldName, maxValue, inputType = "text" },
+                index
+              ) => (
                 <td key={`additional-col-${index}`}>
                   <FormInput
                     name={`productDetails.variations[0].values[${rowIndex}].${fieldName}`}
                     type={inputType}
                     placeholder={placeholder}
-                    value={
-                      get(
-                        formData.productDetails.variations[0].values[rowIndex],
-                        fieldName
-                      ) || ""
-                    }
+                    maxValue={maxValue}
+                    value={get(
+                      formData.productDetails.variations[0].values[rowIndex],
+                      fieldName
+                    )}
                     onChange={onChange}
                   />
                 </td>
@@ -564,13 +585,17 @@ const TableRows = ({
       ) : (
         <tr>
           {additionalInputFields.map(
-            ({ placeholder, fieldName, inputType = "text" }, index) => (
+            (
+              { placeholder, fieldName, maxValue, inputType = "text" },
+              index
+            ) => (
               <td key={`non-row-${fieldName}-${index}`}>
                 <FormInput
                   name={fieldName}
                   type={inputType}
                   placeholder={placeholder}
                   value={get(formData, fieldName)}
+                  maxValue={maxValue}
                   onChange={onChange}
                 />
               </td>
@@ -639,6 +664,7 @@ const ProductPriceStockWrapper = ({
     {
       fieldName: `${!variationRows.length > 0 ? "productDetails." : ""}sku`,
       placeholder: "Seller SKU",
+      maxValue: 200,
     },
     {
       fieldName: `${
@@ -662,17 +688,23 @@ const ProductPriceStockWrapper = ({
         <div className={`${styles.variationInputContainer} flex`}>
           {additionalInputFields
             .slice(0, 4)
-            .map(({ placeholder, fieldName, inputType = "text" }, index) => (
-              <FormInput
-                key={`non-row-${fieldName}-${index}`}
-                name={`productDetails.${fieldName}`}
-                type={inputType}
-                placeholder={placeholder}
-                value={get(formData.productDetails, fieldName)}
-                onChange={onChange}
-                className={styles.variationInputField}
-              />
-            ))}
+            .map(
+              (
+                { placeholder, fieldName, maxValue, inputType = "text" },
+                index
+              ) => (
+                <FormInput
+                  key={`non-row-${fieldName}-${index}`}
+                  name={`productDetails.${fieldName}`}
+                  type={inputType}
+                  placeholder={placeholder}
+                  value={get(formData.productDetails, fieldName)}
+                  maxValue={maxValue}
+                  onChange={onChange}
+                  className={styles.variationInputField}
+                />
+              )
+            )}
           <button
             onClick={handleApplyToAll}
             className={`${styles.applyToAllButton} primary-btn`}
@@ -720,7 +752,7 @@ const ProductForm = ({ customClass }) => {
         original: "",
       },
       stock: "",
-      availability: "",
+      availability: true,
       freeItems: "",
       sku: "",
 
@@ -775,6 +807,7 @@ const ProductForm = ({ customClass }) => {
     {
       label: "Product Name",
       name: "basicInfo.productName",
+      maxValue: 255,
       type: "text",
       placeholder: "Nikon Coolpix A300",
     },
@@ -782,7 +815,24 @@ const ProductForm = ({ customClass }) => {
       label: "Category",
       name: "basicInfo.category",
       type: "select",
-      options: ["Electronics", "Clothing", "Accessories"],
+      options: [
+        "Electronics",
+        "Clothing",
+        "Accessories",
+        "Home & Garden",
+        "Sports & Outdoors",
+        "Books & Magazines",
+        "Toys & Games",
+        "Other",
+        "Gifts & Wishlists",
+        "Merchandise & Collectibles",
+        "Services",
+        "Art & Crafts",
+        "Pet Supplies",
+        "Home Improvement",
+        "Baby & Kids",
+        "Sports & Fitness",
+      ],
     },
   ];
 
@@ -807,13 +857,18 @@ const ProductForm = ({ customClass }) => {
     });
   }, []);
 
-  const debouncedChange = useMemo(
+  const handleDebouncedChange = useMemo(
     () => debounce((e) => handleInputChange(e), 300),
     [handleInputChange]
   );
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const submitter = e?.nativeEvent?.submitter;
+
+    if (submitter.name !== "submitBtn") return;
+
+    console.log("form submitted", formData);
   };
 
   const toggleShowMoreOption = (section) => {
@@ -840,7 +895,7 @@ const ProductForm = ({ customClass }) => {
           original: "",
         },
         stock: "",
-        availability: "",
+        availability: true,
         freeItems: "",
         sku: "",
         packageWeight: "",
@@ -937,14 +992,15 @@ const ProductForm = ({ customClass }) => {
     >
       {/* Basic Information Section */}
       <FormSection title="Basic Information" customClass={styles.basicInfo}>
-        {basicInfoFields.map(({ label, name, type, ...rest }) => (
+        {basicInfoFields.map(({ label, name, maxValue, type, ...rest }) => (
           <FormInput
             key={name}
             label={label}
             name={name}
             type={type}
             {...rest}
-            value={formData[name]}
+            value={get(formData, name)}
+            maxValue={maxValue}
             onChange={handleInputChange}
           />
         ))}
@@ -1076,7 +1132,7 @@ const ProductForm = ({ customClass }) => {
           name="description.main"
           type="textarea"
           value={formData.description.main}
-          onChange={debouncedChange}
+          onChange={handleDebouncedChange}
         />
 
         <FormInput
@@ -1084,7 +1140,7 @@ const ProductForm = ({ customClass }) => {
           name="description.highlights"
           type="textarea"
           value={formData.description.highlights}
-          onChange={debouncedChange}
+          onChange={handleDebouncedChange}
         />
         {showMoreOptions.description && (
           <>
@@ -1175,7 +1231,11 @@ const ProductForm = ({ customClass }) => {
         )}
       </FormSection>
 
-      <button type="submit" className={`${styles.submitButton} primary-btn`}>
+      <button
+        type="submit"
+        name="submitBtn"
+        className={`${styles.submitButton} primary-btn`}
+      >
         Submit
       </button>
     </form>

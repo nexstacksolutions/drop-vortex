@@ -22,6 +22,23 @@
       color: var(--secondary-text);
     }
 
+    & .sectionContent .formInputWrapper .inputWrapper {
+      border: var(--border-sm);
+      position: relative;
+
+      & input {
+        border: none;
+        flex: 1 1;
+      }
+
+      & .rangeDisplay {
+        position: absolute;
+        right: var(--spacing-md);
+        color: var(--secondary-text);
+        font-size: var(--font-xs);
+      }
+    }
+
     & .showMoreBtn {
       transition: var(--transition-base);
 
@@ -96,6 +113,10 @@
             & svg {
               font-size: var(--font-lg);
             }
+          }
+
+          & > div {
+            display: none;
           }
         }
       }
