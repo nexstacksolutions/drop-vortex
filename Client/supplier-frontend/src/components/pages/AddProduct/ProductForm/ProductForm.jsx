@@ -350,7 +350,7 @@ const VariantItem = ({
 
   const { inputValue, variantImages, resetTrigger } = state;
 
-  const resetVariantForm = useCallback(() => {
+  const resetVariantImages = useCallback(() => {
     setState({
       inputValue: "",
       variantImages: [],
@@ -366,13 +366,13 @@ const VariantItem = ({
     (e) => {
       if (e.key === "Enter" && inputValue.trim()) {
         handleAddVariantItem(inputValue, variantImages, variationIndex);
-        resetVariantForm();
+        resetVariantImages();
       }
     },
     [
       inputValue,
       variantImages,
-      resetVariantForm,
+      resetVariantImages,
       variationIndex,
       handleAddVariantItem,
     ]
@@ -955,7 +955,7 @@ const ProductForm = ({ customClass }) => {
           fileType="image"
           maxFiles={5}
           value={formData.basicInfo.media.productImages}
-          onChange={(e) => handleInputChange(e)}
+          onChange={handleInputChange}
         />
         <MediaInput
           label="Buyer Promotion Image"
@@ -963,7 +963,7 @@ const ProductForm = ({ customClass }) => {
           fileType="image"
           maxFiles={1}
           value={formData.basicInfo.media.buyerPromotionImage}
-          onChange={(e) => handleInputChange(e)}
+          onChange={handleInputChange}
           GuideComponent={
             <Guidelines
               content={["White Background Image", "See Example"]}
@@ -977,7 +977,7 @@ const ProductForm = ({ customClass }) => {
           fileType="video"
           maxFiles={1}
           value={formData.basicInfo.media.productVideo}
-          onChange={(e) => handleInputChange(e)}
+          onChange={handleInputChange}
           GuideComponent={
             <Guidelines
               content={[
@@ -1034,16 +1034,8 @@ const ProductForm = ({ customClass }) => {
             name="specifications.additionalSpecs"
             type="text"
             placeholder="Additional Specifications"
-            value={formData.specifications.additionalSpecs.join(", ")}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                specifications: {
-                  ...formData.specifications,
-                  additionalSpecs: e.target.value.split(", "),
-                },
-              })
-            }
+            value={formData.specifications.additionalSpecs}
+            onChange={handleInputChange}
           />
         )}
       </FormSection>
@@ -1056,7 +1048,7 @@ const ProductForm = ({ customClass }) => {
       >
         <ProductVariations
           variations={formData.productDetails.variations}
-          onChange={(e) => handleInputChange(e)}
+          onChange={handleInputChange}
           handleAddVariantItem={handleAddVariantItem}
           handleRemoveVariantItem={handleRemoveVariantItem}
         />
@@ -1065,7 +1057,7 @@ const ProductForm = ({ customClass }) => {
           variations={formData.productDetails.variations}
           formData={formData}
           handleApplyToAll={handleApplyToAll}
-          onChange={(e) => handleInputChange(e)}
+          onChange={handleInputChange}
         />
       </FormSection>
 
