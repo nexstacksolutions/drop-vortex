@@ -96,6 +96,7 @@ function generateInputByType({
   suffixDisplay,
   placeholder,
   fileType,
+  multiple,
   inputRef,
   isSwitch,
   inputList,
@@ -183,6 +184,7 @@ function generateInputByType({
             checked={value}
             placeholder={placeholder}
             accept={fileType && (fileType === "image" ? "image/*" : "video/*")}
+            multiple={multiple}
             onChange={onChange}
             onFocus={onFocus}
             onBlur={onBlur}
@@ -317,6 +319,7 @@ function MediaInput({
               name={name}
               type={type}
               fileType={fileType}
+              multiple={maxFiles && maxFiles > 1 ? true : false}
               inputRef={fileInputRef}
               onChange={handleFileChange}
               customClass={styles.addMediaWrapper}
