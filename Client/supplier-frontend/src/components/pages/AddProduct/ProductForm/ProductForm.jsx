@@ -1,14 +1,28 @@
 import styles from "./ProductForm.module.css";
 import "react-quill/dist/quill.snow.css";
-import { useState, useCallback, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import debounce from "lodash/debounce";
 import { set, get } from "lodash";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
 import { FaPlus, FaAngleDown } from "react-icons/fa6";
+import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
+import Divider from "../../../constant/Divider/Divider";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { RiDeleteBin5Line, RiEdit2Line, RiMenuFill } from "react-icons/ri";
-import { useMemo } from "react";
+
+const getFieldPath = (
+  isVariationField,
+  baseField,
+  valueIndex,
+  variationIndex = 0
+) => {
+  const dynamicField = `productDetails.variations[${variationIndex}].values[${valueIndex}]`;
+
+  return isVariationField
+    ? `${dynamicField}.${baseField}`
+    : `productDetails.${baseField}`;
+};
 
 function Guidelines({ content, guideType }) {
   if (!content.length) return null;
@@ -26,6 +40,7 @@ function Guidelines({ content, guideType }) {
 function FormSection({
   title,
   message,
+  additionalJsx,
   children,
   customClass,
   showMoreBtnProps,
@@ -37,6 +52,7 @@ function FormSection({
       <div className={styles.sectionHeader}>
         <h2>{title}</h2>
         {message && <p>{message}</p>}
+        {additionalJsx && additionalJsx}
       </div>
       <div className={classNames(styles.sectionContent, "flex flex-col")}>
         {children}
@@ -50,7 +66,7 @@ function InputWrapper({
   children,
   label,
   formInputId,
-  showErr = false,
+  errorMessage,
   customClass,
 }) {
   return (
@@ -61,67 +77,86 @@ function InputWrapper({
         customClass
       )}
     >
-      {label && <label htmlFor={formInputId}>{label}</label>}
+      {label && (
+        <label htmlFor={formInputId} className="flex align-center">
+          {label}
+        </label>
+      )}
       {children}
-      {showErr && <p className={styles.errorMsg}>Error message</p>}
+      {errorMessage && <p className={styles.errorMsg}>{errorMessage}</p>}
     </div>
   );
 }
 
 function generateInputByType({
   type,
-  formInputId,
   name,
   value,
+  formInputId,
   suffixDisplay,
   placeholder,
   fileType,
   inputRef,
+  isSwitch,
+  inputList,
   onChange,
   onFocus,
   onBlur,
   options,
   handleQuillChange,
-  inputList,
   onKeyDown,
 }) {
   const { icon, maxValue } = suffixDisplay || {};
 
-  if (inputList && name === "shipping.dimensions") {
-    return (
-      <div className={`${styles.inputGroup} flex`}>
-        {Object.keys(value).map((dimension, index) => (
+  const renderInputList = () => (
+    <div className={`${styles.inputGroup} flex`}>
+      {Object.keys(value).map((dimension, index) => (
+        <input
+          key={index}
+          type={type}
+          name={dimension}
+          value={value[dimension]}
+          placeholder={dimension.charAt(0).toUpperCase() + dimension.slice(1)}
+          onChange={(e) =>
+            onChange({
+              target: {
+                name: name,
+                value: { ...value, [dimension]: e.target.value },
+              },
+            })
+          }
+        />
+      ))}
+    </div>
+  );
+
+  const renderRadioGroup = () => (
+    <div className={classNames(styles.radioGroup, "flex")}>
+      {options.map((option, index) => (
+        <label
+          key={index}
+          htmlFor={`${name}${index}`}
+          className={classNames(styles.radioItem, "flex flex-center")}
+        >
           <input
-            key={index}
             type={type}
-            name={dimension}
-            value={value[dimension]}
-            placeholder={dimension.charAt(0).toUpperCase() + dimension.slice(1)}
-            onChange={(e) =>
-              onChange({
-                target: {
-                  name: name,
-                  value: { ...value, [dimension]: e.target.value },
-                },
-              })
-            }
+            id={`${name}${index}`}
+            name={name}
+            value={option}
+            checked={value === option}
+            onChange={onChange}
           />
-        ))}
-      </div>
-    );
-  }
+          <span>{option}</span>
+        </label>
+      ))}
+    </div>
+  );
+
+  if (inputList && name === "shipping.dimensions") return renderInputList();
+  if (isSwitch)
+    return <SwitchBtn currState={value} name={name} onChange={onChange} />;
 
   switch (type) {
-    case "select":
-      return (
-        <select name={name} id={formInputId} value={value} onChange={onChange}>
-          {options.map((option, index) => (
-            <option key={index} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      );
     case "textarea":
       return (
         <ReactQuill
@@ -131,27 +166,7 @@ function generateInputByType({
         />
       );
     case "radio":
-      return (
-        <div className={classNames(styles.radioGroup, "flex")}>
-          {options.map((option, index) => (
-            <div
-              key={index}
-              className={classNames(styles.radioItem, "flex flex-center")}
-            >
-              <input
-                type={type}
-                id={`${name}${index}`}
-                name={name}
-                value={option}
-                checked={value === option}
-                onChange={onChange}
-              />
-              <label htmlFor={`${name}${index}`}>{option}</label>
-            </div>
-          ))}
-        </div>
-      );
-
+      return renderRadioGroup();
     default:
       return (
         <div
@@ -166,17 +181,13 @@ function generateInputByType({
             id={formInputId}
             value={value}
             checked={value}
-            placeholder={placeholder && placeholder}
+            placeholder={placeholder}
             accept={fileType && (fileType === "image" ? "image/*" : "video/*")}
-            onChange={
-              type !== "checkbox"
-                ? onChange
-                : (e) => onChange({ target: { name, value: e.target.checked } })
-            }
+            onChange={onChange}
             onFocus={onFocus}
             onBlur={onBlur}
-            ref={inputRef?.current && inputRef}
-            onKeyDown={onKeyDown && onKeyDown}
+            ref={inputRef}
+            onKeyDown={onKeyDown}
           />
           {suffixDisplay && (
             <div className={`${styles.suffixDisplay} flex`}>
@@ -185,7 +196,6 @@ function generateInputByType({
                   <span>{value?.length}</span> / <span>{maxValue}</span>
                 </>
               )}
-
               {icon && icon}
             </div>
           )}
@@ -194,26 +204,40 @@ function generateInputByType({
   }
 }
 
-function FormInput(props) {
-  const { customClass, wrapInput = true, label, name, onChange } = props;
-
+function FormInput({
+  customClass,
+  wrapInput = true,
+  label,
+  name,
+  onChange,
+  errorMessage,
+  ...rest
+}) {
   const formInputId = `${name}-form-input`;
   const handleQuillChange = useCallback(
     (content) => onChange({ target: { name, value: content } }),
     [name, onChange]
   );
 
+  const generateInputProps = {
+    ...rest,
+    name,
+    onChange,
+    handleQuillChange,
+    formInputId,
+  };
+
   return wrapInput ? (
     <InputWrapper
       label={label}
       formInputId={formInputId}
       customClass={customClass}
-      showErr={props?.showErr}
+      errorMessage={errorMessage}
     >
-      {generateInputByType({ ...props, handleQuillChange, formInputId })}
+      {generateInputByType(generateInputProps)}
     </InputWrapper>
   ) : (
-    generateInputByType({ ...props, handleQuillChange, formInputId })
+    generateInputByType(generateInputProps)
   );
 }
 
@@ -262,6 +286,12 @@ function MediaInput({
     onChange({ target: { name, value: updatedFiles } });
     if (fileInputRef.current) fileInputRef.current.value = null;
   };
+
+  useEffect(() => {
+    return () => {
+      mediaFiles.forEach((file) => URL.revokeObjectURL(file));
+    };
+  }, [mediaFiles]);
 
   useEffect(() => {
     if (resetTrigger) {
@@ -332,7 +362,7 @@ function MediaPreviewItem({ file, fileType, onRemove }) {
 }
 
 function DropdownInput(props) {
-  const { customClass, label, name, options, value } = props || {};
+  const { customClass, label, name, options, value, onChange } = props || {};
   const [isFocused, setIsFocused] = useState(false);
   const dropdownInputId = `${name}-dropdown-input`;
 
@@ -350,6 +380,13 @@ function DropdownInput(props) {
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(value.toLowerCase())
   );
+
+  const handleOptionClick = (e) => {
+    const { innerText } = e.target;
+    if (onChange) {
+      onChange({ target: { name, value: innerText } });
+    }
+  };
 
   return (
     <InputWrapper
@@ -373,7 +410,11 @@ function DropdownInput(props) {
           <ul className={`${styles.dropdownList} custom-scrollbar-sm`}>
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
-                <li key={index} className={styles.dropdownItem}>
+                <li
+                  onMouseDown={handleOptionClick}
+                  key={index}
+                  className={styles.dropdownItem}
+                >
                   {option}
                 </li>
               ))
@@ -391,18 +432,30 @@ function ShowMoreBtn({
   btnText = "Show More",
   handleShowMore,
   section,
-  showMoreOptions,
+  showAdditionalFields,
 }) {
   return (
     <button
       onClick={handleShowMore}
       className={classNames(styles.showMoreBtn, {
-        [styles.showMoreBtnActive]: showMoreOptions[section],
+        [styles.showMoreBtnActive]: showAdditionalFields[section],
       })}
     >
-      <span> {!showMoreOptions[section] ? btnText : "Show Less"}</span>
+      <span> {!showAdditionalFields[section] ? btnText : "Show Less"}</span>
       <FaAngleDown />
     </button>
+  );
+}
+
+function AdditionalJsx(props) {
+  return (
+    <div className={`${styles.additionalJsx} flex align-center`}>
+      <SwitchBtn {...props} />
+      <p>
+        Switch on if you need different dimension & weight for different product
+        variants
+      </p>
+    </div>
   );
 }
 
@@ -537,7 +590,7 @@ function ProductVariations({
                   id="showImageCheckbox"
                   type="checkbox"
                   value={showVariantImages}
-                  onChange={(e) => setShowVariantImages(e.target.value)}
+                  onChange={(e) => setShowVariantImages(e.target.checked)}
                 />
                 <label
                   htmlFor="showImageCheckbox-form-input"
@@ -579,14 +632,14 @@ function ProductVariations({
 
 // Table header component
 function TableHeaders({
-  variationRows,
+  hasVariationRows,
   variationColumnNames,
   additionalHeaderNames,
 }) {
   return (
     <thead>
       <tr>
-        {variationRows.length > 0 &&
+        {hasVariationRows &&
           variationColumnNames.map((columnName, columnIndex) => (
             <th key={columnIndex}>{columnName}</th>
           ))}
@@ -601,6 +654,7 @@ function TableHeaders({
 // Table row component
 function TableRows({
   variationRows,
+  hasVariationRows,
   variationColumnNames,
   additionalInputFields,
   formData,
@@ -608,7 +662,7 @@ function TableRows({
 }) {
   return (
     <tbody>
-      {variationRows.length > 0 ? (
+      {hasVariationRows ? (
         variationRows.map((rowValues, rowIndex) => (
           <tr key={`variation-row-${rowIndex}`}>
             {variationColumnNames.map((columnName, columnIndex) => (
@@ -616,6 +670,7 @@ function TableRows({
                 {rowValues[columnName]}
               </td>
             ))}
+
             {additionalInputFields.map(
               (
                 { placeholder, fieldName, maxValue, inputType = "text" },
@@ -623,15 +678,16 @@ function TableRows({
               ) => (
                 <td key={`additional-col-${index}`}>
                   <FormInput
-                    name={`productDetails.variations[0].values[${rowIndex}].${fieldName}`}
+                    name={getFieldPath(true, fieldName, rowIndex)}
                     type={inputType}
                     placeholder={placeholder}
                     suffixDisplay={{ maxValue }}
                     value={get(
-                      formData.productDetails.variations[0].values[rowIndex],
-                      fieldName
+                      formData,
+                      getFieldPath(true, fieldName, rowIndex)
                     )}
                     onChange={onChange}
+                    isSwitch={index === additionalInputFields.length - 1}
                   />
                 </td>
               )
@@ -647,12 +703,13 @@ function TableRows({
             ) => (
               <td key={`non-row-${fieldName}-${index}`}>
                 <FormInput
-                  name={fieldName}
+                  name={getFieldPath(false, fieldName)}
                   type={inputType}
                   placeholder={placeholder}
-                  value={get(formData, fieldName)}
                   suffixDisplay={{ maxValue }}
+                  value={get(formData, getFieldPath(false, fieldName))}
                   onChange={onChange}
+                  isSwitch={index === additionalInputFields.length - 1}
                 />
               </td>
             )
@@ -701,46 +758,20 @@ function ProductPriceStockWrapper({
   ];
 
   const additionalInputFields = [
-    {
-      fieldName: `${
-        !variationRows.length > 0 ? "productDetails." : ""
-      }pricing.current`,
-      placeholder: "Price",
-    },
-    {
-      fieldName: `${
-        !variationRows.length > 0 ? "productDetails." : ""
-      }pricing.original`,
-      placeholder: "Special Price",
-    },
-    {
-      fieldName: `${!variationRows.length > 0 ? "productDetails." : ""}stock`,
-      placeholder: "Stock",
-    },
-    {
-      fieldName: `${!variationRows.length > 0 ? "productDetails." : ""}sku`,
-      placeholder: "Seller SKU",
-      maxValue: 200,
-    },
-    {
-      fieldName: `${
-        !variationRows.length > 0 ? "productDetails." : ""
-      }freeItems`,
-      placeholder: "Free Items",
-    },
-    {
-      fieldName: `${
-        !variationRows.length > 0 ? "productDetails." : ""
-      }availability`,
-      inputType: "checkbox",
-    },
+    { fieldName: "pricing.current", placeholder: "Price" },
+    { fieldName: "pricing.original", placeholder: "Special Price" },
+    { fieldName: "stock", placeholder: "Stock" },
+    { fieldName: "sku", placeholder: "Seller SKU", maxValue: 200 },
+    { fieldName: "freeItems", placeholder: "Free Items" },
+    { fieldName: "availability" },
   ];
 
-  // Render the entire table
+  const hasVariationRows = variationRows.length > 0;
+
   return (
     <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
-      {variationRows.length > 0 && (
+      {hasVariationRows && (
         <div className={`${styles.variationInputContainer} flex`}>
           {additionalInputFields
             .slice(0, 4)
@@ -751,13 +782,13 @@ function ProductPriceStockWrapper({
               ) => (
                 <FormInput
                   key={`non-row-${fieldName}-${index}`}
-                  name={`productDetails.${fieldName}`}
+                  name={getFieldPath(false, fieldName)}
                   type={inputType}
                   placeholder={placeholder}
-                  value={get(formData.productDetails, fieldName)}
+                  value={get(formData, getFieldPath(false, fieldName))}
                   suffixDisplay={{ maxValue }}
                   onChange={onChange}
-                  className={styles.variationInputField}
+                  customClass={styles.variationInputField}
                 />
               )
             )}
@@ -773,9 +804,9 @@ function ProductPriceStockWrapper({
       <div className={styles.variantTableWrapper}>
         <table className={styles.variantTable}>
           <TableHeaders
-            variationRows={variationRows}
             variationColumnNames={variationColumnNames}
             additionalHeaderNames={additionalHeaderNames}
+            hasVariationRows={hasVariationRows}
           />
           <TableRows
             variationRows={variationRows}
@@ -783,6 +814,7 @@ function ProductPriceStockWrapper({
             additionalInputFields={additionalInputFields}
             formData={formData}
             onChange={onChange}
+            hasVariationRows={hasVariationRows}
           />
         </table>
       </div>
@@ -853,11 +885,13 @@ function ProductForm({ customClass }) {
     },
   });
 
-  const [showMoreOptions, setShowMoreOptions] = useState({
+  const [showAdditionalFields, setShowAdditionalFields] = useState({
     warranty: false,
     additionalSpecs: false,
     description: false,
   });
+
+  const [variantShipping, setVariantShipping] = useState(false);
 
   const basicInfoFields = [
     {
@@ -928,8 +962,8 @@ function ProductForm({ customClass }) {
     console.log("form submitted", formData);
   };
 
-  const toggleShowMoreOption = (section) => {
-    setShowMoreOptions((prev) => ({
+  const toggleShowAdditionalFields = (section) => {
+    setShowAdditionalFields((prev) => ({
       ...prev,
       [section]: !prev[section],
     }));
@@ -1121,9 +1155,9 @@ function ProductForm({ customClass }) {
         title="Product Specification"
         message="Fill more product specification will increase product searchability."
         showMoreBtnProps={{
-          handleShowMore: () => toggleShowMoreOption("additionalSpecs"),
+          handleShowMore: () => toggleShowAdditionalFields("additionalSpecs"),
           section: "additionalSpecs",
-          showMoreOptions,
+          showAdditionalFields,
         }}
         customClass={styles.productSpec}
       >
@@ -1153,7 +1187,7 @@ function ProductForm({ customClass }) {
           onChange={handleInputChange}
         />
 
-        {showMoreOptions.additionalSpecs && (
+        {showAdditionalFields.additionalSpecs && (
           <FormInput
             label="Additional Specifications"
             name="specifications.additionalSpecs"
@@ -1183,6 +1217,7 @@ function ProductForm({ customClass }) {
           formData={formData}
           handleApplyToAll={handleApplyToAll}
           onChange={handleInputChange}
+          variantShipping={variantShipping}
         />
       </FormSection>
 
@@ -1190,9 +1225,9 @@ function ProductForm({ customClass }) {
       <FormSection
         title="Product Description"
         showMoreBtnProps={{
-          handleShowMore: () => toggleShowMoreOption("description"),
+          handleShowMore: () => toggleShowAdditionalFields("description"),
           section: "description",
-          showMoreOptions,
+          showAdditionalFields,
         }}
         customClass={styles.productDesc}
       >
@@ -1211,7 +1246,7 @@ function ProductForm({ customClass }) {
           value={formData.description.highlights}
           onChange={handleDebouncedChange}
         />
-        {showMoreOptions.description && (
+        {showAdditionalFields.description && (
           <>
             <FormInput
               label="Tags"
@@ -1237,31 +1272,42 @@ function ProductForm({ customClass }) {
       <FormSection
         title="Shipping & Warranty"
         message="Switch to enter different package dimensions & weight for variations"
+        additionalJsx={
+          <AdditionalJsx
+            currState={variantShipping}
+            customClickHandler={() => setVariantShipping(!variantShipping)}
+          />
+        }
         showMoreBtnProps={{
           btnText: "More Warranty Settings",
-          handleShowMore: () => toggleShowMoreOption("warranty"),
+          handleShowMore: () => toggleShowAdditionalFields("warranty"),
           section: "warranty",
-          showMoreOptions,
+          showAdditionalFields,
         }}
         customClass={styles.productSW}
       >
-        <FormInput
-          label="Package Weight"
-          name="shipping.packageWeight"
-          type="number"
-          placeholder="0.01 - 300"
-          value={formData.shipping.packageWeight}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Package Dimensions (L x W x H)"
-          name="shipping.dimensions"
-          type="number"
-          placeholder="0.01 - 300"
-          inputList={3}
-          value={formData.shipping.dimensions}
-          onChange={handleInputChange}
-        />
+        {!variantShipping && (
+          <>
+            <FormInput
+              label="Package Weight"
+              name="shipping.packageWeight"
+              type="number"
+              placeholder="0.01 - 300"
+              value={formData.shipping.packageWeight}
+              onChange={handleInputChange}
+            />
+            <FormInput
+              label="Package Dimensions (L x W x H)"
+              name="shipping.dimensions"
+              type="number"
+              placeholder="0.01 - 300"
+              inputList={3}
+              value={formData.shipping.dimensions}
+              onChange={handleInputChange}
+            />
+          </>
+        )}
+
         <FormInput
           label="Dangerous Goods"
           name="shipping.dangerousGoods"
@@ -1269,8 +1315,12 @@ function ProductForm({ customClass }) {
           options={["None", "Contains battery / flammables / liquid"]}
           value={formData.shipping.dangerousGoods}
           onChange={handleInputChange}
+          customClass={styles.formInputWrapper}
         />
-        {showMoreOptions.warranty && (
+
+        <Divider />
+
+        {showAdditionalFields.warranty && (
           <>
             <FormInput
               label="Warranty Type"

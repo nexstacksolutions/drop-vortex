@@ -7,28 +7,18 @@ const ToggleTheme = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div
+    <button
       onClick={toggleTheme}
-      className={classNames(`${styles.toggleTheme} flex flex-center`, {
-        [styles.lightActive]: theme === "light",
-        [styles.darkActive]: theme === "dark",
-      })}
+      className={classNames(
+        styles.switchBtn,
+        "flex align-center justify-start",
+        { [styles.switchBtnOn]: theme === "dark" }
+      )}
     >
-      <button
-        className={classNames(styles.btnLight, {
-          [styles.activeBtn]: theme === "light",
-        })}
-      >
-        <CiLight />
-      </button>
-      <button
-        className={classNames(styles.btnDark, {
-          [styles.activeBtn]: theme === "dark",
-        })}
-      >
-        <CiDark />
-      </button>
-    </div>
+      <CiLight />
+      <span></span>
+      <CiDark />
+    </button>
   );
 };
 

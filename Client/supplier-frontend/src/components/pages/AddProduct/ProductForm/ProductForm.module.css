@@ -276,13 +276,6 @@
           padding: 10px;
           border: var(--border-sm);
           text-align: center;
-
-          /* &:last-child {
-            position: sticky;
-            right: 0px;
-            background-color: var(--white-color);
-            box-shadow: var(--shadow-base);
-          } */
         }
       }
     }
@@ -299,9 +292,27 @@
   }
 
   & .productSW > div {
+    & .additionalJsx {
+      margin-top: var(--spacing-sm);
+    }
+
     & > div:first-child {
       flex: 0 0 30%;
       width: 30%;
+    }
+
+    & > .formInputWrapper:first-child {
+      flex: 1;
+      width: 100%;
+      margin-top: var(--spacing-sm);
+
+      & > .radioGroup > .radioItem {
+        cursor: pointer;
+
+        & > input {
+          width: max-content;
+        }
+      }
     }
 
     & .inputGroup input:focus {

@@ -1,0 +1,26 @@
+.switchBtn {
+  width: 4.4rem;
+  height: 2.4rem;
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 500px;
+  background-color: #cbced5;
+
+  & span {
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    border-radius: var(--rounded);
+    background-color: #fff;
+    box-shadow: 6px 6px 12px 0 rgba(132, 152, 208, 0.05);
+    transform: translateX(0);
+  }
+
+  &.switchBtnOn {
+    background-color: var(--accent-color);
+
+    & span {
+      transform: translateX(2rem);
+    }
+  }
+}

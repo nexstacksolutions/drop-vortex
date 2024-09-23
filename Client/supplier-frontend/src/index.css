@@ -261,6 +261,7 @@ ul {
 }
 
 /* icons */
+span,
 svg {
   transition: var(--transition-base);
 }
