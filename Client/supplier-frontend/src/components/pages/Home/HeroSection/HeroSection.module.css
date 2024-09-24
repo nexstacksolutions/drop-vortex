@@ -9,7 +9,7 @@
     & > div {
       flex: 1 1;
       height: 13rem;
-      background-color: var(--white-color);
+      background-color: var(--canvas-color);
       padding: var(--spacing-sm) 2rem;
       border-radius: var(--radius-lg);
       overflow: hidden;

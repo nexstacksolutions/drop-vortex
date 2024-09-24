@@ -29,6 +29,7 @@ function SwitchBtn({
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       disabled={disableCondition}
       className={classNames(styles.switchBtn, "justify-start", {

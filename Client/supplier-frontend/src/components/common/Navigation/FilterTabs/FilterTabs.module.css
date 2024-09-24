@@ -11,9 +11,9 @@
     & .tabValueCount {
       position: absolute;
       height: 1.6rem;
-      color: #fff;
+      color: var(--white-color);
       min-width: 16px;
-      border: 0 solid #fff;
+      border: 0 solid var(--white-color);
       border-radius: 8px;
       font-size: 12px;
       height: 16px;

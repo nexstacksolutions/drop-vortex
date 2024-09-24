@@ -15,7 +15,7 @@
   height: 100vh;
   width: 100%;
   min-width: 65px;
-  background-color: var(--white-color);
+  background-color: var(--canvas-color);
   padding: var(--spacing-md);
   gap: var(--spacing-md);
   transition: var(--transition-base);
@@ -178,7 +178,7 @@
       width: 20rem;
       position: absolute;
       padding: var(--spacing-sm) var(--spacing-md);
-      background-color: var(--white-color);
+      background-color: var(--canvas-color);
       left: 5rem;
       top: 0;
     }

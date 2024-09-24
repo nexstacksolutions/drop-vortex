@@ -27,37 +27,10 @@ body {
 
 /* Root Variables */
 :root {
-  /* Light Mode Palette */
-  --primary-bg-light: #f5f5f5;
-  --secondary-bg-light: #2d2d2d;
-  --white-color-light: #ffffff;
-  --primary-text-light: #333333;
-  --secondary-text-light: #666666;
-  --secondary-bg-text-light: #e0e0e0;
-  --rarely-used-text-light: #959595;
-  --accent-color-light: #3b82f6;
-  --feature-color-light: #f97316;
-  --muted-bg-light: #e5e7eb;
-  --border-color-light: #d1d5db;
-  --scrollbar-bg-light: transparent;
-  --scrollbar-thumb-bg-light: #e0e0e0;
-
-  /* Dark Mode Palette */
-  --primary-bg-dark: #1e1e1e;
-  --secondary-bg-dark: #121212;
-  --white-color-dark: #2c2c2c;
-  --primary-text-dark: #e0e0e0;
-  --secondary-text-dark: #b0b0b0;
-  --secondary-bg-text-dark: #cccccc;
-  --rarely-used-text-dark: #959595;
-  --accent-color-dark: #3b82f6;
-  --feature-color-dark: #f97316;
-  --muted-bg-dark: #292929;
-  --border-color-dark: #444444;
-  --scrollbar-bg-dark: transparent;
-  --scrollbar-thumb-bg-dark: #424242;
-
-  /* scrollbar */
+  /* Common Palette */
+  --white-color: #fff;
+  --accent-color: #3b82f6;
+  --feature-color: #f97316;
   --scrollbar-bg: transparent;
 
   /* Typography */
@@ -98,6 +71,7 @@ body {
   --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.06);
   --shadow-base: 2px 2px 16px rgba(0, 0, 0, 0.06);
   --shadow-dark: 2px 4px 20px rgba(0, 0, 0, 0.07);
+  --accent-shadow-light: 0 0 0 2px rgba(59, 130, 246, 0.2);
 
   /* Breakpoints */
   --breakpoint-xs: 320px;
@@ -121,36 +95,32 @@ body {
 
 /* Dark Mode */
 [data-theme="dark"] {
-  --primary-bg: var(--primary-bg-dark);
-  --secondary-bg: var(--secondary-bg-dark);
-  --white-color: var(--white-color-dark);
-  --primary-text: var(--primary-text-dark);
-  --secondary-text: var(--secondary-text-dark);
-  --secondary-bg-text: var(--secondary-bg-text-dark);
-  --rarely-used-text: var(--rarely-used-text-dark);
-  --accent-color: var(--accent-color-dark);
-  --feature-color: var(--feature-color-dark);
-  --muted-bg: var(--muted-bg-dark);
-  --border-color: var(--border-color-dark);
-  --scrollbar-bg: var(--scrollbar-bg-dark);
-  --scrollbar-thumb-bg: var(--scrollbar-thumb-bg-dark);
+  --primary-bg: #1e1e1e;
+  --secondary-bg: #121212;
+  --canvas-color: #2c2c2c;
+  --primary-text: #e0e0e0;
+  --secondary-text: #b0b0b0;
+  --subtle-bg: #cccccc;
+  --inactive-text: #959595;
+  --muted-bg: #292929;
+  --soft-bg: ;
+  --border-color: #444444;
+  --scrollbar-thumb-bg: #424242;
 }
 
 /* Light Mode */
 [data-theme="light"] {
-  --primary-bg: var(--primary-bg-light);
-  --secondary-bg: var(--secondary-bg-light);
-  --white-color: var(--white-color-light);
-  --primary-text: var(--primary-text-light);
-  --secondary-text: var(--secondary-text-light);
-  --secondary-bg-text: var(--secondary-bg-text-light);
-  --rarely-used-text: var(--rarely-used-text-light);
-  --accent-color: var(--accent-color-light);
-  --feature-color: var(--feature-color-light);
-  --muted-bg: var(--muted-bg-light);
-  --border-color: var(--border-color-light);
-  --scrollbar-bg: var(--scrollbar-bg-light);
-  --scrollbar-thumb-bg: var(--scrollbar-thumb-bg-light);
+  --primary-bg: #f5f5f5;
+  --secondary-bg: #2d2d2d;
+  --canvas-color: #ffffff;
+  --primary-text: #333333;
+  --secondary-text: #666666;
+  --subtle-bg: #e0e0e0;
+  --inactive-text: #959595;
+  --muted-bg: #e5e7eb;
+  --soft-bg: ;
+  --border-color: #d1d5db;
+  --scrollbar-thumb-bg: #e0e0e0;
 }
 
 /* Apply transition to theme changes */
@@ -235,7 +205,7 @@ button {
   border-radius: var(--radius-sm);
   line-height: normal;
   background-color: var(--accent-color);
-  color: var(--primary-text);
+  color: var(--white-color);
 
   &:hover {
     opacity: 0.9;
@@ -282,7 +252,7 @@ textarea {
 }
 
 select {
-  background-color: var(--white-color);
+  background-color: var(--canvas-color);
 }
 
 input[type="file"] {

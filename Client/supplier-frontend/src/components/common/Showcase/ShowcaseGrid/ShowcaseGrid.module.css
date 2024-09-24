@@ -1,7 +1,7 @@
 .showcaseGrid {
   width: 100%;
   position: relative;
-  background-color: var(--white-color);
+  background-color: var(--canvas-color);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   gap: var(--spacing-md);

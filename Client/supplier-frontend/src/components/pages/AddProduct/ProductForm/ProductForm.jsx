@@ -117,6 +117,16 @@ function generateInputByType({
 }) {
   const { icon, maxValue } = suffixDisplay || {};
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      if (onKeyDown) {
+        onKeyDown(e);
+      }
+    }
+  };
+
   if (isSwitch)
     return <SwitchBtn currState={value} name={name} onChange={onChange} />;
 
@@ -144,7 +154,7 @@ function generateInputByType({
             onFocus={onFocus}
             onBlur={onBlur}
             ref={inputRef}
-            onKeyDown={onKeyDown}
+            onKeyDown={handleKeyDown}
           />
           {suffixDisplay && (
             <div className={`${styles.suffixDisplay} flex`}>
@@ -449,16 +459,17 @@ function ShowMoreBtn({
   btnText = "Show More",
   handleShowMore,
   section,
-  showAdditionalFields,
+  additionalFields,
 }) {
   return (
     <button
+      type="button"
       onClick={handleShowMore}
       className={classNames(styles.showMoreBtn, {
-        [styles.showMoreBtnActive]: showAdditionalFields[section],
+        [styles.showMoreBtnActive]: additionalFields[section],
       })}
     >
-      <span> {!showAdditionalFields[section] ? btnText : "Show Less"}</span>
+      <span> {!additionalFields[section] ? btnText : "Show Less"}</span>
       <FaAngleDown />
     </button>
   );
@@ -505,21 +516,18 @@ function VariantItem({
     );
   }, [resetTrigger]);
 
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === "Enter" && inputValue.trim()) {
-        handleAddVariantItem(inputValue, variantImages, variationIndex);
-        resetVariantImages();
-      }
-    },
-    [
-      inputValue,
-      variantImages,
-      resetVariantImages,
-      variationIndex,
-      handleAddVariantItem,
-    ]
-  );
+  const handleKeyDown = useCallback(() => {
+    if (inputValue.trim()) {
+      handleAddVariantItem(inputValue, variantImages, variationIndex);
+      resetVariantImages();
+    }
+  }, [
+    inputValue,
+    variantImages,
+    resetVariantImages,
+    variationIndex,
+    handleAddVariantItem,
+  ]);
 
   const updatedValueIndex =
     valueIndex === undefined ? "addVariantItem" : valueIndex;
@@ -565,8 +573,8 @@ function VariantItem({
       {onChange && (
         <div className={`${styles.variantActions} flex justify-end`}>
           <button
-            onClick={() => handleRemoveVariantItem(variationIndex, valueIndex)}
             type="button"
+            onClick={() => handleRemoveVariantItem(variationIndex, valueIndex)}
             className={styles.removeVariant}
           >
             <RiDeleteBin5Line />
@@ -855,6 +863,7 @@ function ProductPriceStockWrapper({
               )
             )}
           <button
+            type="button"
             onClick={handleApplyToAll}
             className={`${styles.applyToAllButton} primary-btn`}
           >
@@ -942,7 +951,7 @@ function ProductForm({ customClass }) {
       },
     },
     uiState: {
-      showAdditionalFields: {
+      additionalFields: {
         warranty: false,
         additionalSpecs: false,
         description: false,
@@ -1068,9 +1077,9 @@ function ProductForm({ customClass }) {
       ...prevData,
       uiState: {
         ...prevData.uiState,
-        showAdditionalFields: {
-          ...prevData.uiState.showAdditionalFields,
-          [section]: !prevData.uiState.showAdditionalFields[section],
+        additionalFields: {
+          ...prevData.uiState.additionalFields,
+          [section]: !prevData.uiState.additionalFields[section],
         },
       },
     }));
@@ -1079,9 +1088,7 @@ function ProductForm({ customClass }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const submitter = e?.nativeEvent?.submitter;
-
     if (submitter.name !== "submitBtn") return;
-
     console.log("form submitted", formData);
   };
 
@@ -1210,7 +1217,7 @@ function ProductForm({ customClass }) {
         showMoreBtnProps={{
           handleShowMore: () => toggleShowAdditionalFields("additionalSpecs"),
           section: "additionalSpecs",
-          showAdditionalFields: formData.uiState.showAdditionalFields,
+          additionalFields: formData.uiState.additionalFields,
         }}
         customClass={styles.productSpec}
       >
@@ -1239,7 +1246,7 @@ function ProductForm({ customClass }) {
           onChange={handleInputChange}
         />
 
-        {formData.uiState.showAdditionalFields.additionalSpecs && (
+        {formData.uiState.additionalFields.additionalSpecs && (
           <FormInput
             label="Additional Specifications"
             name="specifications.additionalSpecs"
@@ -1278,7 +1285,7 @@ function ProductForm({ customClass }) {
         showMoreBtnProps={{
           handleShowMore: () => toggleShowAdditionalFields("description"),
           section: "description",
-          showAdditionalFields: formData.uiState.showAdditionalFields,
+          additionalFields: formData.uiState.additionalFields,
         }}
         customClass={styles.productDesc}
       >
@@ -1296,7 +1303,7 @@ function ProductForm({ customClass }) {
           value={formData.description.highlights}
           onChange={handleDebouncedChange}
         />
-        {formData.uiState.showAdditionalFields.description && (
+        {formData.uiState.additionalFields.description && (
           <>
             <FormInput
               label="Tags"
@@ -1337,7 +1344,7 @@ function ProductForm({ customClass }) {
           btnText: "More Warranty Settings",
           handleShowMore: () => toggleShowAdditionalFields("warranty"),
           section: "warranty",
-          showAdditionalFields: formData.uiState.showAdditionalFields,
+          additionalFields: formData.uiState.additionalFields,
         }}
         customClass={styles.productSW}
       >
@@ -1374,7 +1381,9 @@ function ProductForm({ customClass }) {
           customClass={styles.radioGroup}
         />
 
-        {formData.uiState.showAdditionalFields.warranty && (
+        <Divider />
+
+        {formData.uiState.additionalFields.warranty && (
           <>
             <FormInput
               label="Warranty Type"

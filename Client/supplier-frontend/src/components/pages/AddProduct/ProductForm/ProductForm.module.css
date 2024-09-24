@@ -4,7 +4,7 @@
 
   & .formSection {
     flex: 1;
-    background-color: var(--white-color);
+    background-color: var(--canvas-color);
     padding: 1.2rem var(--spacing-md) 2rem;
     border-radius: var(--radius-md);
     gap: var(--spacing-md);
@@ -52,8 +52,13 @@
             font-size: var(--font-xs);
           }
 
-          &:focus-within {
+          &:focus-within,
+          &:hover {
             border-color: var(--accent-color);
+          }
+
+          &:focus-within {
+            box-shadow: var(--accent-shadow-light);
           }
         }
       }
@@ -168,7 +173,7 @@
       border: var(--border-sm);
       border-radius: var(--radius-sm);
       padding: var(--spacing-sm) 0;
-      background-color: var(--white-color);
+      background-color: var(--canvas-color);
       top: 110%;
       left: 0;
       z-index: 10;
@@ -207,6 +212,9 @@
     & .variationItem {
       flex: 1;
       gap: var(--spacing-md);
+      background-color: var(--muted-bg);
+      padding: 2rem;
+      border-radius: var(--radius-sm);
 
       & .variationHeader {
         width: 100%;
@@ -244,7 +252,7 @@
         & .variantItem {
           width: 100%;
           gap: var(--spacing-md);
-          background-color: var(--muted-bg);
+          background-color: var(--white-color);
           padding: var(--spacing-sm) var(--spacing-md);
           border-radius: var(--radius-md);
 
@@ -338,5 +346,9 @@
         width: auto;
       }
     }
+  }
+
+  & > button {
+    color: var(--white-color);
   }
 }
