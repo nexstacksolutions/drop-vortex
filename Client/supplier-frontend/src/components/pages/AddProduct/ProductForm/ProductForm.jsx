@@ -1078,6 +1078,10 @@ function ProductForm({ customClass }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const submitter = e?.nativeEvent?.submitter;
+
+    if (submitter.name !== "submitBtn") return;
+
     console.log("form submitted", formData);
   };
 
