@@ -947,19 +947,7 @@ function ProductForm({ customClass }) {
     },
   });
 
-  const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-    console.log(name, value);
-
-    setFormData((prevData) => set({ ...prevData }, name, value));
-  }, []);
-
-  const handleDebouncedChange = useMemo(
-    () => debounce(handleInputChange, 300),
-    [handleInputChange]
-  );
-
-  const handleCustomizeChange = (e, name, value, customizer) => {
+  const handleInputChange = useCallback((e, name, value, customizer) => {
     console.log(e, name, value, customizer);
 
     if (e) {
@@ -968,8 +956,13 @@ function ProductForm({ customClass }) {
 
     const customizedValue = customizer ? customizer(value) : value;
 
-    handleInputChange({ target: { name, value: customizedValue } });
-  };
+    setFormData((prevData) => set({ ...prevData }, name, customizedValue));
+  }, []);
+
+  const handleDebouncedChange = useMemo(
+    () => debounce(handleInputChange, 300),
+    [handleInputChange]
+  );
 
   const handleAddVariantItem = useCallback(
     (inputValue, variantImages, variationIndex) => {
@@ -1154,7 +1147,7 @@ function ProductForm({ customClass }) {
               type={type}
               {...rest}
               value={get(formData, name)}
-              onChange={handleCustomizeChange}
+              onChange={handleInputChange}
             />
           )
         )}
@@ -1166,7 +1159,7 @@ function ProductForm({ customClass }) {
           fileType="image"
           maxFiles={5}
           value={formData.basicInfo.media.productImages}
-          onChange={handleCustomizeChange}
+          onChange={handleInputChange}
         />
         <MediaInput
           label="Buyer Promotion Image"
@@ -1174,7 +1167,7 @@ function ProductForm({ customClass }) {
           fileType="image"
           maxFiles={1}
           value={formData.basicInfo.media.buyerPromotionImage}
-          onChange={handleCustomizeChange}
+          onChange={handleInputChange}
           GuideComponent={
             <Guidelines
               content={["White Background Image", "See Example"]}
@@ -1188,7 +1181,7 @@ function ProductForm({ customClass }) {
           fileType="video"
           maxFiles={1}
           value={formData.basicInfo.media.productVideo}
-          onChange={handleCustomizeChange}
+          onChange={handleInputChange}
           GuideComponent={
             <Guidelines
               content={[
@@ -1286,14 +1279,14 @@ function ProductForm({ customClass }) {
           name="description.main"
           type="textarea"
           value={formData.description.main}
-          onChange={handleCustomizeChange}
+          onChange={handleDebouncedChange}
         />
         <FormInput
           label="Highlights"
           name="description.highlights"
           type="textarea"
           value={formData.description.highlights}
-          onChange={handleCustomizeChange}
+          onChange={handleDebouncedChange}
         />
         {formData.uiState.showAdditionalFields.description && (
           <>
@@ -1304,7 +1297,7 @@ function ProductForm({ customClass }) {
               placeholder="Ex: New, Sale, Bestseller"
               value={formData.description.tags.join(", ")}
               onChange={(e) =>
-                handleCustomizeChange(e, null, null, (value) =>
+                handleInputChange(e, null, null, (value) =>
                   value.split(", ").map((tag) => tag.trim())
                 )
               }
@@ -1357,7 +1350,7 @@ function ProductForm({ customClass }) {
               groupType="input"
               placeholder="0.01 - 300"
               value={formData.shipping.dimensions}
-              onChange={handleCustomizeChange}
+              onChange={handleInputChange}
             />
           </>
         )}
