@@ -22,30 +22,39 @@
       color: var(--secondary-text);
     }
 
-    & .sectionContent .formInputWrapper {
+    & .sectionContent .formInputContainer {
       position: relative;
 
-      & .inputWrapper {
-        position: relative;
-        border: var(--border-sm);
-        border-radius: var(--radius-sm);
-        transition: var(--transition-base);
+      & .formInputWrapper {
+        flex: 1;
 
-        & input {
-          border: none;
-          flex: 1 1;
+        & > div {
+          flex: 1;
         }
 
-        & .suffixDisplay {
-          position: absolute;
-          gap: var(--spacing-xs);
-          right: var(--spacing-md);
-          color: var(--secondary-text);
-          font-size: var(--font-xs);
-        }
+        & .inputWrapper {
+          flex: 1;
+          position: relative;
+          border: var(--border-sm);
+          border-radius: var(--radius-sm);
+          transition: var(--transition-base);
 
-        &:focus-within {
-          border-color: var(--accent-color);
+          & input {
+            border: none;
+            flex: 1 1;
+          }
+
+          & .suffixDisplay {
+            position: absolute;
+            gap: var(--spacing-xs);
+            right: var(--spacing-md);
+            color: var(--secondary-text);
+            font-size: var(--font-xs);
+          }
+
+          &:focus-within {
+            border-color: var(--accent-color);
+          }
         }
       }
     }
@@ -57,8 +66,12 @@
         transition: var(--transition-base);
       }
 
-      &.showMoreBtnActive svg {
-        transform: rotate(180deg);
+      &.showMoreBtnActive {
+        color: var(--accent-color);
+
+        & svg {
+          transform: rotate(180deg);
+        }
       }
     }
   }
@@ -244,7 +257,7 @@
             background-color: transparent;
             max-width: max-content;
 
-            & > div > div > div {
+            & > div > div > div > div {
               width: 4rem;
               height: 4rem;
             }
@@ -301,22 +314,17 @@
       width: 30%;
     }
 
-    & > .formInputWrapper:first-child {
-      flex: 1;
-      width: 100%;
-      margin-top: var(--spacing-sm);
-
-      & > .radioGroup > .radioItem {
-        cursor: pointer;
-
-        & > input {
-          width: max-content;
-        }
-      }
-    }
-
     & .inputGroup input:focus {
       border-color: var(--accent-color);
+    }
+
+    & .radioGroup {
+      width: 100% !important;
+      margin-top: var(--spacing-sm);
+
+      & > div {
+        justify-content: start;
+      }
     }
 
     & > div:nth-child(3) > div {

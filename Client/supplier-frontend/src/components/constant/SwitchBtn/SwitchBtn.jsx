@@ -2,7 +2,13 @@ import styles from "./SwitchBtn.module.css";
 import { useState } from "react";
 import classNames from "classnames";
 
-function SwitchBtn({ currState, name, onChange, customClickHandler }) {
+function SwitchBtn({
+  currState,
+  name,
+  onChange,
+  customClickHandler,
+  disableCondition,
+}) {
   const [isSwitchOn, setIsSwitchOn] = useState(currState);
 
   const handleToggleSwitch = () => {
@@ -24,6 +30,7 @@ function SwitchBtn({ currState, name, onChange, customClickHandler }) {
   return (
     <button
       onClick={handleClick}
+      disabled={disableCondition}
       className={classNames(styles.switchBtn, "justify-start", {
         [styles.switchBtnOn]: customClickHandler ? currState : isSwitchOn,
       })}

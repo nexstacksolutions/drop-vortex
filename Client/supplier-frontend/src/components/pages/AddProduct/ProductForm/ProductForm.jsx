@@ -72,7 +72,7 @@ function InputWrapper({
   return (
     <div
       className={classNames(
-        styles.formInputWrapper,
+        styles.formInputContainer,
         "flex flex-col",
         customClass
       )}
@@ -82,7 +82,16 @@ function InputWrapper({
           {label}
         </label>
       )}
-      {children}
+
+      <div
+        className={classNames(
+          styles.formInputWrapper,
+          "flex align-center justify-between"
+        )}
+      >
+        {children}
+      </div>
+
       {errorMessage && <p className={styles.errorMsg}>{errorMessage}</p>}
     </div>
   );
@@ -92,82 +101,28 @@ function generateInputByType({
   type,
   name,
   value,
-  formInputId,
+  checked,
+  id,
   suffixDisplay,
   placeholder,
   fileType,
   multiple,
   inputRef,
   isSwitch,
-  inputList,
   onChange,
   onFocus,
   onBlur,
-  options,
   handleQuillChange,
   onKeyDown,
 }) {
   const { icon, maxValue } = suffixDisplay || {};
 
-  const renderInputList = () => (
-    <div className={`${styles.inputGroup} flex`}>
-      {Object.keys(value).map((dimension, index) => (
-        <input
-          key={index}
-          type={type}
-          name={dimension}
-          value={value[dimension]}
-          placeholder={dimension.charAt(0).toUpperCase() + dimension.slice(1)}
-          onChange={(e) =>
-            onChange({
-              target: {
-                name: name,
-                value: { ...value, [dimension]: e.target.value },
-              },
-            })
-          }
-        />
-      ))}
-    </div>
-  );
-
-  const renderRadioGroup = () => (
-    <div className={classNames(styles.radioGroup, "flex")}>
-      {options.map((option, index) => (
-        <label
-          key={index}
-          htmlFor={`${name}${index}`}
-          className={classNames(styles.radioItem, "flex flex-center")}
-        >
-          <input
-            type={type}
-            id={`${name}${index}`}
-            name={name}
-            value={option}
-            checked={value === option}
-            onChange={onChange}
-          />
-          <span>{option}</span>
-        </label>
-      ))}
-    </div>
-  );
-
-  if (inputList && name === "shipping.dimensions") return renderInputList();
   if (isSwitch)
     return <SwitchBtn currState={value} name={name} onChange={onChange} />;
 
   switch (type) {
     case "textarea":
-      return (
-        <ReactQuill
-          value={value}
-          id={formInputId}
-          onChange={handleQuillChange}
-        />
-      );
-    case "radio":
-      return renderRadioGroup();
+      return <ReactQuill value={value} id={id} onChange={handleQuillChange} />;
     default:
       return (
         <div
@@ -179,9 +134,9 @@ function generateInputByType({
           <input
             type={type}
             name={name}
-            id={formInputId}
+            id={id}
             value={value}
-            checked={value}
+            checked={checked}
             placeholder={placeholder}
             accept={fileType && (fileType === "image" ? "image/*" : "video/*")}
             multiple={multiple}
@@ -226,7 +181,7 @@ function FormInput({
     name,
     onChange,
     handleQuillChange,
-    formInputId,
+    id: formInputId,
   };
 
   return wrapInput ? (
@@ -240,6 +195,70 @@ function FormInput({
     </InputWrapper>
   ) : (
     generateInputByType(generateInputProps)
+  );
+}
+
+function MultiInputGroup({
+  customClass,
+  value,
+  options,
+  name,
+  onChange,
+  type,
+  groupType,
+  label,
+  errorMessage,
+}) {
+  const dropdownInputId = `${name}-multi-input-group`;
+
+  return (
+    <InputWrapper
+      label={label}
+      formInputId={dropdownInputId}
+      customClass={customClass}
+      errorMessage={errorMessage}
+    >
+      {groupType === "input"
+        ? Object.keys(value).map((dimension, index) => (
+            <FormInput
+              key={index}
+              name={dimension}
+              value={value[dimension]}
+              type={type}
+              wrapInput={false}
+              placeholder={
+                dimension.charAt(0).toUpperCase() + dimension.slice(1)
+              }
+              onChange={(e) =>
+                onChange({
+                  target: {
+                    name: name,
+                    value: { ...value, [dimension]: e.target.value },
+                  },
+                })
+              }
+            />
+          ))
+        : options?.map((option, index) => (
+            <label
+              key={index}
+              htmlFor={`${name}${index}`}
+              className={classNames(styles.radioItem, "flex flex-center")}
+            >
+              {generateInputByType({
+                type,
+                id: `${name}${index}`,
+                name,
+                value: option,
+                checked: value === option,
+                wrapInput: false,
+                onChange,
+              })}
+
+              <span>{option}</span>
+            </label>
+          ))}
+    </InputWrapper>
   );
 }
 
@@ -437,6 +456,8 @@ function ShowMoreBtn({
   section,
   showAdditionalFields,
 }) {
+  console.log(showAdditionalFields);
+
   return (
     <button
       onClick={handleShowMore}
@@ -657,6 +678,7 @@ function TableHeaders({
 // Table row component
 function TableRows({
   variationRows,
+  variantShipping,
   hasVariationRows,
   variationColumnNames,
   additionalInputFields,
@@ -676,22 +698,36 @@ function TableRows({
 
             {additionalInputFields.map(
               (
-                { placeholder, fieldName, maxValue, inputType = "text" },
+                { placeholder, fieldName, maxValue, inputType = "number" },
                 index
               ) => (
                 <td key={`additional-col-${index}`}>
-                  <FormInput
-                    name={getFieldPath(true, fieldName, rowIndex)}
-                    type={inputType}
-                    placeholder={placeholder}
-                    suffixDisplay={{ maxValue }}
-                    value={get(
-                      formData,
-                      getFieldPath(true, fieldName, rowIndex)
-                    )}
-                    onChange={onChange}
-                    isSwitch={index === additionalInputFields.length - 1}
-                  />
+                  {variantShipping && index === 4 ? (
+                    <MultiInputGroup
+                      name={getFieldPath(true, fieldName, rowIndex)}
+                      type={inputType}
+                      groupType="input"
+                      placeholder={placeholder}
+                      value={get(
+                        formData,
+                        getFieldPath(true, fieldName, rowIndex)
+                      )}
+                      onChange={onChange}
+                    />
+                  ) : (
+                    <FormInput
+                      name={getFieldPath(true, fieldName, rowIndex)}
+                      type={inputType}
+                      placeholder={placeholder}
+                      suffixDisplay={{ maxValue }}
+                      value={get(
+                        formData,
+                        getFieldPath(true, fieldName, rowIndex)
+                      )}
+                      onChange={onChange}
+                      isSwitch={index === additionalInputFields.length - 1}
+                    />
+                  )}
                 </td>
               )
             )}
@@ -701,7 +737,7 @@ function TableRows({
         <tr>
           {additionalInputFields.map(
             (
-              { placeholder, fieldName, maxValue, inputType = "text" },
+              { placeholder, fieldName, maxValue, inputType = "number" },
               index
             ) => (
               <td key={`non-row-${fieldName}-${index}`}>
@@ -725,6 +761,7 @@ function TableRows({
 
 function ProductPriceStockWrapper({
   variations,
+  variantShipping,
   formData,
   onChange,
   handleApplyToAll,
@@ -751,10 +788,15 @@ function ProductPriceStockWrapper({
     return variations.map((variation) => variation.type);
   }, [variations]);
 
+  const hasVariationRows = variationRows.length > 0;
+
   const additionalHeaderNames = [
     "Price",
     "Special Price",
     "Stock",
+    ...(variantShipping && hasVariationRows
+      ? ["Package Weight", "Package Dimensions(cm): Length * Width * Height"]
+      : []),
     "Seller SKU",
     "Free Items",
     "Availability",
@@ -764,12 +806,29 @@ function ProductPriceStockWrapper({
     { fieldName: "pricing.current", placeholder: "Price" },
     { fieldName: "pricing.original", placeholder: "Special Price" },
     { fieldName: "stock", placeholder: "Stock" },
-    { fieldName: "sku", placeholder: "Seller SKU", maxValue: 200 },
+    ...(variantShipping && hasVariationRows
+      ? [
+          {
+            fieldName: "packageWeight",
+            placeholder: "0.001 - 300",
+            inputType: "number",
+          },
+          {
+            fieldName: "dimensions",
+            placeholder: "0.01 - 300",
+            inputType: "number",
+          },
+        ]
+      : []),
+    {
+      fieldName: "sku",
+      placeholder: "Seller SKU",
+      inputType: "text",
+      maxValue: 200,
+    },
     { fieldName: "freeItems", placeholder: "Free Items" },
     { fieldName: "availability" },
   ];
-
-  const hasVariationRows = variationRows.length > 0;
 
   return (
     <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
@@ -777,10 +836,13 @@ function ProductPriceStockWrapper({
       {hasVariationRows && (
         <div className={`${styles.variationInputContainer} flex`}>
           {additionalInputFields
-            .slice(0, 4)
+            .slice(0, variantShipping ? 6 : 4) // Slice depending on variantShipping
+            .filter(
+              (_, index) => !(variantShipping && (index === 3 || index === 4))
+            ) // Filter out index 3 and 4 if variantShipping is true
             .map(
               (
-                { placeholder, fieldName, maxValue, inputType = "text" },
+                { placeholder, fieldName, maxValue, inputType = "number" },
                 index
               ) => (
                 <FormInput
@@ -818,6 +880,7 @@ function ProductPriceStockWrapper({
             formData={formData}
             onChange={onChange}
             hasVariationRows={hasVariationRows}
+            variantShipping={variantShipping}
           />
         </table>
       </div>
@@ -836,7 +899,6 @@ function ProductForm({ customClass }) {
         productVideo: [],
       },
     },
-
     productDetails: {
       pricing: {
         current: "",
@@ -846,7 +908,6 @@ function ProductForm({ customClass }) {
       availability: true,
       freeItems: "",
       sku: "",
-
       variations: [
         {
           type: "Color Family",
@@ -854,7 +915,6 @@ function ProductForm({ customClass }) {
         },
       ],
     },
-
     specifications: {
       brand: {
         name: "",
@@ -864,14 +924,12 @@ function ProductForm({ customClass }) {
       powerSource: "",
       additionalSpecs: [],
     },
-
     description: {
       main: "",
       highlights: "",
       tags: [],
       whatsInBox: "",
     },
-
     shipping: {
       packageWeight: "",
       dimensions: {
@@ -879,22 +937,154 @@ function ProductForm({ customClass }) {
         width: "",
         height: "",
       },
-      dangerousGoods: "",
+      dangerousGoods: "None",
       warranty: {
         type: "",
         period: "",
         policy: "",
       },
     },
+    uiState: {
+      showAdditionalFields: {
+        warranty: false,
+        additionalSpecs: false,
+        description: false,
+      },
+      variantShipping: false,
+    },
   });
 
-  const [showAdditionalFields, setShowAdditionalFields] = useState({
-    warranty: false,
-    additionalSpecs: false,
-    description: false,
-  });
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => set({ ...prevData }, name, value));
+  }, []);
 
-  const [variantShipping, setVariantShipping] = useState(false);
+  const handleDebouncedChange = useMemo(
+    () => debounce(handleInputChange, 300),
+    [handleInputChange]
+  );
+
+  const handleAddVariantItem = useCallback(
+    (inputValue, variantImages, variationIndex) => {
+      if (!inputValue.trim()) return;
+
+      const newVariant = {
+        id: uuidv4(),
+        name: inputValue,
+        variantImages: variantImages || [],
+        pricing: { current: "", original: "" },
+        stock: "",
+        availability: true,
+        freeItems: "",
+        sku: "",
+        packageWeight: "",
+        dimensions: { length: "", width: "", height: "" },
+      };
+
+      setFormData((prevData) => {
+        const updatedVariations = [...prevData.productDetails.variations];
+        if (updatedVariations[variationIndex]) {
+          updatedVariations[variationIndex].values.push(newVariant);
+        }
+        return {
+          ...prevData,
+          productDetails: {
+            ...prevData.productDetails,
+            variations: updatedVariations,
+          },
+        };
+      });
+    },
+    []
+  );
+
+  const handleRemoveVariantItem = useCallback((variationIndex, valueIndex) => {
+    setFormData((prevData) => {
+      const updatedVariations = [...prevData.productDetails.variations];
+      const updatedValues = [...updatedVariations[variationIndex].values];
+      updatedValues.splice(valueIndex, 1);
+
+      updatedVariations[variationIndex] = {
+        ...updatedVariations[variationIndex],
+        values: updatedValues,
+      };
+
+      return {
+        ...prevData,
+        productDetails: {
+          ...prevData.productDetails,
+          variations: updatedVariations,
+        },
+      };
+    });
+  }, []);
+
+  const multiVariantShippingCondition =
+    formData.productDetails.variations.length &&
+    formData.productDetails.variations[0].values.length > 1;
+
+  const handleApplyToAll = () => {
+    const { pricing, stock, sku } = formData.productDetails;
+    const updatedVariations = formData.productDetails.variations.map(
+      (variation) => ({
+        ...variation,
+        values: variation.values.map((value) => ({
+          ...value,
+          pricing: {
+            current: pricing.current || value.pricing.current,
+            original: pricing.original || value.pricing.original,
+          },
+          stock: stock || value.stock,
+          sku: sku || value.sku,
+        })),
+      })
+    );
+
+    setFormData((prevData) => ({
+      ...prevData,
+      productDetails: {
+        ...prevData.productDetails,
+        variations: updatedVariations,
+      },
+    }));
+  };
+
+  const handleSetVariantShipping = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      uiState: {
+        ...prevData.uiState,
+        variantShipping: !prevData.uiState.variantShipping,
+      },
+    }));
+  };
+
+  const toggleShowAdditionalFields = (section) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      uiState: {
+        ...prevData.uiState,
+        showAdditionalFields: {
+          ...prevData.uiState.showAdditionalFields,
+          [section]: !prevData.uiState.showAdditionalFields[section],
+        },
+      },
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("form submitted", formData);
+  };
+
+  useEffect(() => {
+    if (!multiVariantShippingCondition) {
+      setFormData((prevData) => ({
+        ...prevData,
+        uiState: { ...prevData.uiState, variantShipping: false },
+      }));
+    }
+  }, [multiVariantShippingCondition]);
 
   const basicInfoFields = [
     {
@@ -930,155 +1120,6 @@ function ProductForm({ customClass }) {
     },
   ];
 
-  const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-
-    console.log("input change", name, value);
-
-    setFormData((prevData) => {
-      const updatedData = { ...prevData };
-
-      // Check if the field is for tags
-      if (name === "description.tags") {
-        updatedData.description.tags = value
-          .split(",")
-          .map((tag) => tag.trim());
-      } else {
-        set(updatedData, name, value);
-      }
-
-      return updatedData;
-    });
-  }, []);
-
-  const handleDebouncedChange = useMemo(
-    () => debounce((e) => handleInputChange(e), 300),
-    [handleInputChange]
-  );
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const submitter = e?.nativeEvent?.submitter;
-
-    if (submitter.name !== "submitBtn") return;
-
-    console.log("form submitted", formData);
-  };
-
-  const toggleShowAdditionalFields = (section) => {
-    setShowAdditionalFields((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
-
-  const handleAddVariantItem = useCallback(
-    (inputValue, variantImages, variationIndex) => {
-      // Validate the input
-      if (!inputValue.trim()) {
-        console.error("Variant name cannot be empty");
-        return;
-      }
-
-      const newVariant = {
-        id: uuidv4(),
-        name: inputValue,
-        variantImages: Array.isArray(variantImages) ? variantImages : [],
-        pricing: {
-          current: "",
-          original: "",
-        },
-        stock: "",
-        availability: true,
-        freeItems: "",
-        sku: "",
-        packageWeight: "",
-        dimensions: {
-          length: "",
-          width: "",
-          height: "",
-        },
-      };
-
-      setFormData((prevData) => {
-        const { productDetails } = prevData;
-        const updatedVariations = [...productDetails.variations];
-
-        // Ensure that the variation index is valid
-        if (!updatedVariations[variationIndex]) {
-          console.error(`No variation found at index ${variationIndex}`);
-          return prevData;
-        }
-
-        updatedVariations[variationIndex].values.push(newVariant);
-
-        return {
-          ...prevData,
-          productDetails: {
-            ...productDetails,
-            variations: updatedVariations,
-          },
-        };
-      });
-    },
-    []
-  );
-
-  const handleRemoveVariantItem = useCallback((variationIndex, valueIndex) => {
-    setFormData((prevData) => {
-      const updatedVariations = [...prevData.productDetails.variations];
-      const updatedValues = [...updatedVariations[variationIndex].values];
-      updatedValues.splice(valueIndex, 1);
-
-      updatedVariations[variationIndex] = {
-        ...updatedVariations[variationIndex],
-        values: updatedValues,
-      };
-
-      return {
-        ...prevData,
-        productDetails: {
-          ...prevData.productDetails,
-          variations: updatedVariations,
-        },
-      };
-    });
-  }, []);
-
-  const handleApplyToAll = (e) => {
-    // Extract current values from the outer fields
-    const pricing = get(formData.productDetails, "pricing");
-    const stock = get(formData.productDetails, "stock");
-    const sku = get(formData.productDetails, "sku");
-
-    // Update all variations selectively
-    const updatedVariations = formData.productDetails.variations.map(
-      (variation) => {
-        return {
-          ...variation,
-          values: variation.values.map((value) => ({
-            ...value,
-            pricing: {
-              current: pricing.current || value.pricing.current,
-              original: pricing.original || value.pricing.original,
-            },
-            stock: stock !== "" ? stock : value.stock,
-            sku: sku !== "" ? sku : value.sku,
-          })),
-        };
-      }
-    );
-
-    // Update formData with new variations
-    setFormData((prevData) => ({
-      ...prevData,
-      productDetails: {
-        ...prevData.productDetails,
-        variations: updatedVariations,
-      },
-    }));
-  };
-
   return (
     <form
       className={classNames(styles.productForm, customClass, "flex flex-col")}
@@ -1111,6 +1152,7 @@ function ProductForm({ customClass }) {
           )
         )}
 
+        {/* Media Inputs */}
         <MediaInput
           label="Product Images"
           name="basicInfo.media.productImages"
@@ -1143,7 +1185,7 @@ function ProductForm({ customClass }) {
           GuideComponent={
             <Guidelines
               content={[
-                "Min size: 480x480 px. max video length: 60 seconds. max file size: 100MB.",
+                "Min size: 480x480 px, max video length: 60 seconds, max file size: 100MB.",
                 "Supported Format: mp4",
                 "New Video might take up to 36 hrs to be approved",
               ]}
@@ -1156,11 +1198,11 @@ function ProductForm({ customClass }) {
       {/* Product Specification Section */}
       <FormSection
         title="Product Specification"
-        message="Fill more product specification will increase product searchability."
+        message="Filling more product specification will increase product searchability."
         showMoreBtnProps={{
           handleShowMore: () => toggleShowAdditionalFields("additionalSpecs"),
           section: "additionalSpecs",
-          showAdditionalFields,
+          showAdditionalFields: formData.uiState.showAdditionalFields,
         }}
         customClass={styles.productSpec}
       >
@@ -1172,7 +1214,6 @@ function ProductForm({ customClass }) {
           value={formData.specifications.brand.name}
           onChange={handleInputChange}
         />
-
         <FormInput
           label="Number of Pieces"
           name="specifications.numberOfPieces"
@@ -1190,7 +1231,7 @@ function ProductForm({ customClass }) {
           onChange={handleInputChange}
         />
 
-        {showAdditionalFields.additionalSpecs && (
+        {formData.uiState.showAdditionalFields.additionalSpecs && (
           <FormInput
             label="Additional Specifications"
             name="specifications.additionalSpecs"
@@ -1214,13 +1255,12 @@ function ProductForm({ customClass }) {
           handleAddVariantItem={handleAddVariantItem}
           handleRemoveVariantItem={handleRemoveVariantItem}
         />
-
         <ProductPriceStockWrapper
           variations={formData.productDetails.variations}
           formData={formData}
           handleApplyToAll={handleApplyToAll}
           onChange={handleInputChange}
-          variantShipping={variantShipping}
+          variantShipping={formData.uiState.variantShipping}
         />
       </FormSection>
 
@@ -1230,7 +1270,7 @@ function ProductForm({ customClass }) {
         showMoreBtnProps={{
           handleShowMore: () => toggleShowAdditionalFields("description"),
           section: "description",
-          showAdditionalFields,
+          showAdditionalFields: formData.uiState.showAdditionalFields,
         }}
         customClass={styles.productDesc}
       >
@@ -1241,7 +1281,6 @@ function ProductForm({ customClass }) {
           value={formData.description.main}
           onChange={handleDebouncedChange}
         />
-
         <FormInput
           label="Highlights"
           name="description.highlights"
@@ -1249,7 +1288,7 @@ function ProductForm({ customClass }) {
           value={formData.description.highlights}
           onChange={handleDebouncedChange}
         />
-        {showAdditionalFields.description && (
+        {formData.uiState.showAdditionalFields.description && (
           <>
             <FormInput
               label="Tags"
@@ -1277,19 +1316,20 @@ function ProductForm({ customClass }) {
         message="Switch to enter different package dimensions & weight for variations"
         additionalJsx={
           <AdditionalJsx
-            currState={variantShipping}
-            customClickHandler={() => setVariantShipping(!variantShipping)}
+            currState={formData.uiState.variantShipping}
+            customClickHandler={handleSetVariantShipping}
+            disableCondition={!multiVariantShippingCondition}
           />
         }
         showMoreBtnProps={{
           btnText: "More Warranty Settings",
           handleShowMore: () => toggleShowAdditionalFields("warranty"),
           section: "warranty",
-          showAdditionalFields,
+          showAdditionalFields: formData.uiState.showAdditionalFields,
         }}
         customClass={styles.productSW}
       >
-        {!variantShipping && (
+        {!formData.uiState.variantShipping && (
           <>
             <FormInput
               label="Package Weight"
@@ -1299,31 +1339,30 @@ function ProductForm({ customClass }) {
               value={formData.shipping.packageWeight}
               onChange={handleInputChange}
             />
-            <FormInput
+            <MultiInputGroup
               label="Package Dimensions (L x W x H)"
               name="shipping.dimensions"
               type="number"
+              groupType="input"
               placeholder="0.01 - 300"
-              inputList={3}
               value={formData.shipping.dimensions}
               onChange={handleInputChange}
             />
           </>
         )}
 
-        <FormInput
+        <MultiInputGroup
           label="Dangerous Goods"
           name="shipping.dangerousGoods"
           type="radio"
+          groupType="radio"
           options={["None", "Contains battery / flammables / liquid"]}
           value={formData.shipping.dangerousGoods}
           onChange={handleInputChange}
-          customClass={styles.formInputWrapper}
+          customClass={styles.radioGroup}
         />
 
-        <Divider />
-
-        {showAdditionalFields.warranty && (
+        {formData.uiState.showAdditionalFields.warranty && (
           <>
             <FormInput
               label="Warranty Type"
