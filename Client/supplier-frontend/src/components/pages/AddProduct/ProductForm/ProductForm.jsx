@@ -549,10 +549,14 @@ function VariantItem({
           maxFiles={5}
           value={variantData?.variantImages || variantImages}
           resetTrigger={resetTrigger}
-          onChange={(newMedia) =>
+          onChange={
             onChange
-              ? onChange()
-              : setState({ ...state, variantImages: newMedia?.target?.value })
+              ? onChange
+              : (_, __, newMedia) =>
+                  setState((prevState) => ({
+                    ...prevState,
+                    variantImages: newMedia,
+                  }))
           }
           customClass={styles.mediaInput}
         />
