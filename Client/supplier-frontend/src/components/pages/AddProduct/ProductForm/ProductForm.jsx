@@ -172,7 +172,7 @@ function FormInput({
 }) {
   const formInputId = `${name}-form-input`;
   const handleQuillChange = useCallback(
-    (content) => onChange({ target: { name, value: content } }),
+    (content) => onChange(null, name, content),
     [name, onChange]
   );
 
@@ -230,12 +230,7 @@ function MultiInputGroup({
                 dimension.charAt(0).toUpperCase() + dimension.slice(1)
               }
               onChange={(e) =>
-                onChange({
-                  target: {
-                    name: name,
-                    value: { ...value, [dimension]: e.target.value },
-                  },
-                })
+                onChange(null, name, { ...value, [dimension]: e.target.value })
               }
             />
           ))
@@ -294,7 +289,7 @@ function MediaInput({
       if (mediaFiles.length + files.length <= maxFiles) {
         const updatedFiles = [...mediaFiles, ...files];
         setMediaFiles(updatedFiles);
-        onChange({ target: { name, value: updatedFiles } });
+        onChange(null, name, updatedFiles);
         if (fileInputRef.current) fileInputRef.current.value = null;
       }
     },
@@ -304,7 +299,7 @@ function MediaInput({
   const handleRemoveFile = (index) => {
     const updatedFiles = mediaFiles.filter((_, i) => i !== index);
     setMediaFiles(updatedFiles);
-    onChange({ target: { name, value: updatedFiles } });
+    onChange(null, name, updatedFiles);
     if (fileInputRef.current) fileInputRef.current.value = null;
   };
 
@@ -317,7 +312,7 @@ function MediaInput({
   useEffect(() => {
     if (resetTrigger) {
       setMediaFiles([]);
-      onChange({ target: { name, value: [] } });
+      onChange(null, name, []);
     }
   }, [resetTrigger, name, onChange]);
 
@@ -406,7 +401,7 @@ function DropdownInput(props) {
   const handleOptionClick = (e) => {
     const { innerText } = e.target;
     if (onChange) {
-      onChange({ target: { name, value: innerText } });
+      onChange(null, name, innerText);
     }
   };
 
@@ -456,8 +451,6 @@ function ShowMoreBtn({
   section,
   showAdditionalFields,
 }) {
-  console.log(showAdditionalFields);
-
   return (
     <button
       onClick={handleShowMore}
@@ -558,7 +551,7 @@ function VariantItem({
           resetTrigger={resetTrigger}
           onChange={(newMedia) =>
             onChange
-              ? onChange(newMedia)
+              ? onChange()
               : setState({ ...state, variantImages: newMedia?.target?.value })
           }
           customClass={styles.mediaInput}
@@ -956,6 +949,8 @@ function ProductForm({ customClass }) {
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
+    console.log(name, value);
+
     setFormData((prevData) => set({ ...prevData }, name, value));
   }, []);
 
@@ -963,6 +958,18 @@ function ProductForm({ customClass }) {
     () => debounce(handleInputChange, 300),
     [handleInputChange]
   );
+
+  const handleCustomizeChange = (e, name, value, customizer) => {
+    console.log(e, name, value, customizer);
+
+    if (e) {
+      ({ name, value } = e.target);
+    }
+
+    const customizedValue = customizer ? customizer(value) : value;
+
+    handleInputChange({ target: { name, value: customizedValue } });
+  };
 
   const handleAddVariantItem = useCallback(
     (inputValue, variantImages, variationIndex) => {
@@ -1147,7 +1154,7 @@ function ProductForm({ customClass }) {
               type={type}
               {...rest}
               value={get(formData, name)}
-              onChange={handleInputChange}
+              onChange={handleCustomizeChange}
             />
           )
         )}
@@ -1159,7 +1166,7 @@ function ProductForm({ customClass }) {
           fileType="image"
           maxFiles={5}
           value={formData.basicInfo.media.productImages}
-          onChange={handleInputChange}
+          onChange={handleCustomizeChange}
         />
         <MediaInput
           label="Buyer Promotion Image"
@@ -1167,7 +1174,7 @@ function ProductForm({ customClass }) {
           fileType="image"
           maxFiles={1}
           value={formData.basicInfo.media.buyerPromotionImage}
-          onChange={handleInputChange}
+          onChange={handleCustomizeChange}
           GuideComponent={
             <Guidelines
               content={["White Background Image", "See Example"]}
@@ -1181,7 +1188,7 @@ function ProductForm({ customClass }) {
           fileType="video"
           maxFiles={1}
           value={formData.basicInfo.media.productVideo}
-          onChange={handleInputChange}
+          onChange={handleCustomizeChange}
           GuideComponent={
             <Guidelines
               content={[
@@ -1279,14 +1286,14 @@ function ProductForm({ customClass }) {
           name="description.main"
           type="textarea"
           value={formData.description.main}
-          onChange={handleDebouncedChange}
+          onChange={handleCustomizeChange}
         />
         <FormInput
           label="Highlights"
           name="description.highlights"
           type="textarea"
           value={formData.description.highlights}
-          onChange={handleDebouncedChange}
+          onChange={handleCustomizeChange}
         />
         {formData.uiState.showAdditionalFields.description && (
           <>
@@ -1296,7 +1303,11 @@ function ProductForm({ customClass }) {
               type="text"
               placeholder="Ex: New, Sale, Bestseller"
               value={formData.description.tags.join(", ")}
-              onChange={handleInputChange}
+              onChange={(e) =>
+                handleCustomizeChange(e, null, null, (value) =>
+                  value.split(", ").map((tag) => tag.trim())
+                )
+              }
             />
             <FormInput
               label="What's in the Box"
@@ -1346,7 +1357,7 @@ function ProductForm({ customClass }) {
               groupType="input"
               placeholder="0.01 - 300"
               value={formData.shipping.dimensions}
-              onChange={handleInputChange}
+              onChange={handleCustomizeChange}
             />
           </>
         )}
