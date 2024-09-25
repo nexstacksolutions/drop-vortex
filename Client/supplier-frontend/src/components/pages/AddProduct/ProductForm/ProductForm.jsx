@@ -3,6 +3,7 @@ import "react-quill/dist/quill.snow.css";
 import { v4 as uuidv4 } from "uuid";
 import debounce from "lodash/debounce";
 import { set, get } from "lodash";
+import { produce } from "immer";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
 import { FaPlus, FaAngleDown } from "react-icons/fa6";
@@ -908,10 +909,7 @@ function ProductForm({ customClass }) {
       },
     },
     productDetails: {
-      pricing: {
-        current: "",
-        original: "",
-      },
+      pricing: { current: "", original: "" },
       stock: "",
       availability: true,
       freeItems: "",
@@ -924,10 +922,7 @@ function ProductForm({ customClass }) {
       ],
     },
     specifications: {
-      brand: {
-        name: "",
-        logo: "",
-      },
+      brand: { name: "", logo: "" },
       numberOfPieces: "",
       powerSource: "",
       additionalSpecs: [],
@@ -940,17 +935,9 @@ function ProductForm({ customClass }) {
     },
     shipping: {
       packageWeight: "",
-      dimensions: {
-        length: "",
-        width: "",
-        height: "",
-      },
+      dimensions: { length: "", width: "", height: "" },
       dangerousGoods: "None",
-      warranty: {
-        type: "",
-        period: "",
-        policy: "",
-      },
+      warranty: { type: "", period: "", policy: "" },
     },
     uiState: {
       additionalFields: {
@@ -964,16 +951,24 @@ function ProductForm({ customClass }) {
 
   const [formErrors, setFormErrors] = useState({});
 
+  const updateFormData = (name, value) => {
+    setFormData((prevData) =>
+      produce(prevData, (draft) => {
+        set(draft, name, value);
+      })
+    );
+  };
+
   const handleInputChange = useCallback((e, name, value, customizer) => {
     console.log(e, name, value, customizer);
-
     if (e) {
       ({ name, value } = e.target);
     }
 
-    const customizedValue = customizer ? customizer(value) : value;
+    console.log(name, value);
 
-    setFormData((prevData) => set({ ...prevData }, name, customizedValue));
+    const customizedValue = customizer ? customizer(value) : value;
+    updateFormData(name, customizedValue);
   }, []);
 
   const handleDebouncedChange = useMemo(
@@ -998,42 +993,26 @@ function ProductForm({ customClass }) {
         dimensions: { length: "", width: "", height: "" },
       };
 
-      setFormData((prevData) => {
-        const updatedVariations = [...prevData.productDetails.variations];
-        if (updatedVariations[variationIndex]) {
-          updatedVariations[variationIndex].values.push(newVariant);
-        }
-        return {
-          ...prevData,
-          productDetails: {
-            ...prevData.productDetails,
-            variations: updatedVariations,
-          },
-        };
-      });
+      setFormData((prevData) =>
+        produce(prevData, (draft) => {
+          draft.productDetails.variations[variationIndex].values.push(
+            newVariant
+          );
+        })
+      );
     },
     []
   );
 
   const handleRemoveVariantItem = useCallback((variationIndex, valueIndex) => {
-    setFormData((prevData) => {
-      const updatedVariations = [...prevData.productDetails.variations];
-      const updatedValues = [...updatedVariations[variationIndex].values];
-      updatedValues.splice(valueIndex, 1);
-
-      updatedVariations[variationIndex] = {
-        ...updatedVariations[variationIndex],
-        values: updatedValues,
-      };
-
-      return {
-        ...prevData,
-        productDetails: {
-          ...prevData.productDetails,
-          variations: updatedVariations,
-        },
-      };
-    });
+    setFormData((prevData) =>
+      produce(prevData, (draft) => {
+        draft.productDetails.variations[variationIndex].values.splice(
+          valueIndex,
+          1
+        );
+      })
+    );
   }, []);
 
   const multiVariantShippingCondition =
@@ -1042,88 +1021,74 @@ function ProductForm({ customClass }) {
 
   const handleApplyToAll = () => {
     const { pricing, stock, sku } = formData.productDetails;
-    const updatedVariations = formData.productDetails.variations.map(
-      (variation) => ({
-        ...variation,
-        values: variation.values.map((value) => ({
-          ...value,
-          pricing: {
-            current: pricing.current || value.pricing.current,
-            original: pricing.original || value.pricing.original,
-          },
-          stock: stock || value.stock,
-          sku: sku || value.sku,
-        })),
+    console.log(pricing, stock, sku);
+
+    setFormData((prevData) =>
+      produce(prevData, (draft) => {
+        draft.productDetails.variations.forEach((variation) => {
+          variation.values.forEach((value) => {
+            value.pricing.current = pricing.current || value.pricing.current;
+            value.pricing.original = pricing.original || value.pricing.original;
+            value.stock = stock || value.stock;
+            value.sku = sku || value.sku;
+          });
+        });
       })
     );
-
-    setFormData((prevData) => ({
-      ...prevData,
-      productDetails: {
-        ...prevData.productDetails,
-        variations: updatedVariations,
-      },
-    }));
   };
 
-  const handleSetVariantShipping = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      uiState: {
-        ...prevData.uiState,
-        variantShipping: !prevData.uiState.variantShipping,
-      },
-    }));
+  const handleToggleVariantShipping = () => {
+    setFormData((prevData) =>
+      produce(prevData, (draft) => {
+        draft.uiState.variantShipping = !draft.uiState.variantShipping;
+      })
+    );
   };
 
-  const toggleShowAdditionalFields = (section) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      uiState: {
-        ...prevData.uiState,
-        additionalFields: {
-          ...prevData.uiState.additionalFields,
-          [section]: !prevData.uiState.additionalFields[section],
-        },
-      },
-    }));
+  const toggleAdditionalFields = (section) => {
+    setFormData((prevData) =>
+      produce(prevData, (draft) => {
+        draft.uiState.additionalFields[section] =
+          !draft.uiState.additionalFields[section];
+      })
+    );
   };
 
   const validateForm = async () => {
     try {
       await productFormSchema.validate(formData, { abortEarly: false });
-      setFormErrors({}); // Clear errors if validation passes
-      return true; // Form is valid
+      setFormErrors({});
+      return true;
     } catch (error) {
-      const errors = {};
-      error.inner.forEach((err) => {
-        errors[err.path] = err.message; // Create a mapping of field errors
-      });
-      setFormErrors(errors); // Update state with validation errors
-      return false; // Form is invalid
+      const errors = error.inner.reduce((acc, err) => {
+        acc[err.path] = err.message;
+        return acc;
+      }, {});
+      setFormErrors(errors);
+      return false;
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const submitter = e?.nativeEvent?.submitter;
-    if (submitter.name !== "submitBtn") return;
+    if (e.nativeEvent.submitter.name !== "submitBtn") return;
 
-    const isValid = await validateForm(); // Validate the form data
+    const isValid = await validateForm();
     if (isValid) {
-      console.log("Form submitted", formData);
-      // Handle successful form submission (e.g., API call)
+      console.log("Form submitted successfully", formData);
+      // Handle form submission logic (e.g., API call)
     } else {
-      // Optionally, display validation errors to the user
-      // You can update your UI with the error messages stored in the `errors` object
+      // Display validation errors in the UI
     }
   };
 
   useEffect(() => {
     if (!multiVariantShippingCondition) {
-      setFormData((prevData) => ({
-        ...prevData,
-        uiState: { ...prevData.uiState, variantShipping: false },
-      }));
+      setFormData((prevData) =>
+        produce(prevData, (draft) => {
+          draft.uiState.variantShipping = false;
+        })
+      );
     }
   }, [multiVariantShippingCondition]);
 
@@ -1212,7 +1177,7 @@ function ProductForm({ customClass }) {
         "Filling more product specification will increase product searchability.",
       customClass: styles.productSpec,
       showMoreBtnProps: {
-        handleShowMore: () => toggleShowAdditionalFields("additionalSpecs"),
+        handleShowMore: () => toggleAdditionalFields("additionalSpecs"),
         section: "additionalSpecs",
         additionalFields: formData.uiState.additionalFields,
       },
@@ -1270,7 +1235,7 @@ function ProductForm({ customClass }) {
       title: "Product Description",
       customClass: styles.productDesc,
       showMoreBtnProps: {
-        handleShowMore: () => toggleShowAdditionalFields("description"),
+        handleShowMore: () => toggleAdditionalFields("description"),
         section: "description",
         additionalFields: formData.uiState.additionalFields,
       },
@@ -1319,13 +1284,13 @@ function ProductForm({ customClass }) {
       additionalJsx: (
         <AdditionalJsx
           currState={formData.uiState.variantShipping}
-          customClickHandler={handleSetVariantShipping}
+          customClickHandler={handleToggleVariantShipping}
           disableCondition={!multiVariantShippingCondition}
         />
       ),
       showMoreBtnProps: {
         btnText: "More Warranty Settings",
-        handleShowMore: () => toggleShowAdditionalFields("warranty"),
+        handleShowMore: () => toggleAdditionalFields("warranty"),
         section: "warranty",
         additionalFields: formData.uiState.additionalFields,
       },
@@ -1389,10 +1354,10 @@ function ProductForm({ customClass }) {
       noValidate
       encType="multipart/form-data"
     >
-      {formSections.map(({ title, fields, ...rest }) => (
-        <FormSection key={`${title}${uuidv4()}`} title={title} {...rest}>
+      {formSections.map(({ title, fields, ...rest }, index) => (
+        <FormSection key={`${title}${index}`} title={title} {...rest}>
           {fields.map(
-            ({ name, formInputType, condition, onChange, ...rest }) => {
+            ({ name, formInputType, condition, onChange, ...rest }, i) => {
               const handleChange = onChange || handleInputChange;
               if (condition && !condition(formData)) return null;
 
@@ -1409,7 +1374,7 @@ function ProductForm({ customClass }) {
               } else if (formInputType === "dropdown") {
                 return (
                   <DropdownInput
-                    key={`${name}${uuidv4()}`}
+                    key={`${name}${i}`}
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
@@ -1419,7 +1384,7 @@ function ProductForm({ customClass }) {
               } else if (formInputType === "productVariations") {
                 return (
                   <ProductVariations
-                    key={`${name}${uuidv4()}`}
+                    key={`${name}${i}`}
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
@@ -1429,7 +1394,7 @@ function ProductForm({ customClass }) {
               } else if (formInputType === "productPriceStockWrapper") {
                 return (
                   <ProductPriceStockWrapper
-                    key={`${name}${uuidv4()}`}
+                    key={`${name}${i}`}
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
@@ -1439,7 +1404,7 @@ function ProductForm({ customClass }) {
               } else if (formInputType === "inputGroup") {
                 return (
                   <MultiInputGroup
-                    key={`${name}${uuidv4()}`}
+                    key={`${name}${i}`}
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
@@ -1449,7 +1414,7 @@ function ProductForm({ customClass }) {
               } else {
                 return (
                   <FormInput
-                    key={`${name}${uuidv4()}`}
+                    key={`${name}${i}`}
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
