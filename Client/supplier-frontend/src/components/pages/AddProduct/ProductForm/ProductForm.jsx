@@ -292,6 +292,7 @@ function MediaInput({
   resetTrigger,
   customClass,
   guideComponent,
+  errorMessage,
 }) {
   const [mediaFiles, setMediaFiles] = useState(value || []);
   const fileInputRef = useRef(null);
@@ -336,6 +337,7 @@ function MediaInput({
       label={label}
       formInputId={fileInputId}
       customClass={classNames(styles.mediaInputContainer, customClass)}
+      errorMessage={errorMessage}
     >
       <div className={`${styles.mediaInputWrapper} flex align-center`}>
         <div className={`${styles.mediaPreviewWrapper} flex`}>
@@ -392,7 +394,8 @@ function MediaPreviewItem({ file, fileType, onRemove }) {
 }
 
 function DropdownInput(props) {
-  const { customClass, label, name, options, value, onChange } = props || {};
+  const { customClass, label, name, options, value, onChange, errorMessage } =
+    props || {};
   const [isFocused, setIsFocused] = useState(false);
   const dropdownInputId = `${name}-dropdown-input`;
 
@@ -422,6 +425,7 @@ function DropdownInput(props) {
     <InputWrapper
       label={label}
       formInputId={dropdownInputId}
+      errorMessage={errorMessage}
       customClass={classNames(styles.dropdownInputContainer, customClass, {
         [styles.dropdownInputFocused]: isFocused,
       })}
@@ -923,7 +927,7 @@ function ProductForm({ customClass }) {
     },
     specifications: {
       brand: { name: "", logo: "" },
-      numberOfPieces: "",
+      numberOfPieces: null,
       powerSource: "",
       additionalSpecs: [],
     },
@@ -934,8 +938,8 @@ function ProductForm({ customClass }) {
       whatsInBox: "",
     },
     shipping: {
-      packageWeight: "",
-      dimensions: { length: "", width: "", height: "" },
+      packageWeight: null,
+      dimensions: { length: null, width: null, height: null },
       dangerousGoods: "None",
       warranty: { type: "", period: "", policy: "" },
     },
@@ -950,6 +954,8 @@ function ProductForm({ customClass }) {
   });
 
   const [formErrors, setFormErrors] = useState({});
+
+  console.log(formErrors);
 
   const updateFormData = (name, value) => {
     setFormData((prevData) =>
@@ -1021,7 +1027,6 @@ function ProductForm({ customClass }) {
 
   const handleApplyToAll = () => {
     const { pricing, stock, sku } = formData.productDetails;
-    console.log(pricing, stock, sku);
 
     setFormData((prevData) =>
       produce(prevData, (draft) => {
@@ -1191,7 +1196,7 @@ function ProductForm({ customClass }) {
         {
           label: "Number of Pieces",
           name: "specifications.numberOfPieces",
-          type: "text",
+          type: "number",
           placeholder: "Number of Pieces",
         },
         {
@@ -1300,7 +1305,7 @@ function ProductForm({ customClass }) {
           name: "shipping.packageWeight",
           type: "number",
           placeholder: "0.01 - 300",
-          condition: (formData) => !formData.uiState.variantShipping, // Example condition for conditional rendering
+          condition: (formData) => !formData.uiState.variantShipping,
         },
         {
           label: "Package Dimensions (L x W x H)",
@@ -1368,6 +1373,7 @@ function ProductForm({ customClass }) {
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
+                    errorMessage={get(formErrors, name)}
                     {...rest}
                   />
                 );
@@ -1378,6 +1384,7 @@ function ProductForm({ customClass }) {
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
+                    errorMessage={get(formErrors, name)}
                     {...rest}
                   />
                 );
@@ -1388,6 +1395,7 @@ function ProductForm({ customClass }) {
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
+                    errorMessage={get(formErrors, name)}
                     {...rest}
                   />
                 );
@@ -1398,6 +1406,7 @@ function ProductForm({ customClass }) {
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
+                    errorMessage={get(formErrors, name)}
                     {...rest}
                   />
                 );
@@ -1408,6 +1417,7 @@ function ProductForm({ customClass }) {
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
+                    errorMessage={get(formErrors, name)}
                     {...rest}
                   />
                 );
@@ -1418,6 +1428,7 @@ function ProductForm({ customClass }) {
                     name={name}
                     value={get(formData, name)}
                     onChange={handleChange}
+                    errorMessage={get(formErrors, name)}
                     {...rest}
                   />
                 );
