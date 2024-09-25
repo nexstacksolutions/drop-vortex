@@ -5,7 +5,7 @@
   z-index: 99;
   width: 7rem;
   height: 3rem;
-  background: var(--muted-bg);
+  background: var(--wrapper-bg);
   border: 2px solid transparent;
   border-radius: 500px;
 

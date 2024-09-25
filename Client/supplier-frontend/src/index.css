@@ -31,6 +31,7 @@ body {
   --white-color: #fff;
   --accent-color: #3b82f6;
   --feature-color: #f97316;
+  --switch-btn-bg: #cbced5;
   --scrollbar-bg: transparent;
 
   /* Typography */
@@ -102,8 +103,10 @@ body {
   --secondary-text: #b0b0b0;
   --subtle-bg: #cccccc;
   --inactive-text: #959595;
-  --muted-bg: #292929;
-  --soft-bg: ;
+  --wrapper-bg: #292929;
+  --block-bg: #383838;
+  --section-bg: ;
+  --overlay-bg: ;
   --border-color: #444444;
   --scrollbar-thumb-bg: #424242;
 }
@@ -117,8 +120,10 @@ body {
   --secondary-text: #666666;
   --subtle-bg: #e0e0e0;
   --inactive-text: #959595;
-  --muted-bg: #e5e7eb;
-  --soft-bg: ;
+  --wrapper-bg: #e5e7eb;
+  --block-bg: var(--white-color);
+  --section-bg: ;
+  --overlay-bg: ;
   --border-color: #d1d5db;
   --scrollbar-thumb-bg: #e0e0e0;
 }

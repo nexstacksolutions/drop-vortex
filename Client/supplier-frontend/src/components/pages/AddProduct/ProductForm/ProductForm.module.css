@@ -85,7 +85,7 @@
     flex: 1;
     padding: var(--spacing-md);
     border-radius: var(--radius-md);
-    background-color: var(--muted-bg);
+    background-color: var(--wrapper-bg);
 
     & .mediaInputWrapper {
       max-width: max-content;
@@ -190,7 +190,7 @@
           padding: var(--spacing-sm) var(--spacing-md);
 
           &:hover {
-            background-color: var(--muted-bg);
+            background-color: var(--wrapper-bg);
           }
         }
 
@@ -201,7 +201,7 @@
       }
     }
 
-    &.dropdownInputFocused > div > div:last-child svg {
+    &.dropdownInputFocused > div > div > div:last-child svg {
       transform: rotate(180deg);
     }
   }
@@ -212,7 +212,7 @@
     & .variationItem {
       flex: 1;
       gap: var(--spacing-md);
-      background-color: var(--muted-bg);
+      background-color: var(--wrapper-bg);
       padding: 2rem;
       border-radius: var(--radius-sm);
 
@@ -252,7 +252,7 @@
         & .variantItem {
           width: 100%;
           gap: var(--spacing-md);
-          background-color: var(--white-color);
+          background-color: var(--block-bg);
           padding: var(--spacing-sm) var(--spacing-md);
           border-radius: var(--radius-md);
 

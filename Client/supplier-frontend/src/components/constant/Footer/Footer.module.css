@@ -1,7 +1,7 @@
 .footer {
   width: 100%;
   text-align: start;
-  background-color: var(--bg-secondary);
+  background-color: transparent;
   padding: var(--spacing-sm) 0;
   margin-top: auto;
 

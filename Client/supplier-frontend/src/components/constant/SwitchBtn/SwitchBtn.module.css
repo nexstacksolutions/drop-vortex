@@ -4,7 +4,7 @@
   position: relative;
   border: 2px solid transparent;
   border-radius: 500px;
-  background-color: #cbced5;
+  background-color: var(--switch-btn-bg);
 
   & span {
     width: 2rem;

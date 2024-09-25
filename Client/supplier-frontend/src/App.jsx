@@ -8,10 +8,11 @@ import ToggleTheme from "./components/constant/ToggleTheme/ToggleTheme";
 import LoadingSpinner from "./components/Constant/LoadingSpinner/LoadingSpinner";
 
 function App() {
+  const loading = false; // Simulate loading state
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Sidebar />
-      <MainLayout />
+      {loading ? <LoadingSpinner /> : <MainLayout />}
       <ToggleTheme />
     </Suspense>
   );

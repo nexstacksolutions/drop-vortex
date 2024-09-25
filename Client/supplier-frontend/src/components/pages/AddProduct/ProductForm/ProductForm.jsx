@@ -9,6 +9,8 @@ import { FaPlus, FaAngleDown } from "react-icons/fa6";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
 import Divider from "../../../constant/Divider/Divider";
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import productFormSchema from "../../../../schemas/productFormSchema";
 import { RiDeleteBin5Line, RiEdit2Line, RiMenuFill } from "react-icons/ri";
 
 const getFieldPath = (
@@ -288,7 +290,7 @@ function MediaInput({
   onChange,
   resetTrigger,
   customClass,
-  GuideComponent,
+  guideComponent,
 }) {
   const [mediaFiles, setMediaFiles] = useState(value || []);
   const fileInputRef = useRef(null);
@@ -350,7 +352,7 @@ function MediaInput({
             />
           )}
         </div>
-        {GuideComponent}
+        {guideComponent}
       </div>
     </InputWrapper>
   );
@@ -960,6 +962,8 @@ function ProductForm({ customClass }) {
     },
   });
 
+  const [formErrors, setFormErrors] = useState({});
+
   const handleInputChange = useCallback((e, name, value, customizer) => {
     console.log(e, name, value, customizer);
 
@@ -1085,11 +1089,33 @@ function ProductForm({ customClass }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = async () => {
+    try {
+      await productFormSchema.validate(formData, { abortEarly: false });
+      setFormErrors({}); // Clear errors if validation passes
+      return true; // Form is valid
+    } catch (error) {
+      const errors = {};
+      error.inner.forEach((err) => {
+        errors[err.path] = err.message; // Create a mapping of field errors
+      });
+      setFormErrors(errors); // Update state with validation errors
+      return false; // Form is invalid
+    }
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const submitter = e?.nativeEvent?.submitter;
     if (submitter.name !== "submitBtn") return;
-    console.log("form submitted", formData);
+
+    const isValid = await validateForm(); // Validate the form data
+    if (isValid) {
+      console.log("Form submitted", formData);
+      // Handle successful form submission (e.g., API call)
+    } else {
+      // Optionally, display validation errors to the user
+      // You can update your UI with the error messages stored in the `errors` object
+    }
   };
 
   useEffect(() => {
@@ -1101,103 +1127,73 @@ function ProductForm({ customClass }) {
     }
   }, [multiVariantShippingCondition]);
 
-  const basicInfoFields = [
+  const formSections = [
     {
-      label: "Product Name",
-      name: "basicInfo.productName",
-      maxValue: 255,
-      type: "text",
-      placeholder: "Nikon Coolpix A300",
-    },
-    {
-      label: "Category",
-      name: "basicInfo.category",
-      type: "text",
-      placeholder: "Please select category or search with keyword",
-      options: [
-        "Electronics",
-        "Clothing",
-        "Accessories",
-        "Home & Garden",
-        "Sports & Outdoors",
-        "Books & Magazines",
-        "Toys & Games",
-        "Other",
-        "Gifts & Wishlists",
-        "Merchandise & Collectibles",
-        "Services",
-        "Art & Crafts",
-        "Pet Supplies",
-        "Home Improvement",
-        "Baby & Kids",
-        "Sports & Fitness",
-      ],
-    },
-  ];
-
-  return (
-    <form
-      className={classNames(styles.productForm, customClass, "flex flex-col")}
-      onSubmit={handleSubmit}
-    >
-      {/* Basic Information Section */}
-      <FormSection title="Basic Information" customClass={styles.basicInfo}>
-        {basicInfoFields.map(({ label, name, maxValue, type, ...rest }, i) =>
-          i < 1 ? (
-            <FormInput
-              key={name}
-              label={label}
-              name={name}
-              type={type}
-              {...rest}
-              value={get(formData, name)}
-              suffixDisplay={{ maxValue }}
-              onChange={handleInputChange}
-            />
-          ) : (
-            <DropdownInput
-              key={name}
-              label={label}
-              name={name}
-              type={type}
-              {...rest}
-              value={get(formData, name)}
-              onChange={handleInputChange}
-            />
-          )
-        )}
-
-        {/* Media Inputs */}
-        <MediaInput
-          label="Product Images"
-          name="basicInfo.media.productImages"
-          fileType="image"
-          maxFiles={5}
-          value={formData.basicInfo.media.productImages}
-          onChange={handleInputChange}
-        />
-        <MediaInput
-          label="Buyer Promotion Image"
-          name="basicInfo.media.buyerPromotionImage"
-          fileType="image"
-          maxFiles={1}
-          value={formData.basicInfo.media.buyerPromotionImage}
-          onChange={handleInputChange}
-          GuideComponent={
+      title: "Basic Information",
+      customClass: styles.basicInfo,
+      fields: [
+        {
+          label: "Product Name",
+          name: "basicInfo.productName",
+          suffixDisplay: { maxValue: 255 },
+          type: "text",
+          placeholder: "Nikon Coolpix A300",
+        },
+        {
+          label: "Category",
+          name: "basicInfo.category",
+          type: "text",
+          formInputType: "dropdown",
+          placeholder: "Please select category or search with keyword",
+          options: [
+            "Electronics",
+            "Clothing",
+            "Accessories",
+            "Home & Garden",
+            "Sports & Outdoors",
+            "Books & Magazines",
+            "Toys & Games",
+            "Other",
+            "Gifts & Wishlists",
+            "Merchandise & Collectibles",
+            "Services",
+            "Art & Crafts",
+            "Pet Supplies",
+            "Home Improvement",
+            "Baby & Kids",
+            "Sports & Fitness",
+          ],
+        },
+        {
+          label: "Product Images",
+          name: "basicInfo.media.productImages",
+          type: "file",
+          formInputType: "media",
+          fileType: "image",
+          maxFiles: 5,
+        },
+        {
+          label: "Buyer Promotion Image",
+          name: "basicInfo.media.buyerPromotionImage",
+          type: "file",
+          formInputType: "media",
+          fileType: "image",
+          maxFiles: 1,
+          guideComponent: (
             <Guidelines
               content={["White Background Image", "See Example"]}
               guideType="imageGuidelines"
             />
-          }
-        />
-        <MediaInput
-          label="Product Video"
-          name="basicInfo.media.productVideo"
-          fileType="video"
-          maxFiles={1}
-          value={formData.basicInfo.media.productVideo}
-          onChange={handleInputChange}
-          GuideComponent={
+          ),
+        },
+        {
+          label: "Product Video",
+          name: "basicInfo.media.productVideo",
+          type: "file",
+          formInputType: "media",
+          fileType: "video",
+          maxFiles: 1,
+          guideComponent: (
             <Guidelines
               content={[
                 "Min size: 480x480 px, max video length: 60 seconds, max file size: 100MB.",
@@ -1206,212 +1202,265 @@ function ProductForm({ customClass }) {
               ]}
               guideType="videoGuidelines"
             />
-          }
+          ),
+        },
+      ],
+    },
+    {
+      title: "Product Specification",
+      message:
+        "Filling more product specification will increase product searchability.",
+      customClass: styles.productSpec,
+      showMoreBtnProps: {
+        handleShowMore: () => toggleShowAdditionalFields("additionalSpecs"),
+        section: "additionalSpecs",
+        additionalFields: formData.uiState.additionalFields,
+      },
+      fields: [
+        {
+          label: "Brand",
+          name: "specifications.brand.name",
+          type: "text",
+          placeholder: "Brand Name",
+        },
+        {
+          label: "Number of Pieces",
+          name: "specifications.numberOfPieces",
+          type: "text",
+          placeholder: "Number of Pieces",
+        },
+        {
+          label: "Power Source",
+          name: "specifications.powerSource",
+          type: "text",
+          placeholder: "Power Source",
+        },
+        {
+          label: "Additional Specifications",
+          name: "specifications.additionalSpecs",
+          type: "text",
+          placeholder: "Additional Specifications",
+          condition: (formData) =>
+            formData.uiState.additionalFields.additionalSpecs, // Example condition for conditional rendering
+        },
+      ],
+    },
+    {
+      title: "Price, Stock & Variants",
+      message:
+        "You can add variants to a product that has more than one option, such as size or color.",
+      customClass: styles.productPSV,
+      fields: [
+        {
+          formInputType: "productVariations",
+          variations: formData.productDetails.variations,
+          handleAddVariantItem: handleAddVariantItem,
+          handleRemoveVariantItem: handleRemoveVariantItem,
+        },
+        {
+          formInputType: "productPriceStockWrapper",
+          variations: formData.productDetails.variations,
+          formData: formData,
+          handleApplyToAll: handleApplyToAll,
+          variantShipping: formData.uiState.variantShipping,
+        },
+      ],
+    },
+    {
+      title: "Product Description",
+      customClass: styles.productDesc,
+      showMoreBtnProps: {
+        handleShowMore: () => toggleShowAdditionalFields("description"),
+        section: "description",
+        additionalFields: formData.uiState.additionalFields,
+      },
+      fields: [
+        {
+          label: "Main Description",
+          name: "description.main",
+          type: "textarea",
+          formInputType: "textarea",
+          onChange: handleDebouncedChange,
+        },
+        {
+          label: "Highlights",
+          name: "description.highlights",
+          type: "textarea",
+          formInputType: "textarea",
+          onChange: handleDebouncedChange,
+        },
+        {
+          label: "Tags",
+          name: "description.tags",
+          type: "text",
+          placeholder: "Ex: New, Sale, Bestseller",
+          onChange: (e) =>
+            handleInputChange(e, null, null, (value) =>
+              value.split(", ").map((tag) => tag.trim())
+            ),
+          condition: (formData) =>
+            formData.uiState.additionalFields.description, // Example condition for conditional rendering
+        },
+        {
+          label: "What's in the Box",
+          name: "description.whatsInBox",
+          type: "text",
+          placeholder: "Ex: 1x product, 1x accessory",
+          condition: (formData) =>
+            formData.uiState.additionalFields.description, // Example condition for conditional rendering
+        },
+      ],
+    },
+    {
+      title: "Shipping & Warranty",
+      message:
+        "Switch to enter different package dimensions & weight for variations",
+      customClass: styles.productSW,
+      additionalJsx: (
+        <AdditionalJsx
+          currState={formData.uiState.variantShipping}
+          customClickHandler={handleSetVariantShipping}
+          disableCondition={!multiVariantShippingCondition}
         />
-      </FormSection>
+      ),
+      showMoreBtnProps: {
+        btnText: "More Warranty Settings",
+        handleShowMore: () => toggleShowAdditionalFields("warranty"),
+        section: "warranty",
+        additionalFields: formData.uiState.additionalFields,
+      },
+      fields: [
+        {
+          label: "Package Weight",
+          name: "shipping.packageWeight",
+          type: "number",
+          placeholder: "0.01 - 300",
+          condition: (formData) => !formData.uiState.variantShipping, // Example condition for conditional rendering
+        },
+        {
+          label: "Package Dimensions (L x W x H)",
+          name: "shipping.dimensions",
+          type: "number",
+          formInputType: "inputGroup",
+          groupType: "input",
+          placeholder: "0.01 - 300",
+          condition: (formData) => !formData.uiState.variantShipping, // Example condition for conditional rendering
+        },
+        {
+          label: "Dangerous Goods",
+          name: "shipping.dangerousGoods",
+          type: "radio",
+          groupType: "radio",
+          formInputType: "inputGroup",
+          options: ["None", "Contains battery / flammables / liquid"],
+          customClass: styles.radioGroup,
+        },
+        {
+          label: "Warranty Type",
+          name: "shipping.warranty.type",
+          type: "text",
+          placeholder: "Warranty Type",
+          condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
+        },
+        {
+          label: "Warranty Period",
+          name: "shipping.warranty.period",
+          type: "text",
+          placeholder: "Warranty Period",
+          condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
+        },
+        {
+          label: "Warranty Policy",
+          name: "shipping.warranty.policy",
+          type: "text",
+          placeholder: "Warranty Policy",
+          condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
+        },
+      ],
+    },
+  ];
 
-      {/* Product Specification Section */}
-      <FormSection
-        title="Product Specification"
-        message="Filling more product specification will increase product searchability."
-        showMoreBtnProps={{
-          handleShowMore: () => toggleShowAdditionalFields("additionalSpecs"),
-          section: "additionalSpecs",
-          additionalFields: formData.uiState.additionalFields,
-        }}
-        customClass={styles.productSpec}
-      >
-        <FormInput
-          label="Brand"
-          name="specifications.brand.name"
-          type="text"
-          placeholder="Brand Name"
-          value={formData.specifications.brand.name}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Number of Pieces"
-          name="specifications.numberOfPieces"
-          type="text"
-          placeholder="Number of Pieces"
-          value={formData.specifications.numberOfPieces}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          label="Power Source"
-          name="specifications.powerSource"
-          type="text"
-          placeholder="Power Source"
-          value={formData.specifications.powerSource}
-          onChange={handleInputChange}
-        />
+  return (
+    <form
+      className={classNames(styles.productForm, customClass, "flex flex-col")}
+      onSubmit={handleSubmit}
+      action="/products/manage"
+      method="post"
+      noValidate
+      encType="multipart/form-data"
+    >
+      {formSections.map(({ title, fields, ...rest }) => (
+        <FormSection key={`${title}${uuidv4()}`} title={title} {...rest}>
+          {fields.map(
+            ({ name, formInputType, condition, onChange, ...rest }) => {
+              const handleChange = onChange || handleInputChange;
+              if (condition && !condition(formData)) return null;
 
-        {formData.uiState.additionalFields.additionalSpecs && (
-          <FormInput
-            label="Additional Specifications"
-            name="specifications.additionalSpecs"
-            type="text"
-            placeholder="Additional Specifications"
-            value={formData.specifications.additionalSpecs}
-            onChange={handleInputChange}
-          />
-        )}
-      </FormSection>
-
-      {/* Price, Stock & Variants Section */}
-      <FormSection
-        title="Price, Stock & Variants"
-        message="You can add variants to a product that has more than one option, such as size or color."
-        customClass={styles.productPSV}
-      >
-        <ProductVariations
-          variations={formData.productDetails.variations}
-          onChange={handleInputChange}
-          handleAddVariantItem={handleAddVariantItem}
-          handleRemoveVariantItem={handleRemoveVariantItem}
-        />
-        <ProductPriceStockWrapper
-          variations={formData.productDetails.variations}
-          formData={formData}
-          handleApplyToAll={handleApplyToAll}
-          onChange={handleInputChange}
-          variantShipping={formData.uiState.variantShipping}
-        />
-      </FormSection>
-
-      {/* Product Description Section */}
-      <FormSection
-        title="Product Description"
-        showMoreBtnProps={{
-          handleShowMore: () => toggleShowAdditionalFields("description"),
-          section: "description",
-          additionalFields: formData.uiState.additionalFields,
-        }}
-        customClass={styles.productDesc}
-      >
-        <FormInput
-          label="Main Description"
-          name="description.main"
-          type="textarea"
-          value={formData.description.main}
-          onChange={handleDebouncedChange}
-        />
-        <FormInput
-          label="Highlights"
-          name="description.highlights"
-          type="textarea"
-          value={formData.description.highlights}
-          onChange={handleDebouncedChange}
-        />
-        {formData.uiState.additionalFields.description && (
-          <>
-            <FormInput
-              label="Tags"
-              name="description.tags"
-              type="text"
-              placeholder="Ex: New, Sale, Bestseller"
-              value={formData.description.tags.join(", ")}
-              onChange={(e) =>
-                handleInputChange(e, null, null, (value) =>
-                  value.split(", ").map((tag) => tag.trim())
-                )
+              if (formInputType === "media") {
+                return (
+                  <MediaInput
+                    key={`${name}${uuidv4()}`}
+                    name={name}
+                    value={get(formData, name)}
+                    onChange={handleChange}
+                    {...rest}
+                  />
+                );
+              } else if (formInputType === "dropdown") {
+                return (
+                  <DropdownInput
+                    key={`${name}${uuidv4()}`}
+                    name={name}
+                    value={get(formData, name)}
+                    onChange={handleChange}
+                    {...rest}
+                  />
+                );
+              } else if (formInputType === "productVariations") {
+                return (
+                  <ProductVariations
+                    key={`${name}${uuidv4()}`}
+                    name={name}
+                    value={get(formData, name)}
+                    onChange={handleChange}
+                    {...rest}
+                  />
+                );
+              } else if (formInputType === "productPriceStockWrapper") {
+                return (
+                  <ProductPriceStockWrapper
+                    key={`${name}${uuidv4()}`}
+                    name={name}
+                    value={get(formData, name)}
+                    onChange={handleChange}
+                    {...rest}
+                  />
+                );
+              } else if (formInputType === "inputGroup") {
+                return (
+                  <MultiInputGroup
+                    key={`${name}${uuidv4()}`}
+                    name={name}
+                    value={get(formData, name)}
+                    onChange={handleChange}
+                    {...rest}
+                  />
+                );
+              } else {
+                return (
+                  <FormInput
+                    key={`${name}${uuidv4()}`}
+                    name={name}
+                    value={get(formData, name)}
+                    onChange={handleChange}
+                    {...rest}
+                  />
+                );
               }
-            />
-            <FormInput
-              label="What's in the Box"
-              name="description.whatsInBox"
-              type="text"
-              placeholder="Ex: 1x product, 1x accessory"
-              value={formData.description.whatsInBox}
-              onChange={handleInputChange}
-            />
-          </>
-        )}
-      </FormSection>
-
-      {/* Shipping & Warranty Section */}
-      <FormSection
-        title="Shipping & Warranty"
-        message="Switch to enter different package dimensions & weight for variations"
-        additionalJsx={
-          <AdditionalJsx
-            currState={formData.uiState.variantShipping}
-            customClickHandler={handleSetVariantShipping}
-            disableCondition={!multiVariantShippingCondition}
-          />
-        }
-        showMoreBtnProps={{
-          btnText: "More Warranty Settings",
-          handleShowMore: () => toggleShowAdditionalFields("warranty"),
-          section: "warranty",
-          additionalFields: formData.uiState.additionalFields,
-        }}
-        customClass={styles.productSW}
-      >
-        {!formData.uiState.variantShipping && (
-          <>
-            <FormInput
-              label="Package Weight"
-              name="shipping.packageWeight"
-              type="number"
-              placeholder="0.01 - 300"
-              value={formData.shipping.packageWeight}
-              onChange={handleInputChange}
-            />
-            <MultiInputGroup
-              label="Package Dimensions (L x W x H)"
-              name="shipping.dimensions"
-              type="number"
-              groupType="input"
-              placeholder="0.01 - 300"
-              value={formData.shipping.dimensions}
-              onChange={handleInputChange}
-            />
-          </>
-        )}
-
-        <MultiInputGroup
-          label="Dangerous Goods"
-          name="shipping.dangerousGoods"
-          type="radio"
-          groupType="radio"
-          options={["None", "Contains battery / flammables / liquid"]}
-          value={formData.shipping.dangerousGoods}
-          onChange={handleInputChange}
-          customClass={styles.radioGroup}
-        />
-
-        <Divider />
-
-        {formData.uiState.additionalFields.warranty && (
-          <>
-            <FormInput
-              label="Warranty Type"
-              name="shipping.warranty.type"
-              type="text"
-              placeholder="Warranty Type"
-              value={formData.shipping.warranty.type}
-              onChange={handleInputChange}
-            />
-            <FormInput
-              label="Warranty Period"
-              name="shipping.warranty.period"
-              type="text"
-              placeholder="Warranty Period"
-              value={formData.shipping.warranty.period}
-              onChange={handleInputChange}
-            />
-            <FormInput
-              label="Warranty Policy"
-              name="shipping.warranty.policy"
-              type="text"
-              placeholder="Warranty Policy"
-              value={formData.shipping.warranty.policy}
-              onChange={handleInputChange}
-            />
-          </>
-        )}
-      </FormSection>
+            }
+          )}
+        </FormSection>
+      ))}
 
       <button
         type="submit"
