@@ -25,6 +25,11 @@
     & .sectionContent .formInputContainer {
       position: relative;
 
+      & label > svg {
+        color: red;
+        font-size: 1rem;
+      }
+
       & .formInputWrapper {
         flex: 1;
 
@@ -219,6 +224,10 @@
       background-color: var(--wrapper-bg);
       padding: 2rem;
       border-radius: var(--radius-sm);
+
+      & > div {
+        flex-direction: column;
+      }
 
       & .variationHeader {
         width: 100%;

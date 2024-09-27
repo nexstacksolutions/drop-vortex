@@ -4,15 +4,23 @@ import { v4 as uuidv4 } from "uuid";
 import debounce from "lodash/debounce";
 import { set, get } from "lodash";
 import { produce } from "immer";
+import * as Yup from "yup";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
-import { FaPlus, FaAngleDown } from "react-icons/fa6";
+import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
 import Divider from "../../../constant/Divider/Divider";
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import productFormSchema from "../../../../schemas/productFormSchema";
+import {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+  useReducer,
+} from "react";
+import productFormSchema from "../../../../schemas/productForm";
 import { RiDeleteBin5Line, RiEdit2Line, RiMenuFill } from "react-icons/ri";
+import { useProductForm } from "../../../../context/ProductForm";
 
 const getFieldPath = (
   isVariationField,
@@ -69,6 +77,7 @@ function InputWrapper({
   children,
   label,
   formInputId,
+  isRequired,
   errorMessage,
   customClass,
 }) {
@@ -82,7 +91,8 @@ function InputWrapper({
     >
       {label && (
         <label htmlFor={formInputId} className="flex align-center">
-          {label}
+          {isRequired && <FaAsterisk />}
+          <span>{label}</span>
         </label>
       )}
 
@@ -176,10 +186,11 @@ function generateInputByType({
 
 function FormInput({
   customClass,
-  wrapInput = true,
   label,
   name,
   onChange,
+  wrapInput = true,
+  isRequired,
   errorMessage,
   ...rest
 }) {
@@ -202,6 +213,7 @@ function FormInput({
       label={label}
       formInputId={formInputId}
       customClass={customClass}
+      isRequired={isRequired}
       errorMessage={errorMessage}
     >
       {generateInputByType(generateInputProps)}
@@ -220,6 +232,7 @@ function MultiInputGroup({
   type,
   groupType,
   label,
+  isRequired,
   errorMessage,
 }) {
   const dropdownInputId = `${name}-multi-input-group`;
@@ -229,6 +242,7 @@ function MultiInputGroup({
       label={label}
       formInputId={dropdownInputId}
       customClass={customClass}
+      isRequired={isRequired}
       errorMessage={errorMessage}
     >
       {groupType === "input"
@@ -292,6 +306,7 @@ function MediaInput({
   resetTrigger,
   customClass,
   guideComponent,
+  isRequired,
   errorMessage,
 }) {
   const [mediaFiles, setMediaFiles] = useState(value || []);
@@ -310,12 +325,15 @@ function MediaInput({
     [mediaFiles, name, maxFiles, onChange]
   );
 
-  const handleRemoveFile = (index) => {
-    const updatedFiles = mediaFiles.filter((_, i) => i !== index);
-    setMediaFiles(updatedFiles);
-    onChange(null, name, updatedFiles);
-    if (fileInputRef.current) fileInputRef.current.value = null;
-  };
+  const handleRemoveFile = useCallback(
+    (index) => {
+      const updatedFiles = mediaFiles.filter((_, i) => i !== index);
+      setMediaFiles(updatedFiles);
+      onChange(null, name, updatedFiles);
+      if (fileInputRef.current) fileInputRef.current.value = null;
+    },
+    [mediaFiles, name, onChange]
+  );
 
   useEffect(() => {
     return () => {
@@ -337,6 +355,7 @@ function MediaInput({
       label={label}
       formInputId={fileInputId}
       customClass={classNames(styles.mediaInputContainer, customClass)}
+      isRequired={isRequired}
       errorMessage={errorMessage}
     >
       <div className={`${styles.mediaInputWrapper} flex align-center`}>
@@ -394,8 +413,16 @@ function MediaPreviewItem({ file, fileType, onRemove }) {
 }
 
 function DropdownInput(props) {
-  const { customClass, label, name, options, value, onChange, errorMessage } =
-    props || {};
+  const {
+    customClass,
+    label,
+    name,
+    options,
+    value,
+    onChange,
+    isRequired,
+    errorMessage,
+  } = props || {};
   const [isFocused, setIsFocused] = useState(false);
   const dropdownInputId = `${name}-dropdown-input`;
 
@@ -425,6 +452,7 @@ function DropdownInput(props) {
     <InputWrapper
       label={label}
       formInputId={dropdownInputId}
+      isRequired={isRequired}
       errorMessage={errorMessage}
       customClass={classNames(styles.dropdownInputContainer, customClass, {
         [styles.dropdownInputFocused]: isFocused,
@@ -598,70 +626,82 @@ function VariantItem({
 function ProductVariations({
   variations,
   onChange,
+  formErrors,
+  isFieldRequired,
   handleAddVariantItem,
   handleRemoveVariantItem,
 }) {
   const [showVariantImages, setShowVariantImages] = useState(false);
+  const err = get(formErrors, `productDetails.variations`);
 
   return (
     <div className={`${styles.productVariationsWrapper} flex flex-col`}>
-      {variations.map(({ type, values }, variationIndex) => (
-        <div
-          key={variationIndex}
-          className={`${styles.variationItem} flex flex-col`}
-        >
-          <div className={`${styles.variationHeader} flex flex-col`}>
-            <span className={styles.variationTitle}>
-              Variant {variationIndex + 1}
-            </span>
-            <div className={`${styles.variationInfo} flex flex-col`}>
-              <span className={styles.variationName}>Variant Name</span>
-              <span className={styles.variationType}>{type}</span>
-            </div>
-            <div className={`${styles.variationDetails} flex flex-col`}>
-              <span>Total Variants</span>
-              <div className={`${styles.showImageCheckbox} flex align-center`}>
-                <FormInput
-                  name="showImageCheckbox"
-                  id="showImageCheckbox"
-                  type="checkbox"
-                  value={showVariantImages}
-                  onChange={(e) => setShowVariantImages(e.target.checked)}
-                />
-                <label
-                  htmlFor="showImageCheckbox-form-input"
-                  className="flex align-center"
+      {variations.map(({ type, values }, variationIndex) => {
+        const name = `productDetails.variations[${variationIndex}].values`;
+        const isRequired = isFieldRequired(name);
+
+        return (
+          <InputWrapper
+            key={variationIndex}
+            label={`Variant ${variationIndex + 1}`}
+            customClass={styles.variationItem}
+            isRequired={isRequired}
+            errorMessage={get(formErrors, name)}
+          >
+            <div className={`${styles.variationHeader} flex flex-col`}>
+              <div className={`${styles.variationInfo} flex flex-col`}>
+                <span className={styles.variationName}>Variant Name</span>
+                <span className={styles.variationType}>{type}</span>
+              </div>
+              <div className={`${styles.variationDetails} flex flex-col`}>
+                <span>Total Variants</span>
+                <div
+                  className={`${styles.showImageCheckbox} flex align-center`}
                 >
-                  <span>Add Image</span>
-                  <span>Max 8 images for each variant.</span>
-                </label>
+                  <FormInput
+                    name="showImageCheckbox"
+                    id="showImageCheckbox"
+                    type="checkbox"
+                    value={showVariantImages}
+                    onChange={(e) => setShowVariantImages(e.target.checked)}
+                  />
+                  <label
+                    htmlFor="showImageCheckbox-form-input"
+                    className="flex align-center"
+                  >
+                    <span>Add Image</span>
+                    <span>Max 8 images for each variant.</span>
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className={`${styles.variationBody} flex flex-col`}>
-            <div className={`${styles.variantWrapper} flex flex-col`}>
-              {values.map((variantData, valueIndex) => (
-                <VariantItem
-                  key={`${variationIndex}-${variantData.id}`}
-                  variantData={variantData}
-                  onChange={onChange}
-                  variationIndex={variationIndex}
-                  valueIndex={valueIndex}
-                  showVariantImages={showVariantImages}
-                  handleRemoveVariantItem={handleRemoveVariantItem}
-                />
-              ))}
+            <div className={`${styles.variationBody} flex flex-col`}>
+              <div className={`${styles.variantWrapper} flex flex-col`}>
+                {values.map((variantData, valueIndex) => (
+                  <VariantItem
+                    key={`${variationIndex}-${variantData.id}`}
+                    variantData={variantData}
+                    onChange={onChange}
+                    variationIndex={variationIndex}
+                    valueIndex={valueIndex}
+                    showVariantImages={showVariantImages}
+                    handleRemoveVariantItem={handleRemoveVariantItem}
+                  />
+                ))}
+              </div>
+
+              <VariantItem
+                handleAddVariantItem={handleAddVariantItem}
+                variationIndex={variationIndex}
+                showVariantImages={showVariantImages}
+              />
             </div>
+          </InputWrapper>
+        );
+      })}
 
-            <VariantItem
-              handleAddVariantItem={handleAddVariantItem}
-              variationIndex={variationIndex}
-              showVariantImages={showVariantImages}
-            />
-          </div>
-        </div>
-      ))}
+      {err && <p className={styles.errorMsg}>{err}</p>}
     </div>
   );
 }
@@ -902,80 +942,30 @@ function ProductPriceStockWrapper({
 }
 
 function ProductForm({ customClass }) {
-  const [formData, setFormData] = useState({
-    basicInfo: {
-      productName: "",
-      category: "",
-      media: {
-        productImages: [],
-        buyerPromotionImage: [],
-        productVideo: [],
-      },
-    },
-    productDetails: {
-      pricing: { current: "", original: "" },
-      stock: "",
-      availability: true,
-      freeItems: "",
-      sku: "",
-      variations: [
-        {
-          type: "Color Family",
-          values: [],
-        },
-      ],
-    },
-    specifications: {
-      brand: { name: "", logo: "" },
-      numberOfPieces: null,
-      powerSource: "",
-      additionalSpecs: [],
-    },
-    description: {
-      main: "",
-      highlights: "",
-      tags: [],
-      whatsInBox: "",
-    },
-    shipping: {
-      packageWeight: null,
-      dimensions: { length: null, width: null, height: null },
-      dangerousGoods: "None",
-      warranty: { type: "", period: "", policy: "" },
-    },
-    uiState: {
-      additionalFields: {
-        warranty: false,
-        additionalSpecs: false,
-        description: false,
-      },
-      variantShipping: false,
-    },
-  });
-
+  const { state, dispatch } = useProductForm();
+  const [requiredFields, setRequiredFields] = useState({});
   const [formErrors, setFormErrors] = useState({});
 
-  console.log(formErrors);
+  const updateFormData = useCallback(
+    (name, value) => {
+      dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
+    },
+    [dispatch]
+  );
 
-  const updateFormData = (name, value) => {
-    setFormData((prevData) =>
-      produce(prevData, (draft) => {
-        set(draft, name, value);
-      })
-    );
-  };
+  const handleInputChange = useCallback(
+    (e, name, value, customizer) => {
+      if (e) {
+        ({ name, value } = e.target);
+      }
 
-  const handleInputChange = useCallback((e, name, value, customizer) => {
-    console.log(e, name, value, customizer);
-    if (e) {
-      ({ name, value } = e.target);
-    }
+      console.log(e, name, value, customizer);
 
-    console.log(name, value);
-
-    const customizedValue = customizer ? customizer(value) : value;
-    updateFormData(name, customizedValue);
-  }, []);
+      const customizedValue = customizer ? customizer(value) : value;
+      updateFormData(name, customizedValue);
+    },
+    [updateFormData]
+  );
 
   const handleDebouncedChange = useMemo(
     () => debounce(handleInputChange, 300),
@@ -999,69 +989,55 @@ function ProductForm({ customClass }) {
         dimensions: { length: "", width: "", height: "" },
       };
 
-      setFormData((prevData) =>
-        produce(prevData, (draft) => {
-          draft.productDetails.variations[variationIndex].values.push(
-            newVariant
-          );
-        })
-      );
+      // Dispatch to update the state in context
+      dispatch({
+        type: "ADD_VARIANT_ITEM",
+        payload: { newVariant, variationIndex },
+      });
     },
-    []
+    [dispatch]
   );
 
-  const handleRemoveVariantItem = useCallback((variationIndex, valueIndex) => {
-    setFormData((prevData) =>
-      produce(prevData, (draft) => {
-        draft.productDetails.variations[variationIndex].values.splice(
-          valueIndex,
-          1
-        );
-      })
-    );
-  }, []);
+  const handleRemoveVariantItem = useCallback(
+    (variationIndex, valueIndex) => {
+      // Dispatch to remove a variant item
+      dispatch({
+        type: "REMOVE_VARIANT_ITEM",
+        payload: { variationIndex, valueIndex },
+      });
+    },
+    [dispatch]
+  );
 
   const multiVariantShippingCondition =
-    formData.productDetails.variations.length &&
-    formData.productDetails.variations[0].values.length > 1;
+    state.productDetails.variations.length &&
+    state.productDetails.variations[0].values.length > 1;
 
-  const handleApplyToAll = () => {
-    const { pricing, stock, sku } = formData.productDetails;
+  const handleApplyToAll = useCallback(() => {
+    const { pricing, stock, sku } = state.productDetails;
 
-    setFormData((prevData) =>
-      produce(prevData, (draft) => {
-        draft.productDetails.variations.forEach((variation) => {
-          variation.values.forEach((value) => {
-            value.pricing.current = pricing.current || value.pricing.current;
-            value.pricing.original = pricing.original || value.pricing.original;
-            value.stock = stock || value.stock;
-            value.sku = sku || value.sku;
-          });
-        });
-      })
-    );
-  };
+    dispatch({
+      type: "APPLY_TO_ALL_VARIANTS",
+      payload: { pricing, stock, sku },
+    });
+  }, [dispatch, state.productDetails]);
 
-  const handleToggleVariantShipping = () => {
-    setFormData((prevData) =>
-      produce(prevData, (draft) => {
-        draft.uiState.variantShipping = !draft.uiState.variantShipping;
-      })
-    );
-  };
+  const handleToggleVariantShipping = useCallback(() => {
+    // Dispatch to toggle variant shipping
+    dispatch({ type: "TOGGLE_VARIANT_SHIPPING" });
+  }, [dispatch]);
 
-  const toggleAdditionalFields = (section) => {
-    setFormData((prevData) =>
-      produce(prevData, (draft) => {
-        draft.uiState.additionalFields[section] =
-          !draft.uiState.additionalFields[section];
-      })
-    );
-  };
+  const toggleAdditionalFields = useCallback(
+    (section) => {
+      // Dispatch to toggle additional fields
+      dispatch({ type: "TOGGLE_ADDITIONAL_FIELDS", payload: { section } });
+    },
+    [dispatch]
+  );
 
-  const validateForm = async () => {
+  const validateForm = useCallback(async () => {
     try {
-      await productFormSchema.validate(formData, { abortEarly: false });
+      await productFormSchema.validate(state, { abortEarly: false });
       setFormErrors({});
       return true;
     } catch (error) {
@@ -1072,283 +1048,336 @@ function ProductForm({ customClass }) {
       setFormErrors(errors);
       return false;
     }
+  }, [state]);
+
+  const isFieldRequired = async (fieldPath) => {
+    try {
+      if (!fieldPath || typeof fieldPath !== "string") return;
+      const validationSchema = Yup.reach(productFormSchema, fieldPath);
+      const isRequired =
+        validationSchema?.tests?.some((test) => test.name === "validate") ||
+        false;
+
+      return isRequired;
+    } catch (error) {
+      console.error("Field path not found in schema:", error);
+      return false;
+    }
   };
 
+  // Update form submission to include context state
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (e.nativeEvent.submitter.name !== "submitBtn") return;
 
     const isValid = await validateForm();
     if (isValid) {
-      console.log("Form submitted successfully", formData);
+      console.log("Form submitted successfully", state);
       // Handle form submission logic (e.g., API call)
     } else {
       // Display validation errors in the UI
     }
   };
 
+  const formSections = useMemo(
+    () => [
+      {
+        title: "Basic Information",
+        customClass: styles.basicInfo,
+        fields: [
+          {
+            label: "Product Name",
+            name: "basicInfo.productName",
+            suffixDisplay: { maxValue: 255 },
+            type: "text",
+            placeholder: "Nikon Coolpix A300",
+          },
+          {
+            label: "Category",
+            name: "basicInfo.category",
+            type: "text",
+            formInputType: "dropdown",
+            placeholder: "Please select category or search with keyword",
+            options: [
+              "Electronics",
+              "Clothing",
+              "Accessories",
+              "Home & Garden",
+              "Sports & Outdoors",
+              "Books & Magazines",
+              "Toys & Games",
+              "Other",
+              "Gifts & Wishlists",
+              "Merchandise & Collectibles",
+              "Services",
+              "Art & Crafts",
+              "Pet Supplies",
+              "Home Improvement",
+              "Baby & Kids",
+              "Sports & Fitness",
+            ],
+          },
+          {
+            label: "Product Images",
+            name: "basicInfo.media.productImages",
+            type: "file",
+            formInputType: "media",
+            fileType: "image",
+            maxFiles: 5,
+          },
+          {
+            label: "Buyer Promotion Image",
+            name: "basicInfo.media.buyerPromotionImage",
+            type: "file",
+            formInputType: "media",
+            fileType: "image",
+            maxFiles: 1,
+            guideComponent: (
+              <Guidelines
+                content={["White Background Image", "See Example"]}
+                guideType="imageGuidelines"
+              />
+            ),
+          },
+          {
+            label: "Product Video",
+            name: "basicInfo.media.productVideo",
+            type: "file",
+            formInputType: "media",
+            fileType: "video",
+            maxFiles: 1,
+            guideComponent: (
+              <Guidelines
+                content={[
+                  "Min size: 480x480 px, max video length: 60 seconds, max file size: 100MB.",
+                  "Supported Format: mp4",
+                  "New Video might take up to 36 hrs to be approved",
+                ]}
+                guideType="videoGuidelines"
+              />
+            ),
+          },
+        ],
+      },
+      {
+        title: "Product Specification",
+        message:
+          "Filling more product specification will increase product searchability.",
+        customClass: styles.productSpec,
+        showMoreBtnProps: {
+          handleShowMore: () => toggleAdditionalFields("additionalSpecs"),
+          section: "additionalSpecs",
+          additionalFields: state.uiState.additionalFields,
+        },
+        fields: [
+          {
+            label: "Brand",
+            name: "specifications.brand.name",
+            type: "text",
+            placeholder: "Brand Name",
+          },
+          {
+            label: "Number of Pieces",
+            name: "specifications.numberOfPieces",
+            type: "number",
+            placeholder: "Number of Pieces",
+          },
+          {
+            label: "Power Source",
+            name: "specifications.powerSource",
+            type: "text",
+            placeholder: "Power Source",
+          },
+          {
+            label: "Additional Specifications",
+            name: "specifications.additionalSpecs",
+            type: "text",
+            placeholder: "Additional Specifications",
+            condition: (formData) =>
+              formData.uiState.additionalFields.additionalSpecs, // Example condition for conditional rendering
+          },
+        ],
+      },
+      {
+        title: "Price, Stock & Variants",
+        message:
+          "You can add variants to a product that has more than one option, such as size or color.",
+        customClass: styles.productPSV,
+        fields: [
+          {
+            formInputType: "productVariations",
+            variations: state.productDetails.variations,
+            isFieldRequired: isFieldRequired,
+            formErrors: formErrors,
+            handleAddVariantItem: handleAddVariantItem,
+            handleRemoveVariantItem: handleRemoveVariantItem,
+          },
+          {
+            formInputType: "productPriceStockWrapper",
+            variations: state.productDetails.variations,
+            formData: state,
+            isFieldRequired: isFieldRequired,
+            formErrors: formErrors,
+            handleApplyToAll: handleApplyToAll,
+            variantShipping: state.uiState.variantShipping,
+          },
+        ],
+      },
+      {
+        title: "Product Description",
+        customClass: styles.productDesc,
+        showMoreBtnProps: {
+          handleShowMore: () => toggleAdditionalFields("description"),
+          section: "description",
+          additionalFields: state.uiState.additionalFields,
+        },
+        fields: [
+          {
+            label: "Main Description",
+            name: "description.main",
+            type: "textarea",
+            formInputType: "textarea",
+            onChange: handleDebouncedChange,
+          },
+          {
+            label: "Highlights",
+            name: "description.highlights",
+            type: "textarea",
+            formInputType: "textarea",
+            onChange: handleDebouncedChange,
+          },
+          {
+            label: "Tags",
+            name: "description.tags",
+            type: "text",
+            placeholder: "Ex: New, Sale, Bestseller",
+            onChange: (e) =>
+              handleInputChange(e, null, null, (value) =>
+                value.split(", ").map((tag) => tag.trim())
+              ),
+            condition: (formData) =>
+              formData.uiState.additionalFields.description, // Example condition for conditional rendering
+          },
+          {
+            label: "What's in the Box",
+            name: "description.whatsInBox",
+            type: "text",
+            placeholder: "Ex: 1x product, 1x accessory",
+            condition: (formData) =>
+              formData.uiState.additionalFields.description, // Example condition for conditional rendering
+          },
+        ],
+      },
+      {
+        title: "Shipping & Warranty",
+        message:
+          "Switch to enter different package dimensions & weight for variations",
+        customClass: styles.productSW,
+        additionalJsx: (
+          <AdditionalJsx
+            currState={state.uiState.variantShipping}
+            customClickHandler={handleToggleVariantShipping}
+            disableCondition={!multiVariantShippingCondition}
+          />
+        ),
+        showMoreBtnProps: {
+          btnText: "More Warranty Settings",
+          handleShowMore: () => toggleAdditionalFields("warranty"),
+          section: "warranty",
+          additionalFields: state.uiState.additionalFields,
+        },
+        fields: [
+          {
+            label: "Package Weight",
+            name: "shipping.packageWeight",
+            type: "number",
+            placeholder: "0.01 - 300",
+            condition: (formData) => !formData.uiState.variantShipping,
+          },
+          {
+            label: "Package Dimensions (L x W x H)",
+            name: "shipping.dimensions",
+            type: "number",
+            formInputType: "inputGroup",
+            groupType: "input",
+            placeholder: "0.01 - 300",
+            condition: (formData) => !formData.uiState.variantShipping, // Example condition for conditional rendering
+          },
+          {
+            label: "Dangerous Goods",
+            name: "shipping.dangerousGoods",
+            type: "radio",
+            groupType: "radio",
+            formInputType: "inputGroup",
+            options: ["None", "Contains battery / flammables / liquid"],
+            customClass: styles.radioGroup,
+          },
+          {
+            label: "Warranty Type",
+            name: "shipping.warranty.type",
+            type: "text",
+            placeholder: "Warranty Type",
+            condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
+          },
+          {
+            label: "Warranty Period",
+            name: "shipping.warranty.period",
+            type: "text",
+            placeholder: "Warranty Period",
+            condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
+          },
+          {
+            label: "Warranty Policy",
+            name: "shipping.warranty.policy",
+            type: "text",
+            placeholder: "Warranty Policy",
+            condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
+          },
+        ],
+      },
+    ],
+    [
+      state,
+      formErrors,
+      handleAddVariantItem,
+      handleApplyToAll,
+      handleDebouncedChange,
+      handleInputChange,
+      handleRemoveVariantItem,
+      toggleAdditionalFields,
+      handleToggleVariantShipping,
+      multiVariantShippingCondition,
+    ]
+  );
+
   useEffect(() => {
-    if (!multiVariantShippingCondition) {
-      setFormData((prevData) =>
-        produce(prevData, (draft) => {
-          draft.uiState.variantShipping = false;
+    const fetchRequiredFields = async () => {
+      let requiredFieldStatuses = {};
+
+      await Promise.all(
+        formSections.map(async (section) => {
+          await Promise.all(
+            section.fields.map(async (field) => {
+              const isRequired = await isFieldRequired(field?.name);
+              if (isRequired === undefined) return;
+              requiredFieldStatuses[field.name] = isRequired;
+            })
+          );
         })
       );
-    }
-  }, [multiVariantShippingCondition]);
 
-  const formSections = [
-    {
-      title: "Basic Information",
-      customClass: styles.basicInfo,
-      fields: [
-        {
-          label: "Product Name",
-          name: "basicInfo.productName",
-          suffixDisplay: { maxValue: 255 },
-          type: "text",
-          placeholder: "Nikon Coolpix A300",
-        },
-        {
-          label: "Category",
-          name: "basicInfo.category",
-          type: "text",
-          formInputType: "dropdown",
-          placeholder: "Please select category or search with keyword",
-          options: [
-            "Electronics",
-            "Clothing",
-            "Accessories",
-            "Home & Garden",
-            "Sports & Outdoors",
-            "Books & Magazines",
-            "Toys & Games",
-            "Other",
-            "Gifts & Wishlists",
-            "Merchandise & Collectibles",
-            "Services",
-            "Art & Crafts",
-            "Pet Supplies",
-            "Home Improvement",
-            "Baby & Kids",
-            "Sports & Fitness",
-          ],
-        },
-        {
-          label: "Product Images",
-          name: "basicInfo.media.productImages",
-          type: "file",
-          formInputType: "media",
-          fileType: "image",
-          maxFiles: 5,
-        },
-        {
-          label: "Buyer Promotion Image",
-          name: "basicInfo.media.buyerPromotionImage",
-          type: "file",
-          formInputType: "media",
-          fileType: "image",
-          maxFiles: 1,
-          guideComponent: (
-            <Guidelines
-              content={["White Background Image", "See Example"]}
-              guideType="imageGuidelines"
-            />
-          ),
-        },
-        {
-          label: "Product Video",
-          name: "basicInfo.media.productVideo",
-          type: "file",
-          formInputType: "media",
-          fileType: "video",
-          maxFiles: 1,
-          guideComponent: (
-            <Guidelines
-              content={[
-                "Min size: 480x480 px, max video length: 60 seconds, max file size: 100MB.",
-                "Supported Format: mp4",
-                "New Video might take up to 36 hrs to be approved",
-              ]}
-              guideType="videoGuidelines"
-            />
-          ),
-        },
-      ],
-    },
-    {
-      title: "Product Specification",
-      message:
-        "Filling more product specification will increase product searchability.",
-      customClass: styles.productSpec,
-      showMoreBtnProps: {
-        handleShowMore: () => toggleAdditionalFields("additionalSpecs"),
-        section: "additionalSpecs",
-        additionalFields: formData.uiState.additionalFields,
-      },
-      fields: [
-        {
-          label: "Brand",
-          name: "specifications.brand.name",
-          type: "text",
-          placeholder: "Brand Name",
-        },
-        {
-          label: "Number of Pieces",
-          name: "specifications.numberOfPieces",
-          type: "number",
-          placeholder: "Number of Pieces",
-        },
-        {
-          label: "Power Source",
-          name: "specifications.powerSource",
-          type: "text",
-          placeholder: "Power Source",
-        },
-        {
-          label: "Additional Specifications",
-          name: "specifications.additionalSpecs",
-          type: "text",
-          placeholder: "Additional Specifications",
-          condition: (formData) =>
-            formData.uiState.additionalFields.additionalSpecs, // Example condition for conditional rendering
-        },
-      ],
-    },
-    {
-      title: "Price, Stock & Variants",
-      message:
-        "You can add variants to a product that has more than one option, such as size or color.",
-      customClass: styles.productPSV,
-      fields: [
-        {
-          formInputType: "productVariations",
-          variations: formData.productDetails.variations,
-          handleAddVariantItem: handleAddVariantItem,
-          handleRemoveVariantItem: handleRemoveVariantItem,
-        },
-        {
-          formInputType: "productPriceStockWrapper",
-          variations: formData.productDetails.variations,
-          formData: formData,
-          handleApplyToAll: handleApplyToAll,
-          variantShipping: formData.uiState.variantShipping,
-        },
-      ],
-    },
-    {
-      title: "Product Description",
-      customClass: styles.productDesc,
-      showMoreBtnProps: {
-        handleShowMore: () => toggleAdditionalFields("description"),
-        section: "description",
-        additionalFields: formData.uiState.additionalFields,
-      },
-      fields: [
-        {
-          label: "Main Description",
-          name: "description.main",
-          type: "textarea",
-          formInputType: "textarea",
-          onChange: handleDebouncedChange,
-        },
-        {
-          label: "Highlights",
-          name: "description.highlights",
-          type: "textarea",
-          formInputType: "textarea",
-          onChange: handleDebouncedChange,
-        },
-        {
-          label: "Tags",
-          name: "description.tags",
-          type: "text",
-          placeholder: "Ex: New, Sale, Bestseller",
-          onChange: (e) =>
-            handleInputChange(e, null, null, (value) =>
-              value.split(", ").map((tag) => tag.trim())
-            ),
-          condition: (formData) =>
-            formData.uiState.additionalFields.description, // Example condition for conditional rendering
-        },
-        {
-          label: "What's in the Box",
-          name: "description.whatsInBox",
-          type: "text",
-          placeholder: "Ex: 1x product, 1x accessory",
-          condition: (formData) =>
-            formData.uiState.additionalFields.description, // Example condition for conditional rendering
-        },
-      ],
-    },
-    {
-      title: "Shipping & Warranty",
-      message:
-        "Switch to enter different package dimensions & weight for variations",
-      customClass: styles.productSW,
-      additionalJsx: (
-        <AdditionalJsx
-          currState={formData.uiState.variantShipping}
-          customClickHandler={handleToggleVariantShipping}
-          disableCondition={!multiVariantShippingCondition}
-        />
-      ),
-      showMoreBtnProps: {
-        btnText: "More Warranty Settings",
-        handleShowMore: () => toggleAdditionalFields("warranty"),
-        section: "warranty",
-        additionalFields: formData.uiState.additionalFields,
-      },
-      fields: [
-        {
-          label: "Package Weight",
-          name: "shipping.packageWeight",
-          type: "number",
-          placeholder: "0.01 - 300",
-          condition: (formData) => !formData.uiState.variantShipping,
-        },
-        {
-          label: "Package Dimensions (L x W x H)",
-          name: "shipping.dimensions",
-          type: "number",
-          formInputType: "inputGroup",
-          groupType: "input",
-          placeholder: "0.01 - 300",
-          condition: (formData) => !formData.uiState.variantShipping, // Example condition for conditional rendering
-        },
-        {
-          label: "Dangerous Goods",
-          name: "shipping.dangerousGoods",
-          type: "radio",
-          groupType: "radio",
-          formInputType: "inputGroup",
-          options: ["None", "Contains battery / flammables / liquid"],
-          customClass: styles.radioGroup,
-        },
-        {
-          label: "Warranty Type",
-          name: "shipping.warranty.type",
-          type: "text",
-          placeholder: "Warranty Type",
-          condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
-        },
-        {
-          label: "Warranty Period",
-          name: "shipping.warranty.period",
-          type: "text",
-          placeholder: "Warranty Period",
-          condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
-        },
-        {
-          label: "Warranty Policy",
-          name: "shipping.warranty.policy",
-          type: "text",
-          placeholder: "Warranty Policy",
-          condition: (formData) => formData.uiState.additionalFields.warranty, // Example condition for conditional rendering
-        },
-      ],
-    },
-  ];
+      setRequiredFields(requiredFieldStatuses);
+    };
+
+    fetchRequiredFields();
+  }, [formSections]);
+
+  // In your useEffect
+  useEffect(() => {
+    if (!multiVariantShippingCondition) {
+      dispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
+    }
+  }, [multiVariantShippingCondition, dispatch]);
 
   return (
     <form
@@ -1363,17 +1392,21 @@ function ProductForm({ customClass }) {
         <FormSection key={`${title}${index}`} title={title} {...rest}>
           {fields.map(
             ({ name, formInputType, condition, onChange, ...rest }, i) => {
+              const inputValue = get(state, name);
               const handleChange = onChange || handleInputChange;
-              if (condition && !condition(formData)) return null;
+              const isRequired = get(requiredFields, name);
+              const errorMessage = get(formErrors, name);
+              if (condition && !condition(state)) return null;
 
               if (formInputType === "media") {
                 return (
                   <MediaInput
                     key={`${name}${uuidv4()}`}
                     name={name}
-                    value={get(formData, name)}
+                    value={inputValue}
                     onChange={handleChange}
-                    errorMessage={get(formErrors, name)}
+                    isRequired={isRequired}
+                    errorMessage={errorMessage}
                     {...rest}
                   />
                 );
@@ -1382,9 +1415,10 @@ function ProductForm({ customClass }) {
                   <DropdownInput
                     key={`${name}${i}`}
                     name={name}
-                    value={get(formData, name)}
+                    value={inputValue}
                     onChange={handleChange}
-                    errorMessage={get(formErrors, name)}
+                    isRequired={isRequired}
+                    errorMessage={errorMessage}
                     {...rest}
                   />
                 );
@@ -1393,9 +1427,10 @@ function ProductForm({ customClass }) {
                   <ProductVariations
                     key={`${name}${i}`}
                     name={name}
-                    value={get(formData, name)}
+                    value={inputValue}
                     onChange={handleChange}
-                    errorMessage={get(formErrors, name)}
+                    isRequired={isRequired}
+                    errorMessage={errorMessage}
                     {...rest}
                   />
                 );
@@ -1404,9 +1439,10 @@ function ProductForm({ customClass }) {
                   <ProductPriceStockWrapper
                     key={`${name}${i}`}
                     name={name}
-                    value={get(formData, name)}
+                    value={inputValue}
                     onChange={handleChange}
-                    errorMessage={get(formErrors, name)}
+                    isRequired={isRequired}
+                    errorMessage={errorMessage}
                     {...rest}
                   />
                 );
@@ -1415,9 +1451,10 @@ function ProductForm({ customClass }) {
                   <MultiInputGroup
                     key={`${name}${i}`}
                     name={name}
-                    value={get(formData, name)}
+                    value={inputValue}
                     onChange={handleChange}
-                    errorMessage={get(formErrors, name)}
+                    isRequired={isRequired}
+                    errorMessage={errorMessage}
                     {...rest}
                   />
                 );
@@ -1426,9 +1463,10 @@ function ProductForm({ customClass }) {
                   <FormInput
                     key={`${name}${i}`}
                     name={name}
-                    value={get(formData, name)}
+                    value={inputValue}
                     onChange={handleChange}
-                    errorMessage={get(formErrors, name)}
+                    isRequired={isRequired}
+                    errorMessage={errorMessage}
                     {...rest}
                   />
                 );
