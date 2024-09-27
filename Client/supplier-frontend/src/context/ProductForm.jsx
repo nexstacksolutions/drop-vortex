@@ -1,8 +1,9 @@
 import * as Yup from "yup";
-import debounce from "lodash/debounce";
+import * as z from "zod";
 import { v4 as uuidv4 } from "uuid";
-// import formSections from "../../../../constant/formSections";
-import productFormSchema from "../schemas/productForm";
+import debounce from "lodash/debounce";
+import productFormSchema from "../schemas/productFormYup";
+import ZodSchema from "../schemas/productFormZod";
 import { initialState, productFormReducer } from "../store/productFormReducer";
 import {
   createContext,
@@ -18,8 +19,6 @@ export const ProductFormContext = createContext();
 
 const ProductFormProvider = ({ children }) => {
   const [state, dispatch] = useReducer(productFormReducer, initialState);
-  const [requiredFields, setRequiredFields] = useState({});
-  const [formErrors, setFormErrors] = useState({});
 
   const multiVariantShippingCondition =
     state.productDetails.variations.length &&
@@ -59,13 +58,13 @@ const ProductFormProvider = ({ children }) => {
         id: uuidv4(),
         name: inputValue,
         variantImages: variantImages || [],
-        pricing: { current: "", original: "" },
-        stock: "",
+        pricing: { current: null, original: null },
+        stock: null,
         availability: true,
-        freeItems: "",
+        freeItems: null,
         sku: "",
-        packageWeight: "",
-        dimensions: { length: "", width: "", height: "" },
+        packageWeight: null,
+        dimensions: { length: null, width: null, height: null },
       };
 
       // Dispatch to update the state in context
@@ -113,17 +112,47 @@ const ProductFormProvider = ({ children }) => {
   const validateForm = useCallback(async () => {
     try {
       await productFormSchema.validate(state, { abortEarly: false });
-      setFormErrors({});
+
+      dispatch({ type: "CLEAR_FORM_ERRORS" });
       return true;
     } catch (error) {
       const errors = error.inner.reduce((acc, err) => {
         acc[err.path] = err.message;
         return acc;
       }, {});
-      setFormErrors(errors);
+
+      dispatch({ type: "SET_FORM_ERRORS", payload: errors });
       return false;
     }
-  }, [state]);
+  }, [state, dispatch]);
+
+  const validateFormZod = useCallback(async () => {
+    try {
+      // Validate the state against the Zod schema
+      ZodSchema.parse(state); // Use your specific schema
+
+      // Clear any previous form errors
+      dispatch({ type: "CLEAR_FORM_ERRORS" });
+      return true;
+    } catch (error) {
+      // Ensure that error is a ZodError and has the expected structure
+      if (error instanceof z.ZodError) {
+        // If validation fails, create an errors object
+        const errors = error.errors.reduce((acc, err) => {
+          // Use the 'path' property for the key and the message for the value
+          const path = err.path.join("."); // Convert array path to string
+          acc[path] = err.message;
+          return acc;
+        }, {});
+        console.log(errors);
+
+        dispatch({ type: "SET_FORM_ERRORS", payload: errors });
+      } else {
+        console.error("Unexpected error during validation", error);
+      }
+      return false;
+    }
+  }, [state, dispatch]);
 
   const isFieldRequired = useCallback(async (fieldPath) => {
     try {
@@ -157,41 +186,13 @@ const ProductFormProvider = ({ children }) => {
     [state, validateForm]
   );
 
-  // useEffect(() => {
-  //   const fetchRequiredFields = async () => {
-  //     let requiredFieldStatuses = {};
-
-  //     await Promise.all(
-  //       formSections.map(async (section) => {
-  //         await Promise.all(
-  //           section.fields.map(async (field) => {
-  //             const isRequired = await isFieldRequired(field?.name);
-  //             if (isRequired === undefined) return;
-  //             requiredFieldStatuses[field.name] = isRequired;
-  //           })
-  //         );
-  //       })
-  //     );
-
-  //     setRequiredFields(requiredFieldStatuses);
-  //   };
-
-  //   fetchRequiredFields();
-  // }, [isFieldRequired]);
-
-  // In your useEffect
-  useEffect(() => {
-    if (!multiVariantShippingCondition) {
-      dispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
-    }
-  }, [multiVariantShippingCondition, dispatch]);
-
   const values = useMemo(
     () => ({
       state,
       dispatch,
-      requiredFields,
-      formErrors,
+      formErrors: state.formErrors, // Now from state
+      requiredFields: state.requiredFields, // Now from state
+      isFieldRequired,
       handleInputChange,
       handleDebouncedChange,
       handleAddVariantItem,
@@ -204,8 +205,7 @@ const ProductFormProvider = ({ children }) => {
     }),
     [
       state,
-      requiredFields,
-      formErrors,
+      isFieldRequired,
       handleInputChange,
       handleDebouncedChange,
       handleAddVariantItem,

@@ -3,11 +3,11 @@ import classNames from "classnames";
 import { FaAngleDown } from "react-icons/fa6";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
 import { useProductForm } from "../../../../context/ProductForm";
+import { get } from "lodash";
 
 function ShowMoreBtn({ btnText = "Show More", section }) {
   const { state, toggleAdditionalFields } = useProductForm();
-
-  const additionalFields = state.uiState.additionalFields;
+  const additionalFields = get(state, "uiState.additionalFields");
 
   return (
     <button

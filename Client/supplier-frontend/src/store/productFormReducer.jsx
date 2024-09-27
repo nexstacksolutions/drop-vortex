@@ -12,15 +12,15 @@ const initialState = {
     },
   },
   productDetails: {
-    pricing: { current: "", original: "" },
-    stock: "",
+    pricing: { current: null, original: null }, // original required, current optional
+    stock: null,
     availability: true,
-    freeItems: "",
-    sku: "",
+    freeItems: null, // nullable
+    sku: "", // nullable
     variations: [{ type: "Color Family", values: [] }],
   },
   specifications: {
-    brand: { name: "", logo: "" },
+    brand: { name: "", logo: [] },
     numberOfPieces: null,
     powerSource: "",
     additionalSpecs: [],
@@ -32,8 +32,8 @@ const initialState = {
     whatsInBox: "",
   },
   shipping: {
-    packageWeight: null,
-    dimensions: { length: null, width: null, height: null },
+    packageWeight: null, // optional
+    dimensions: { length: null, width: null, height: null }, // optional
     dangerousGoods: "None",
     warranty: { type: "", period: "", policy: "" },
   },
@@ -46,6 +46,8 @@ const initialState = {
     variantShipping: false,
     showVariantImages: true,
   },
+  requiredFields: {},
+  formErrors: {},
 };
 
 const productFormReducer = (state, action) =>
@@ -55,31 +57,34 @@ const productFormReducer = (state, action) =>
       case "UPDATE_FIELD":
         set(draft, payload.name, payload.value);
         break;
+
       case "TOGGLE_ADDITIONAL_FIELDS":
         draft.uiState.additionalFields[payload.section] =
           !draft.uiState.additionalFields[payload.section];
         break;
+
       case "TOGGLE_VARIANT_SHIPPING":
         draft.uiState.variantShipping = !draft.uiState.variantShipping;
         break;
+
       case "SET_VARIANT_SHIPPING_FALSE":
         draft.uiState.variantShipping = false;
         break;
+
       case "ADD_VARIANT_ITEM":
-        // Add the new variant item to the specified variation index
         draft.productDetails.variations[payload.variationIndex].values.push(
           payload.newVariant
         );
         break;
+
       case "REMOVE_VARIANT_ITEM":
-        // Remove the variant item from the specified variation index and value index
         draft.productDetails.variations[payload.variationIndex].values.splice(
           payload.valueIndex,
           1
         );
         break;
+
       case "APPLY_TO_ALL_VARIANTS":
-        // Apply pricing, stock, and SKU to all variants
         draft.productDetails.variations.forEach((variation) => {
           variation.values.forEach((value) => {
             value.pricing.current =
@@ -91,6 +96,20 @@ const productFormReducer = (state, action) =>
           });
         });
         break;
+
+      // New Cases for formErrors and requiredFields
+      case "SET_REQUIRED_FIELDS":
+        draft.requiredFields = payload;
+        break;
+
+      case "SET_FORM_ERRORS":
+        draft.formErrors = payload;
+        break;
+
+      case "CLEAR_FORM_ERRORS":
+        draft.formErrors = {};
+        break;
+
       default:
         break;
     }

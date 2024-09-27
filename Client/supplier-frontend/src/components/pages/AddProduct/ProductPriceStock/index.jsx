@@ -17,6 +17,7 @@ const getFieldPath = (
     : `productDetails.${baseField}`;
 };
 
+// Table header component
 function TableHeaders({
   hasVariationRows,
   variationColumnNames,
@@ -44,8 +45,9 @@ function TableRows({
   hasVariationRows,
   variationColumnNames,
   additionalInputFields,
+  formData,
+  onChange,
 }) {
-  const { state } = useProductForm();
   return (
     <tbody>
       {hasVariationRows ? (
@@ -70,9 +72,10 @@ function TableRows({
                       groupType="input"
                       placeholder={placeholder}
                       value={get(
-                        state,
+                        formData,
                         getFieldPath(true, fieldName, rowIndex)
                       )}
+                      onChange={onChange}
                     />
                   ) : (
                     <FormInput
@@ -81,9 +84,10 @@ function TableRows({
                       placeholder={placeholder}
                       suffixDisplay={{ maxValue }}
                       value={get(
-                        state,
+                        formData,
                         getFieldPath(true, fieldName, rowIndex)
                       )}
+                      onChange={onChange}
                       isSwitch={index === additionalInputFields.length - 1}
                     />
                   )}
@@ -105,7 +109,8 @@ function TableRows({
                   type={inputType}
                   placeholder={placeholder}
                   suffixDisplay={{ maxValue }}
-                  value={get(state, getFieldPath(false, fieldName))}
+                  value={get(formData, getFieldPath(false, fieldName))}
+                  onChange={onChange}
                   isSwitch={index === additionalInputFields.length - 1}
                 />
               </td>
@@ -117,10 +122,8 @@ function TableRows({
   );
 }
 
-function ProductPriceStockWrapper() {
+function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
   const { state, handleApplyToAll } = useProductForm();
-  const variations = state.productDetails.variations;
-  const variantShipping = state.uiState.variantShipping;
   const variationNames = variations.map((variation) =>
     variation.values.map((v) => v.name).join(",")
   );
@@ -207,6 +210,7 @@ function ProductPriceStockWrapper() {
                   placeholder={placeholder}
                   value={get(state, getFieldPath(false, fieldName))}
                   suffixDisplay={{ maxValue }}
+                  onChange={onChange}
                   customClass={styles.variationInputField}
                 />
               )
@@ -232,6 +236,8 @@ function ProductPriceStockWrapper() {
             variationRows={variationRows}
             variationColumnNames={variationColumnNames}
             additionalInputFields={additionalInputFields}
+            formData={state}
+            onChange={onChange}
             hasVariationRows={hasVariationRows}
             variantShipping={variantShipping}
           />

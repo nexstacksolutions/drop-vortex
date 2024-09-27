@@ -22,11 +22,18 @@ function Guidelines({ content, guideType }) {
   );
 }
 
-function InputWrapper({ name, label, id, children, customClass }) {
+function InputWrapper({
+  id,
+  name,
+  label,
+  children,
+  customClass,
+  hideValidation,
+}) {
   const { requiredFields, formErrors } = useProductForm();
 
-  const isRequired = get(requiredFields, name);
-  const errorMessage = get(formErrors, name);
+  const isRequired = !hideValidation && get(requiredFields, name);
+  const errorMessage = !hideValidation && get(formErrors, name);
 
   return (
     <div
@@ -58,11 +65,11 @@ function InputWrapper({ name, label, id, children, customClass }) {
 }
 
 function GenerateInputByType({
-  id,
-  name,
   type,
+  name,
   value,
   checked,
+  id,
   suffixDisplay,
   placeholder,
   fileType,
@@ -72,6 +79,7 @@ function GenerateInputByType({
   onChange,
   onFocus,
   onBlur,
+  handleQuillChange,
   onKeyDown,
 }) {
   const { icon, maxValue } = suffixDisplay || {};
@@ -91,7 +99,7 @@ function GenerateInputByType({
 
   switch (type) {
     case "textarea":
-      return <ReactQuill value={value} id={id} onChange={onChange} />;
+      return <ReactQuill value={value} id={id} onChange={handleQuillChange} />;
     default:
       return (
         <div
@@ -101,9 +109,9 @@ function GenerateInputByType({
           )}
         >
           <input
-            id={id}
-            name={name}
             type={type}
+            name={name}
+            id={id}
             value={value}
             checked={checked}
             placeholder={placeholder}
@@ -131,100 +139,78 @@ function GenerateInputByType({
 }
 
 function FormInput({
-  id,
   name,
   label,
-  type,
-  value,
   onChange,
   customClass,
   wrapInput = true,
-  useCustomizer = false,
+  hideValidation = false,
   ...rest
 }) {
-  const { state, handleInputChange, handleDebouncedChange } = useProductForm();
-
+  const id = `${name}-form-input`;
   const handleQuillChange = useCallback(
-    (content) => handleDebouncedChange(null, name, content),
-    [name, handleDebouncedChange]
+    (content) => onChange(null, name, content),
+    [name, onChange]
   );
 
-  if (id === undefined && !useCustomizer) {
-    ({ id } = { id: `${name}-form-input` });
-  }
-
-  if (value === undefined && !useCustomizer) {
-    ({ value } = { value: get(state, name) });
-  }
-
-  if (onChange === undefined && !useCustomizer) {
-    if (type === "textarea") {
-      ({ onChange } = { onChange: handleQuillChange });
-    } else {
-      ({ onChange } = { onChange: handleInputChange });
-    }
-  }
+  const generateInputProps = {
+    ...rest,
+    name,
+    onChange,
+    handleQuillChange,
+    id,
+  };
 
   return wrapInput ? (
-    <InputWrapper {...{ label, name, id, customClass }}>
-      {GenerateInputByType({ ...rest, name, id, onChange, value, type })}
+    <InputWrapper {...{ label, id, name, customClass, hideValidation }}>
+      {GenerateInputByType(generateInputProps)}
     </InputWrapper>
   ) : (
-    GenerateInputByType({ ...rest, name, id, onChange, value, type })
+    GenerateInputByType(generateInputProps)
   );
 }
-
 function MultiInputGroup({
-  name,
-  label,
-  type,
-  options,
-  groupType,
   customClass,
+  value,
+  options,
+  name,
+  onChange,
+  type,
+  groupType,
+  label,
 }) {
-  const { state, handleInputChange: onChange } = useProductForm();
-  const value = get(state, name);
-  const id = `${name}-form-input`;
+  const id = `${name}-multi-input-group`;
 
   return (
-    <InputWrapper label={label} formInputId={id} customClass={customClass}>
+    <InputWrapper {...{ label, id, name, customClass }}>
       {groupType === "input"
         ? Object.keys(value).map((dimension, index) => (
-            <GenerateInputByType
+            <FormInput
               key={index}
               name={dimension}
               value={value[dimension]}
               type={type}
+              wrapInput={false}
               placeholder={
                 dimension.charAt(0).toUpperCase() + dimension.slice(1)
               }
-              useCustomizer={true}
               onChange={(e) =>
-                onChange(null, name, {
-                  ...value,
-                  [dimension]: e.target.value,
-                })
+                onChange(null, name, { ...value, [dimension]: e.target.value })
               }
             />
           ))
         : options?.map((option, index) => (
             <label
               key={index}
-              htmlFor={`${name}.${option}`}
+              htmlFor={`${name}${index}`}
               className={classNames(styles.radioItem, "flex flex-center")}
             >
-              {
-                <FormInput
-                  type={type}
-                  id={`${name}.${option}`}
-                  name={name}
-                  value={option}
-                  useCustomizer={true}
-                  checked={value === option}
-                  onChange={onChange}
-                  wrapInput={false}
-                />
-              }
+              <GenerateInputByType
+                {...{ type, name }}
+                id={`${name}${index}`}
+                value={option}
+                checked={value === option}
+              />
 
               <span>{option}</span>
             </label>
@@ -232,7 +218,6 @@ function MultiInputGroup({
     </InputWrapper>
   );
 }
-
 function renderMediaFiles(mediaFiles, fileType, handleRemoveFile) {
   return mediaFiles.map((file, index) => (
     <MediaPreviewItem
@@ -245,17 +230,17 @@ function renderMediaFiles(mediaFiles, fileType, handleRemoveFile) {
 }
 
 function MediaInput({
-  name,
   label,
+  name,
   maxFiles,
   type = "file",
   fileType,
+  value,
+  onChange,
   resetTrigger,
   customClass,
   guidelinesProps,
 }) {
-  const { state, handleInputChange: onChange } = useProductForm();
-  const value = get(state, name);
   const [mediaFiles, setMediaFiles] = useState(value || []);
   const fileInputRef = useRef(null);
 
@@ -295,12 +280,11 @@ function MediaInput({
     }
   }, [resetTrigger, name, onChange]);
 
-  const fileInputId = `${name}-file-upload`;
+  const id = `${name}-file-upload`;
 
   return (
     <InputWrapper
-      label={label}
-      formInputId={fileInputId}
+      {...{ label, id, name }}
       customClass={classNames(styles.mediaInputContainer, customClass)}
     >
       <div className={`${styles.mediaInputWrapper} flex align-center`}>
@@ -309,13 +293,11 @@ function MediaInput({
           {mediaFiles.length < maxFiles && (
             <FormInput
               label={<FaPlus />}
-              name={name}
-              type={type}
-              fileType={fileType}
+              {...{ name, type, fileType }}
               multiple={maxFiles && maxFiles > 1 ? true : false}
               inputRef={fileInputRef}
               onChange={handleFileChange}
-              useCustomizer={true}
+              hideValidation={true}
               customClass={styles.addMediaWrapper}
             />
           )}
@@ -325,7 +307,6 @@ function MediaInput({
     </InputWrapper>
   );
 }
-
 function MediaPreviewItem({ file, fileType, onRemove }) {
   return (
     <div className={`${styles.mediaPreviewItem} flex flex-center`}>
@@ -357,12 +338,10 @@ function MediaPreviewItem({ file, fileType, onRemove }) {
     </div>
   );
 }
-
-function DropdownInput({ label, name, options, customClass, ...rest }) {
-  const { state, handleInputChange: onChange } = useProductForm();
+function DropdownInput(props) {
+  const { customClass, label, name, options, value, onChange } = props || {};
   const [isFocused, setIsFocused] = useState(false);
-  const value = get(state, name);
-  const dropdownInputId = `${name}-dropdown-input`;
+  const id = `${name}-dropdown-input`;
 
   // Handle input focus
   const handleFocus = () => {
@@ -388,16 +367,14 @@ function DropdownInput({ label, name, options, customClass, ...rest }) {
 
   return (
     <InputWrapper
-      label={label}
-      formInputId={dropdownInputId}
+      {...{ label, id, name }}
       customClass={classNames(styles.dropdownInputContainer, customClass, {
         [styles.dropdownInputFocused]: isFocused,
       })}
     >
       <FormInput
-        {...rest}
+        {...props}
         wrapInput={false}
-        name={name}
         suffixDisplay={{ icon: <FaAngleDown /> }}
         onFocus={handleFocus} // Trigger dropdown on focus
         onBlur={handleBlur} // Close dropdown on blur

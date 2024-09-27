@@ -6,15 +6,14 @@ import { RiDeleteBin5Line, RiMenuFill } from "react-icons/ri";
 import { useProductForm } from "../../../../context/ProductForm";
 
 function VariantItem({
+  handleAddVariantItem,
+  handleRemoveVariantItem,
   variantData,
   variationIndex,
   valueIndex,
-  useCustomOnChange,
   showVariantImages,
+  onChange,
 }) {
-  const { handleAddVariantItem, handleRemoveVariantItem, handleInputChange } =
-    useProductForm();
-
   const [state, setState] = useState({
     inputValue: "",
     variantImages: [],
@@ -60,8 +59,11 @@ function VariantItem({
         type="text"
         placeholder="Please type or select"
         value={(variantData && variantData.name) || inputValue}
-        onChange={(e) => setState({ ...state, inputValue: e.target.value })}
-        useCustomOnChange={useCustomOnChange}
+        onChange={
+          onChange
+            ? onChange
+            : (e) => setState({ ...state, inputValue: e.target.value })
+        }
         onKeyDown={handleKeyDown}
         customClass={styles.formInput}
       />
@@ -73,17 +75,20 @@ function VariantItem({
           maxFiles={5}
           value={variantData?.variantImages || variantImages}
           resetTrigger={resetTrigger}
-          onChange={(_, __, newMedia) =>
-            setState((prevState) => ({
-              ...prevState,
-              variantImages: newMedia,
-            }))
+          onChange={
+            onChange
+              ? onChange
+              : (_, __, newMedia) =>
+                  setState((prevState) => ({
+                    ...prevState,
+                    variantImages: newMedia,
+                  }))
           }
           customClass={styles.mediaInput}
         />
       )}
 
-      {
+      {onChange && (
         <div className={`${styles.variantActions} flex justify-end`}>
           <button
             type="button"
@@ -96,16 +101,14 @@ function VariantItem({
             <RiMenuFill />
           </button>
         </div>
-      }
+      )}
     </div>
   );
 }
 
-function ProductVariations() {
-  const { state, formErrors, handleInputChange: onChange } = useProductForm();
-  const variations = get(state, "productDetails.variations");
-  const showVariantImages = get(state, "uiState.showVariantImages");
-  const err = get(formErrors, `productDetails.variations`);
+function ProductVariations({ variations, onChange }) {
+  const { handleRemoveVariantItem, handleAddVariantItem } = useProductForm();
+  const [showVariantImages, setShowVariantImages] = useState(false);
 
   return (
     <div className={`${styles.productVariationsWrapper} flex flex-col`}>
@@ -130,11 +133,11 @@ function ProductVariations() {
                   className={`${styles.showImageCheckbox} flex align-center`}
                 >
                   <FormInput
-                    name="uiState.showVariantImages"
+                    name="showImageCheckbox"
+                    id="showImageCheckbox"
                     type="checkbox"
                     value={showVariantImages}
-                    checked={showVariantImages}
-                    onChange={(e) => onChange(null, name, e.target.checked)}
+                    onChange={(e) => setShowVariantImages(e.target.checked)}
                   />
                   <label
                     htmlFor="showImageCheckbox-form-input"
@@ -153,24 +156,24 @@ function ProductVariations() {
                   <VariantItem
                     key={`${variationIndex}-${variantData.id}`}
                     variantData={variantData}
+                    onChange={onChange}
                     variationIndex={variationIndex}
                     valueIndex={valueIndex}
                     showVariantImages={showVariantImages}
+                    handleRemoveVariantItem={handleRemoveVariantItem}
                   />
                 ))}
               </div>
 
               <VariantItem
+                handleAddVariantItem={handleAddVariantItem}
                 variationIndex={variationIndex}
                 showVariantImages={showVariantImages}
-                useCustomOnChange={true}
               />
             </div>
           </InputWrapper>
         );
       })}
-
-      {err && <p className={styles.errorMsg}>{err}</p>}
     </div>
   );
 }
