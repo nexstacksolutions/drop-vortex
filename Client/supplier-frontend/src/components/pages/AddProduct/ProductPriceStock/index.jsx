@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { FormInput, MultiInputGroup } from "../ProductInputs";
 import { get } from "lodash";
 import { useProductForm } from "../../../../context/ProductForm";
+import { FaAsterisk } from "react-icons/fa6";
 
 const getFieldPath = (
   isVariationField,
@@ -19,6 +20,7 @@ const getFieldPath = (
 
 // Table header component
 function TableHeaders({
+  requiredFields,
   hasVariationRows,
   variationColumnNames,
   additionalHeaderNames,
@@ -30,9 +32,19 @@ function TableHeaders({
           variationColumnNames.map((columnName, columnIndex) => (
             <th key={columnIndex}>{columnName}</th>
           ))}
-        {additionalHeaderNames.map((headerName, headerIndex) => (
-          <th key={headerIndex}>{headerName}</th>
-        ))}
+        {additionalHeaderNames.map(({ label, fieldPath }, headerIndex) => {
+          const name = getFieldPath(false, fieldPath);
+          const isRequired = get(requiredFields, name);
+
+          return (
+            <th key={headerIndex}>
+              <label htmlFor={`${name}-form-input`}>
+                {isRequired && <FaAsterisk />}
+                <span>{label}</span>
+              </label>
+            </th>
+          );
+        })}
       </tr>
     </thead>
   );
@@ -40,13 +52,14 @@ function TableHeaders({
 
 // Table row component
 function TableRows({
+  state,
+  onChange,
+  formErrors,
   variationRows,
   variantShipping,
   hasVariationRows,
   variationColumnNames,
   additionalInputFields,
-  formData,
-  onChange,
 }) {
   return (
     <tbody>
@@ -60,35 +73,30 @@ function TableRows({
             ))}
 
             {additionalInputFields.map(
-              (
-                { placeholder, fieldName, maxValue, inputType = "number" },
-                index
-              ) => (
+              ({ fieldPath, maxValue, type = "number", ...rest }, index) => (
                 <td key={`additional-col-${index}`}>
                   {variantShipping && index === 4 ? (
                     <MultiInputGroup
-                      name={getFieldPath(true, fieldName, rowIndex)}
-                      type={inputType}
+                      {...{ type, onChange, ...rest }}
+                      name={getFieldPath(true, fieldPath, rowIndex)}
                       groupType="input"
-                      placeholder={placeholder}
+                      hideValidation={true}
                       value={get(
-                        formData,
-                        getFieldPath(true, fieldName, rowIndex)
+                        state,
+                        getFieldPath(true, fieldPath, rowIndex)
                       )}
-                      onChange={onChange}
                     />
                   ) : (
                     <FormInput
-                      name={getFieldPath(true, fieldName, rowIndex)}
-                      type={inputType}
-                      placeholder={placeholder}
+                      {...{ type, onChange, ...rest }}
+                      name={getFieldPath(true, fieldPath, rowIndex)}
                       suffixDisplay={{ maxValue }}
-                      value={get(
-                        formData,
-                        getFieldPath(true, fieldName, rowIndex)
-                      )}
-                      onChange={onChange}
+                      hideValidation={true}
                       isSwitch={index === additionalInputFields.length - 1}
+                      value={get(
+                        state,
+                        getFieldPath(true, fieldPath, rowIndex)
+                      )}
                     />
                   )}
                 </td>
@@ -99,18 +107,14 @@ function TableRows({
       ) : (
         <tr>
           {additionalInputFields.map(
-            (
-              { placeholder, fieldName, maxValue, inputType = "number" },
-              index
-            ) => (
-              <td key={`non-row-${fieldName}-${index}`}>
+            ({ fieldPath, maxValue, type = "number", ...rest }, index) => (
+              <td key={`non-row-${fieldPath}-${index}`}>
                 <FormInput
-                  name={getFieldPath(false, fieldName)}
-                  type={inputType}
-                  placeholder={placeholder}
+                  {...{ type, onChange, ...rest }}
+                  name={getFieldPath(false, fieldPath)}
                   suffixDisplay={{ maxValue }}
-                  value={get(formData, getFieldPath(false, fieldName))}
-                  onChange={onChange}
+                  hideValidation={true}
+                  value={get(state, getFieldPath(false, fieldPath))}
                   isSwitch={index === additionalInputFields.length - 1}
                 />
               </td>
@@ -123,7 +127,9 @@ function TableRows({
 }
 
 function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
-  const { state, handleApplyToAll } = useProductForm();
+  const { state, handleApplyToAll, requiredFields, formErrors } =
+    useProductForm();
+
   const variationNames = variations.map((variation) =>
     variation.values.map((v) => v.name).join(",")
   );
@@ -149,43 +155,41 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
   const hasVariationRows = variationRows.length > 0;
 
   const additionalHeaderNames = [
-    "Price",
-    "Special Price",
-    "Stock",
-    ...(variantShipping && hasVariationRows
-      ? ["Package Weight", "Package Dimensions(cm): Length * Width * Height"]
-      : []),
-    "Seller SKU",
-    "Free Items",
-    "Availability",
-  ];
-
-  const additionalInputFields = [
-    { fieldName: "pricing.current", placeholder: "Price" },
-    { fieldName: "pricing.original", placeholder: "Special Price" },
-    { fieldName: "stock", placeholder: "Stock" },
+    { fieldPath: "pricing.original", label: "Price" },
+    { fieldPath: "pricing.curren", label: "Special Price" },
+    { fieldPath: "stock", label: "Stock" },
     ...(variantShipping && hasVariationRows
       ? [
+          { fieldPath: "packageWeight", label: "Package Weight" },
           {
-            fieldName: "packageWeight",
-            placeholder: "0.001 - 300",
-            inputType: "number",
-          },
-          {
-            fieldName: "dimensions",
-            placeholder: "0.01 - 300",
-            inputType: "number",
+            fieldPath: "dimensions",
+            label: "Package Dimensions(cm): Length * Width * Height",
           },
         ]
       : []),
+    { fieldPath: "sku", label: "Seller SKU" },
+    { fieldPath: "freeItems", label: "Free Items" },
+    { fieldPath: "availability", label: "Availability" },
+  ];
+
+  const additionalInputFields = [
+    { fieldPath: "pricing.original", placeholder: "Price" },
+    { fieldPath: "pricing.current", placeholder: "Special Price" },
+    { fieldPath: "stock", placeholder: "Stock" },
+    ...(variantShipping && hasVariationRows
+      ? [
+          { fieldPath: "packageWeight", placeholder: "0.001 - 300" },
+          { fieldPath: "dimensions", placeholder: "0.01 - 300" },
+        ]
+      : []),
     {
-      fieldName: "sku",
+      fieldPath: "sku",
       placeholder: "Seller SKU",
-      inputType: "text",
+      type: "text",
       maxValue: 200,
     },
-    { fieldName: "freeItems", placeholder: "Free Items" },
-    { fieldName: "availability" },
+    { fieldPath: "freeItems", placeholder: "Free Items" },
+    { fieldPath: "availability" },
   ];
 
   return (
@@ -194,27 +198,20 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
       {hasVariationRows && (
         <div className={`${styles.variationInputContainer} flex`}>
           {additionalInputFields
-            .slice(0, variantShipping ? 6 : 4) // Slice depending on variantShipping
+            .slice(0, variantShipping ? 6 : 4)
             .filter(
               (_, index) => !(variantShipping && (index === 3 || index === 4))
-            ) // Filter out index 3 and 4 if variantShipping is true
-            .map(
-              (
-                { placeholder, fieldName, maxValue, inputType = "number" },
-                index
-              ) => (
-                <FormInput
-                  key={`non-row-${fieldName}-${index}`}
-                  name={getFieldPath(false, fieldName)}
-                  type={inputType}
-                  placeholder={placeholder}
-                  value={get(state, getFieldPath(false, fieldName))}
-                  suffixDisplay={{ maxValue }}
-                  onChange={onChange}
-                  customClass={styles.variationInputField}
-                />
-              )
-            )}
+            )
+            .map(({ fieldPath, maxValue, type = "number", ...rest }, index) => (
+              <FormInput
+                key={`non-row-${fieldPath}-${index}`}
+                name={getFieldPath(false, fieldPath)}
+                value={get(state, getFieldPath(false, fieldPath))}
+                suffixDisplay={{ maxValue }}
+                {...{ type, onChange, ...rest }}
+                customClass={styles.variationInputField}
+              />
+            ))}
           <button
             type="button"
             onClick={handleApplyToAll}
@@ -228,18 +225,24 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
       <div className={styles.variantTableWrapper}>
         <table className={styles.variantTable}>
           <TableHeaders
-            variationColumnNames={variationColumnNames}
-            additionalHeaderNames={additionalHeaderNames}
-            hasVariationRows={hasVariationRows}
+            {...{
+              hasVariationRows,
+              requiredFields,
+              variationColumnNames,
+              additionalHeaderNames,
+            }}
           />
           <TableRows
-            variationRows={variationRows}
-            variationColumnNames={variationColumnNames}
-            additionalInputFields={additionalInputFields}
-            formData={state}
-            onChange={onChange}
-            hasVariationRows={hasVariationRows}
-            variantShipping={variantShipping}
+            {...{
+              state,
+              onChange,
+              variationRows,
+              variantShipping,
+              formErrors,
+              hasVariationRows,
+              variationColumnNames,
+              additionalInputFields,
+            }}
           />
         </table>
       </div>

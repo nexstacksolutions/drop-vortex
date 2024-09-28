@@ -9,10 +9,10 @@ import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useProductForm } from "../../../../context/ProductForm";
 
-function Guidelines({ content, guideType }) {
+function Guidelines({ content, customClass }) {
   if (!content.length) return null;
   return (
-    <div className={classNames(styles.guideContainer, styles[guideType])}>
+    <div className={classNames(styles.guideContainer, customClass)}>
       <ul>
         {content.map((item, index) => (
           <li key={index}>{item}</li>
@@ -29,23 +29,23 @@ function InputWrapper({
   children,
   customClass,
   hideValidation,
+  formInputWrapperProps,
 }) {
   const { requiredFields, formErrors } = useProductForm();
 
-  const isRequired = !hideValidation && get(requiredFields, name);
-  const errorMessage = !hideValidation && get(formErrors, name);
+  const isRequired = get(requiredFields, name);
+  const errorMessage = get(formErrors, name);
 
   return (
     <div
-      className={classNames(
-        styles.formInputContainer,
-        "flex flex-col",
-        customClass
-      )}
+      className={classNames(styles.formInputContainer, "flex flex-col", {
+        [customClass]: customClass,
+        [styles.invalidInput]: errorMessage,
+      })}
     >
       {label && (
         <label htmlFor={id} className="flex align-center">
-          {isRequired && <FaAsterisk />}
+          {!hideValidation && isRequired && <FaAsterisk />}
           <span>{label}</span>
         </label>
       )}
@@ -53,13 +53,16 @@ function InputWrapper({
       <div
         className={classNames(
           styles.formInputWrapper,
-          "flex align-center justify-between"
+          "flex align-center justify-between",
+          formInputWrapperProps?.customClass
         )}
       >
         {children}
       </div>
 
-      {errorMessage && <p className={styles.errorMsg}>{errorMessage}</p>}
+      {!hideValidation && errorMessage && (
+        <p className={styles.errorMsg}>{errorMessage}</p>
+      )}
     </div>
   );
 }
@@ -153,13 +156,7 @@ function FormInput({
     [name, onChange]
   );
 
-  const generateInputProps = {
-    ...rest,
-    name,
-    onChange,
-    handleQuillChange,
-    id,
-  };
+  const generateInputProps = { id, name, onChange, ...rest, handleQuillChange };
 
   return wrapInput ? (
     <InputWrapper {...{ label, id, name, customClass, hideValidation }}>
@@ -210,6 +207,7 @@ function MultiInputGroup({
                 id={`${name}${index}`}
                 value={option}
                 checked={value === option}
+                onChange={onChange}
               />
 
               <span>{option}</span>
@@ -222,8 +220,7 @@ function renderMediaFiles(mediaFiles, fileType, handleRemoveFile) {
   return mediaFiles.map((file, index) => (
     <MediaPreviewItem
       key={index}
-      file={file}
-      fileType={fileType}
+      {...{ file, fileType }}
       onRemove={() => handleRemoveFile(index)}
     />
   ));
@@ -285,25 +282,26 @@ function MediaInput({
   return (
     <InputWrapper
       {...{ label, id, name }}
+      formInputWrapperProps={{
+        customClass: classNames(styles.mediaInputWrapper),
+      }}
       customClass={classNames(styles.mediaInputContainer, customClass)}
     >
-      <div className={`${styles.mediaInputWrapper} flex align-center`}>
-        <div className={`${styles.mediaPreviewWrapper} flex`}>
-          {renderMediaFiles(mediaFiles, fileType, handleRemoveFile)}
-          {mediaFiles.length < maxFiles && (
-            <FormInput
-              label={<FaPlus />}
-              {...{ name, type, fileType }}
-              multiple={maxFiles && maxFiles > 1 ? true : false}
-              inputRef={fileInputRef}
-              onChange={handleFileChange}
-              hideValidation={true}
-              customClass={styles.addMediaWrapper}
-            />
-          )}
-        </div>
-        {guidelinesProps && <Guidelines {...guidelinesProps} />}
+      <div className={`${styles.mediaPreviewWrapper} flex`}>
+        {renderMediaFiles(mediaFiles, fileType, handleRemoveFile)}
+        {mediaFiles.length < maxFiles && (
+          <FormInput
+            label={<FaPlus />}
+            {...{ name, type, fileType }}
+            multiple={maxFiles && maxFiles > 1 ? true : false}
+            inputRef={fileInputRef}
+            onChange={handleFileChange}
+            hideValidation={true}
+            customClass={styles.addMediaWrapper}
+          />
+        )}
       </div>
+      {guidelinesProps && <Guidelines {...guidelinesProps} />}
     </InputWrapper>
   );
 }
@@ -404,4 +402,11 @@ function DropdownInput(props) {
   );
 }
 
-export { FormInput, MultiInputGroup, InputWrapper, DropdownInput, MediaInput };
+export {
+  FormInput,
+  MultiInputGroup,
+  InputWrapper,
+  DropdownInput,
+  MediaInput,
+  GenerateInputByType,
+};

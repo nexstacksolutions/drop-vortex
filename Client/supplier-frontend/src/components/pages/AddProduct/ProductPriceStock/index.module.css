@@ -17,6 +17,11 @@
         border: var(--border-sm);
         text-align: center;
       }
+
+      & th label > svg {
+        color: red;
+        font-size: 1rem;
+      }
     }
   }
 }

@@ -47,16 +47,20 @@
   & .errorMsg {
     color: red;
   }
+
+  &.invalidInput .formInputWrapper .inputWrapper {
+    border-color: red;
+  }
 }
 
 .mediaInputContainer {
   flex: 1;
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  background-color: var(--wrapper-bg);
 
   & .mediaInputWrapper {
-    max-width: max-content;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    background-color: var(--wrapper-bg);
+    justify-content: start;
 
     & .mediaPreviewWrapper {
       max-width: max-content;

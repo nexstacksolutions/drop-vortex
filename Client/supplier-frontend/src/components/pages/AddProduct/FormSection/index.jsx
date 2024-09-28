@@ -12,7 +12,7 @@ function ShowMoreBtn({ btnText = "Show More", section }) {
   return (
     <button
       type="button"
-      onClick={toggleAdditionalFields}
+      onClick={() => toggleAdditionalFields(section)}
       className={classNames(styles.showMoreBtn, {
         [styles.showMoreBtnActive]: additionalFields[section],
       })}

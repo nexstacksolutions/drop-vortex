@@ -1,7 +1,7 @@
 import styles from "./ProductForm.module.css";
 import classNames from "classnames";
 import { get } from "lodash";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import FormSection from "../FormSection";
 import ProductVariations from "../ProductVariations";
 import ProductPriceStockWrapper from "../ProductPriceStock";
@@ -47,9 +47,7 @@ const RenderInputField = (
 function ProductForm({ customClass }) {
   const {
     state,
-    dispatch,
     handleSubmit,
-    isFieldRequired,
     handleInputChange,
     handleDebouncedChange,
     handleToggleVariantShipping,
@@ -111,7 +109,6 @@ function ProductForm({ customClass }) {
             maxFiles: 1,
             guidelinesProps: {
               content: ["White Background Image", "See Example"],
-              guideType: "imageGuidelines",
             },
           },
           {
@@ -127,7 +124,6 @@ function ProductForm({ customClass }) {
                 "Supported Format: mp4",
                 "New Video might take up to 36 hrs to be approved",
               ],
-              guideType: "videoGuidelines",
             },
           },
         ],
@@ -297,38 +293,6 @@ function ProductForm({ customClass }) {
       multiVariantShippingCondition,
     ]
   );
-
-  useEffect(() => {
-    const fetchRequiredFields = async () => {
-      let requiredFieldStatuses = {};
-
-      await Promise.all(
-        memoizedFormSections.map(async (section) => {
-          await Promise.all(
-            section.fields.map(async (field) => {
-              const isRequired = await isFieldRequired(field?.name);
-
-              if (isRequired === undefined) return;
-              requiredFieldStatuses[field.name] = isRequired;
-            })
-          );
-        })
-      );
-
-      // Dispatch required fields to the reducer
-      dispatch({ type: "SET_REQUIRED_FIELDS", payload: requiredFieldStatuses });
-    };
-
-    fetchRequiredFields();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // In your useEffect
-  useEffect(() => {
-    if (!multiVariantShippingCondition) {
-      dispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
-    }
-  }, [multiVariantShippingCondition, dispatch]);
 
   return (
     <form

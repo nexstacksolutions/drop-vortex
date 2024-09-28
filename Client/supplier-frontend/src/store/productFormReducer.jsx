@@ -12,16 +12,16 @@ const initialState = {
     },
   },
   productDetails: {
-    pricing: { current: null, original: null }, // original required, current optional
-    stock: null,
+    pricing: { current: "", original: "" },
+    stock: "",
     availability: true,
-    freeItems: null, // nullable
-    sku: "", // nullable
+    freeItems: "",
+    sku: "",
     variations: [{ type: "Color Family", values: [] }],
   },
   specifications: {
     brand: { name: "", logo: [] },
-    numberOfPieces: null,
+    numberOfPieces: "",
     powerSource: "",
     additionalSpecs: [],
   },
@@ -32,8 +32,8 @@ const initialState = {
     whatsInBox: "",
   },
   shipping: {
-    packageWeight: null, // optional
-    dimensions: { length: null, width: null, height: null }, // optional
+    packageWeight: "",
+    dimensions: { length: "", width: "", height: "" },
     dangerousGoods: "None",
     warranty: { type: "", period: "", policy: "" },
   },

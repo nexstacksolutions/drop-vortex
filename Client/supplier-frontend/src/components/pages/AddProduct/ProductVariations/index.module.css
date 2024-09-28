@@ -35,6 +35,11 @@
             color: var(--secondary-text);
           }
         }
+
+        & > div {
+          border: none;
+          max-width: max-content;
+        }
       }
     }
 
@@ -61,7 +66,13 @@
           background-color: transparent;
           max-width: max-content;
 
-          & > div > div > div > div {
+          & > div:first-child {
+            padding: 0;
+            border-radius: none;
+            background-color: transparent;
+          }
+
+          & > div > div > div {
             width: 4rem;
             height: 4rem;
           }

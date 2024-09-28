@@ -1,9 +1,14 @@
 import styles from "./index.module.css";
 import { get } from "lodash";
 import { useCallback, useState } from "react";
-import { FormInput, MediaInput, InputWrapper } from "../ProductInputs";
 import { RiDeleteBin5Line, RiMenuFill } from "react-icons/ri";
 import { useProductForm } from "../../../../context/ProductForm";
+import {
+  FormInput,
+  MediaInput,
+  InputWrapper,
+  GenerateInputByType,
+} from "../ProductInputs";
 
 function VariantItem({
   handleAddVariantItem,
@@ -132,7 +137,7 @@ function ProductVariations({ variations, onChange }) {
                 <div
                   className={`${styles.showImageCheckbox} flex align-center`}
                 >
-                  <FormInput
+                  <GenerateInputByType
                     name="showImageCheckbox"
                     id="showImageCheckbox"
                     type="checkbox"
@@ -140,7 +145,7 @@ function ProductVariations({ variations, onChange }) {
                     onChange={(e) => setShowVariantImages(e.target.checked)}
                   />
                   <label
-                    htmlFor="showImageCheckbox-form-input"
+                    htmlFor="showImageCheckbox"
                     className="flex align-center"
                   >
                     <span>Add Image</span>

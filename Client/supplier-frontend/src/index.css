@@ -190,18 +190,22 @@ li {
   list-style: none;
 }
 
-button {
-  font-family: var(--family-base);
-  color: var(--primary-text);
+button,
+span {
   display: inline-flex;
   justify-content: center;
   align-items: center;
   width: max-content;
+  transition: var(--transition-base);
+}
+
+button {
+  font-family: var(--family-base);
+  color: var(--primary-text);
   gap: var(--spacing-xs);
   cursor: pointer;
   border: none;
   background-color: transparent;
-  transition: var(--transition-base);
   z-index: 10;
 }
 

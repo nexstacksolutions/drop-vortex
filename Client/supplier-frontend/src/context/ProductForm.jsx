@@ -1,9 +1,7 @@
 import * as Yup from "yup";
-import * as z from "zod";
 import { v4 as uuidv4 } from "uuid";
 import debounce from "lodash/debounce";
-import productFormSchema from "../schemas/productFormYup";
-import ZodSchema from "../schemas/productFormZod";
+import productFormSchema from "../schemas/productForm";
 import { initialState, productFormReducer } from "../store/productFormReducer";
 import {
   createContext,
@@ -20,10 +18,11 @@ export const ProductFormContext = createContext();
 const ProductFormProvider = ({ children }) => {
   const [state, dispatch] = useReducer(productFormReducer, initialState);
 
-  const multiVariantShippingCondition =
-    state.productDetails.variations.length &&
-    state.productDetails.variations[0].values.length > 1;
+  const multiVariantShippingCondition = useMemo(() => {
+    return state.productDetails.variations?.[0]?.values?.length > 1;
+  }, [state.productDetails.variations]);
 
+  // Handle update input Changes
   const updateFormData = useCallback(
     (name, value) => {
       dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
@@ -31,6 +30,7 @@ const ProductFormProvider = ({ children }) => {
     [dispatch]
   );
 
+  // Handle Input Change
   const handleInputChange = useCallback(
     (e, name, value, customizer) => {
       if (e) {
@@ -45,11 +45,13 @@ const ProductFormProvider = ({ children }) => {
     [updateFormData]
   );
 
+  // Debounce the input change event to optimize performance
   const handleDebouncedChange = useMemo(
     () => debounce(handleInputChange, 300),
     [handleInputChange]
   );
 
+  // Handle Add Variant Item in variations
   const handleAddVariantItem = useCallback(
     (inputValue, variantImages, variationIndex) => {
       if (!inputValue.trim()) return;
@@ -58,13 +60,13 @@ const ProductFormProvider = ({ children }) => {
         id: uuidv4(),
         name: inputValue,
         variantImages: variantImages || [],
-        pricing: { current: null, original: null },
-        stock: null,
+        pricing: { current: "", original: "" },
+        stock: "",
         availability: true,
-        freeItems: null,
+        freeItems: "",
         sku: "",
-        packageWeight: null,
-        dimensions: { length: null, width: null, height: null },
+        packageWeight: "",
+        dimensions: { length: "", width: "", height: "" },
       };
 
       // Dispatch to update the state in context
@@ -76,6 +78,7 @@ const ProductFormProvider = ({ children }) => {
     [dispatch]
   );
 
+  // Remove a variant item
   const handleRemoveVariantItem = useCallback(
     (variationIndex, valueIndex) => {
       // Dispatch to remove a variant item
@@ -87,6 +90,7 @@ const ProductFormProvider = ({ children }) => {
     [dispatch]
   );
 
+  // Apply to all variants
   const handleApplyToAll = useCallback(() => {
     const { pricing, stock, sku } = state.productDetails;
 
@@ -96,11 +100,13 @@ const ProductFormProvider = ({ children }) => {
     });
   }, [dispatch, state.productDetails]);
 
+  // Toggle variant shipping
   const handleToggleVariantShipping = useCallback(() => {
     // Dispatch to toggle variant shipping
     dispatch({ type: "TOGGLE_VARIANT_SHIPPING" });
   }, [dispatch]);
 
+  // Toggle additional fields
   const toggleAdditionalFields = useCallback(
     (section) => {
       // Dispatch to toggle additional fields
@@ -109,10 +115,10 @@ const ProductFormProvider = ({ children }) => {
     [dispatch]
   );
 
-  const validateForm = useCallback(async () => {
+  // debounce form Validations for efficiency
+  const debouncedValidate = debounce(async (state, dispatch) => {
     try {
       await productFormSchema.validate(state, { abortEarly: false });
-
       dispatch({ type: "CLEAR_FORM_ERRORS" });
       return true;
     } catch (error) {
@@ -120,43 +126,22 @@ const ProductFormProvider = ({ children }) => {
         acc[err.path] = err.message;
         return acc;
       }, {});
-
       dispatch({ type: "SET_FORM_ERRORS", payload: errors });
+      console.log(errors);
+
       return false;
     }
-  }, [state, dispatch]);
+  }, 300);
 
-  const validateFormZod = useCallback(async () => {
-    try {
-      // Validate the state against the Zod schema
-      ZodSchema.parse(state); // Use your specific schema
+  // Validate form on input change and debounce for efficiency
+  const validateForm = useCallback(() => {
+    debouncedValidate(state, dispatch);
+  }, [state, dispatch, debouncedValidate]);
 
-      // Clear any previous form errors
-      dispatch({ type: "CLEAR_FORM_ERRORS" });
-      return true;
-    } catch (error) {
-      // Ensure that error is a ZodError and has the expected structure
-      if (error instanceof z.ZodError) {
-        // If validation fails, create an errors object
-        const errors = error.errors.reduce((acc, err) => {
-          // Use the 'path' property for the key and the message for the value
-          const path = err.path.join("."); // Convert array path to string
-          acc[path] = err.message;
-          return acc;
-        }, {});
-        console.log(errors);
-
-        dispatch({ type: "SET_FORM_ERRORS", payload: errors });
-      } else {
-        console.error("Unexpected error during validation", error);
-      }
-      return false;
-    }
-  }, [state, dispatch]);
-
+  // Get Required field value
   const isFieldRequired = useCallback(async (fieldPath) => {
     try {
-      if (!fieldPath || typeof fieldPath !== "string") return;
+      if (!fieldPath || fieldPath.includes("uiState")) return;
       const validationSchema = Yup.reach(productFormSchema, fieldPath);
       const isRequired =
         validationSchema?.tests?.some((test) => test.name === "validate") ||
@@ -169,7 +154,7 @@ const ProductFormProvider = ({ children }) => {
     }
   }, []);
 
-  // Update form submission to include context state
+  // Handle form submission
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -186,6 +171,56 @@ const ProductFormProvider = ({ children }) => {
     [state, validateForm]
   );
 
+  // Get nested keys to Fetch required fields
+  const getNestedKeys = (obj, parent = "") => {
+    let keys = [];
+    for (let key in obj) {
+      const fullKey = parent ? `${parent}.${key}` : key;
+      if (
+        typeof obj[key] === "object" &&
+        obj[key] !== null &&
+        !Array.isArray(obj[key])
+      ) {
+        keys = keys.concat(getNestedKeys(obj[key], fullKey));
+      } else {
+        keys.push(fullKey);
+      }
+    }
+    return keys;
+  };
+
+  // Fetch required fields on initial render to show Asterisk icons in label
+  useEffect(() => {
+    const fetchRequiredFields = async () => {
+      let requiredFieldStatuses = {};
+      const formDataKeys = getNestedKeys(state);
+      console.log(formDataKeys);
+
+      await Promise.all(
+        formDataKeys.map(async (field) => {
+          const isRequired = await isFieldRequired(field);
+
+          if (isRequired === undefined) return;
+          requiredFieldStatuses[field] = isRequired;
+        })
+      );
+
+      // Dispatch required fields to the reducer
+      dispatch({ type: "SET_REQUIRED_FIELDS", payload: requiredFieldStatuses });
+    };
+
+    fetchRequiredFields();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Apply shipping condition based on multi-variant shipping
+  useEffect(() => {
+    if (!multiVariantShippingCondition) {
+      dispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
+    }
+  }, [multiVariantShippingCondition, dispatch]);
+
+  // Create memoized state values
   const values = useMemo(
     () => ({
       state,
@@ -225,6 +260,7 @@ const ProductFormProvider = ({ children }) => {
   );
 };
 
+// Custom hook to get values from the context
 export function useProductForm() {
   return useContext(ProductFormContext);
 }
