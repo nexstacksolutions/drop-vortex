@@ -33,6 +33,11 @@ body {
   --feature-color: #f97316;
   --switch-btn-bg: #cbced5;
   --scrollbar-bg: transparent;
+  --danger-color: #dc2626;
+  --success-color: #16a34a;
+  --danger-Rgb: 220, 38, 38;
+  --success-Rgb: 22, 163, 74;
+  --accent-Rgb: 59, 130, 246;
 
   /* Typography */
   --family-base: "Poppins", sans-serif;
@@ -57,11 +62,11 @@ body {
   --spacing-xl: 3.2rem;
 
   /* Borders */
-  --border-base: 1px solid;
-  --border-base-dotted: 1px dotted;
-  --border-base-dashed: 1px dashed;
-  --border-sm: 1px solid var(--border-color);
-  --border-md: 2px solid var(--border-color);
+  --border-base: 1px solid var(--border-color);
+  --border-err: 1px solid var(--danger-color);
+  --border-base-dotted: 1px dotted var(--border-color);
+  --border-base-dashed: 1px dashed var(--border-color);
+  --border-err-dashed: 1px dashed var(--danger-color);
   --radius-xs: 0.3rem;
   --radius-sm: 0.4rem;
   --radius-md: 0.8rem;
@@ -69,10 +74,17 @@ body {
   --rounded: 50%;
 
   /* Shadows */
-  --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.06);
-  --shadow-base: 2px 2px 16px rgba(0, 0, 0, 0.06);
-  --shadow-dark: 2px 4px 20px rgba(0, 0, 0, 0.07);
-  --accent-shadow-light: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  --shadow-xs: 0 0 0 2px;
+  --shadow-sm: 0 2px 4px;
+  --shadow-md: 2px 4px 12px;
+  --shadow-lg: 4px 6px 18px;
+
+  /* Opacity */
+  --opacity-xs: 0.1;
+  --opacity-sm: 0.2;
+  --opacity-md: 0.4;
+  --opacity-lg: 0.6;
+  --opacity-xl: 0.7;
 
   /* Breakpoints */
   --breakpoint-xs: 320px;
@@ -108,6 +120,9 @@ body {
   --section-bg: ;
   --overlay-bg: ;
   --border-color: #444444;
+  --shadow-light-Rgb: 0, 0, 0, 0.2;
+  --shadow-base-Rgb: 0, 0, 0, 0.3;
+  --shadow-dark-Rgb: 0, 0, 0, 0.4;
   --scrollbar-thumb-bg: #424242;
 }
 
@@ -125,6 +140,9 @@ body {
   --section-bg: ;
   --overlay-bg: ;
   --border-color: #d1d5db;
+  --shadow-light-Rgb: 0, 0, 0, 0.1;
+  --shadow-base-Rgb: 0, 0, 0, 0.06;
+  --shadow-dark-Rgb: 0, 0, 0, 0.15;
   --scrollbar-thumb-bg: #e0e0e0;
 }
 

@@ -1,4 +1,4 @@
-import styles from "./index.module.css";
+import styles from "./ProductForm.module.css";
 import "react-quill/dist/quill.snow.css";
 import classNames from "classnames";
 import ReactQuill from "react-quill";
@@ -102,7 +102,14 @@ function GenerateInputByType({
 
   switch (type) {
     case "textarea":
-      return <ReactQuill value={value} id={id} onChange={handleQuillChange} />;
+      return (
+        <ReactQuill
+          value={value}
+          id={id}
+          onChange={handleQuillChange}
+          className={styles.reactQuillInput}
+        />
+      );
     default:
       return (
         <div
@@ -282,9 +289,6 @@ function MediaInput({
   return (
     <InputWrapper
       {...{ label, id, name }}
-      formInputWrapperProps={{
-        customClass: classNames(styles.mediaInputWrapper),
-      }}
       customClass={classNames(styles.mediaInputContainer, customClass)}
     >
       <div className={`${styles.mediaPreviewWrapper} flex`}>

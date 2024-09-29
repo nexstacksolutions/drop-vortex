@@ -1,4 +1,4 @@
-import styles from "./index.module.css";
+import styles from "./ProductForm.module.css";
 import classNames from "classnames";
 import { FaAngleDown } from "react-icons/fa6";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";

@@ -1,5 +1,4 @@
-import styles from "./index.module.css";
-import { get } from "lodash";
+import styles from "./ProductForm.module.css";
 import { useCallback, useState } from "react";
 import { RiDeleteBin5Line, RiMenuFill } from "react-icons/ri";
 import { useProductForm } from "../../../../context/ProductForm";
@@ -8,7 +7,7 @@ import {
   MediaInput,
   InputWrapper,
   GenerateInputByType,
-} from "../ProductInputs";
+} from "./ProductInputs";
 
 function VariantItem({
   handleAddVariantItem,
@@ -70,7 +69,6 @@ function VariantItem({
             : (e) => setState({ ...state, inputValue: e.target.value })
         }
         onKeyDown={handleKeyDown}
-        customClass={styles.formInput}
       />
 
       {showVariantImages && (
@@ -89,7 +87,6 @@ function VariantItem({
                     variantImages: newMedia,
                   }))
           }
-          customClass={styles.mediaInput}
         />
       )}
 

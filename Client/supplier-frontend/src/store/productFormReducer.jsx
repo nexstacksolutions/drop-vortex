@@ -48,6 +48,7 @@ const initialState = {
   },
   requiredFields: {},
   formErrors: {},
+  formSubmitted: false,
 };
 
 const productFormReducer = (state, action) =>
@@ -108,6 +109,10 @@ const productFormReducer = (state, action) =>
 
       case "CLEAR_FORM_ERRORS":
         draft.formErrors = {};
+        break;
+
+      case "SET_FORM_SUBMITTED":
+        draft.formSubmitted = payload;
         break;
 
       default:

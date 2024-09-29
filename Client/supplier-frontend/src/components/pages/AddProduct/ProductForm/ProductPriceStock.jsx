@@ -1,6 +1,6 @@
-import styles from "./index.module.css";
+import styles from "./ProductForm.module.css";
 import { useMemo } from "react";
-import { FormInput, MultiInputGroup } from "../ProductInputs";
+import { FormInput, MultiInputGroup } from "./ProductInputs";
 import { get } from "lodash";
 import { useProductForm } from "../../../../context/ProductForm";
 import { FaAsterisk } from "react-icons/fa6";
@@ -38,7 +38,10 @@ function TableHeaders({
 
           return (
             <th key={headerIndex}>
-              <label htmlFor={`${name}-form-input`}>
+              <label
+                htmlFor={`${name}-form-input`}
+                className="flex flex-center"
+              >
                 {isRequired && <FaAsterisk />}
                 <span>{label}</span>
               </label>
@@ -196,22 +199,26 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
     <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
       {hasVariationRows && (
-        <div className={`${styles.variationInputContainer} flex`}>
-          {additionalInputFields
-            .slice(0, variantShipping ? 6 : 4)
-            .filter(
-              (_, index) => !(variantShipping && (index === 3 || index === 4))
-            )
-            .map(({ fieldPath, maxValue, type = "number", ...rest }, index) => (
-              <FormInput
-                key={`non-row-${fieldPath}-${index}`}
-                name={getFieldPath(false, fieldPath)}
-                value={get(state, getFieldPath(false, fieldPath))}
-                suffixDisplay={{ maxValue }}
-                {...{ type, onChange, ...rest }}
-                customClass={styles.variationInputField}
-              />
-            ))}
+        <div className={`${styles.variationInputContainer} flex align-center`}>
+          <div className={`${styles.variationInputWrapper} flex `}>
+            {additionalInputFields
+              .slice(0, variantShipping ? 6 : 4)
+              .filter(
+                (_, index) => !(variantShipping && (index === 3 || index === 4))
+              )
+              .map(
+                ({ fieldPath, maxValue, type = "number", ...rest }, index) => (
+                  <FormInput
+                    key={`non-row-${fieldPath}-${index}`}
+                    name={getFieldPath(false, fieldPath)}
+                    value={get(state, getFieldPath(false, fieldPath))}
+                    suffixDisplay={{ maxValue }}
+                    hideValidation={true}
+                    {...{ type, onChange, ...rest }}
+                  />
+                )
+              )}
+          </div>
           <button
             type="button"
             onClick={handleApplyToAll}

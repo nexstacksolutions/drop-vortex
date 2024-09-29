@@ -1,65 +1,59 @@
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
-import debounce from "lodash/debounce";
 import productFormSchema from "../schemas/productForm";
+import useDebouncedCallback from "../hooks/useDebouncedCallback";
+import useFormValidation from "../hooks/useFormValidation";
 import { initialState, productFormReducer } from "../store/productFormReducer";
-import {
+import React, {
   createContext,
   useReducer,
   useContext,
   useMemo,
-  useState,
-  useCallback,
   useEffect,
+  useCallback,
+  useState,
 } from "react";
 
 export const ProductFormContext = createContext();
 
 const ProductFormProvider = ({ children }) => {
   const [state, dispatch] = useReducer(productFormReducer, initialState);
+  const { validateForm } = useFormValidation(productFormSchema, dispatch);
+  const [touchedFields, setTouchedFields] = useState({});
+  const debouncedValidateForm = useDebouncedCallback(validateForm, 300);
 
-  const multiVariantShippingCondition = useMemo(() => {
-    return state.productDetails.variations?.[0]?.values?.length > 1;
-  }, [state.productDetails.variations]);
+  const multiVariantShippingCondition = useMemo(
+    () => state.productDetails.variations?.[0]?.values?.length > 1,
+    [state.productDetails.variations]
+  );
 
-  // Handle update input Changes
   const updateFormData = useCallback(
     (name, value) => {
       dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
+      setTouchedFields((prev) => ({ ...prev, [name]: true }));
     },
     [dispatch]
   );
 
-  // Handle Input Change
   const handleInputChange = useCallback(
     (e, name, value, customizer) => {
       if (e) {
         ({ name, value } = e.target);
       }
-
-      console.log(e, name, value, customizer);
-
       const customizedValue = customizer ? customizer(value) : value;
       updateFormData(name, customizedValue);
     },
     [updateFormData]
   );
 
-  // Debounce the input change event to optimize performance
-  const handleDebouncedChange = useMemo(
-    () => debounce(handleInputChange, 300),
-    [handleInputChange]
-  );
-
-  // Handle Add Variant Item in variations
   const handleAddVariantItem = useCallback(
-    (inputValue, variantImages, variationIndex) => {
+    (inputValue, variantImages = [], variationIndex) => {
       if (!inputValue.trim()) return;
 
       const newVariant = {
         id: uuidv4(),
         name: inputValue,
-        variantImages: variantImages || [],
+        variantImages,
         pricing: { current: "", original: "" },
         stock: "",
         availability: true,
@@ -69,7 +63,6 @@ const ProductFormProvider = ({ children }) => {
         dimensions: { length: "", width: "", height: "" },
       };
 
-      // Dispatch to update the state in context
       dispatch({
         type: "ADD_VARIANT_ITEM",
         payload: { newVariant, variationIndex },
@@ -78,10 +71,8 @@ const ProductFormProvider = ({ children }) => {
     [dispatch]
   );
 
-  // Remove a variant item
   const handleRemoveVariantItem = useCallback(
     (variationIndex, valueIndex) => {
-      // Dispatch to remove a variant item
       dispatch({
         type: "REMOVE_VARIANT_ITEM",
         payload: { variationIndex, valueIndex },
@@ -90,146 +81,123 @@ const ProductFormProvider = ({ children }) => {
     [dispatch]
   );
 
-  // Apply to all variants
   const handleApplyToAll = useCallback(() => {
     const { pricing, stock, sku } = state.productDetails;
-
     dispatch({
       type: "APPLY_TO_ALL_VARIANTS",
       payload: { pricing, stock, sku },
     });
   }, [dispatch, state.productDetails]);
 
-  // Toggle variant shipping
   const handleToggleVariantShipping = useCallback(() => {
-    // Dispatch to toggle variant shipping
     dispatch({ type: "TOGGLE_VARIANT_SHIPPING" });
   }, [dispatch]);
 
-  // Toggle additional fields
   const toggleAdditionalFields = useCallback(
     (section) => {
-      // Dispatch to toggle additional fields
       dispatch({ type: "TOGGLE_ADDITIONAL_FIELDS", payload: { section } });
     },
     [dispatch]
   );
 
-  // debounce form Validations for efficiency
-  const debouncedValidate = debounce(async (state, dispatch) => {
-    try {
-      await productFormSchema.validate(state, { abortEarly: false });
-      dispatch({ type: "CLEAR_FORM_ERRORS" });
-      return true;
-    } catch (error) {
-      const errors = error.inner.reduce((acc, err) => {
-        acc[err.path] = err.message;
-        return acc;
-      }, {});
-      dispatch({ type: "SET_FORM_ERRORS", payload: errors });
-      console.log(errors);
+  const getNestedKeys = useCallback((obj, parent = "") => {
+    return Object.keys(obj).reduce((keys, key) => {
+      const fullKey = parent ? `${parent}.${key}` : key;
+      return typeof obj[key] === "object" &&
+        obj[key] !== null &&
+        !Array.isArray(obj[key])
+        ? keys.concat(getNestedKeys(obj[key], fullKey))
+        : keys.concat(fullKey);
+    }, []);
+  }, []);
 
-      return false;
-    }
-  }, 300);
-
-  // Validate form on input change and debounce for efficiency
-  const validateForm = useCallback(() => {
-    debouncedValidate(state, dispatch);
-  }, [state, dispatch, debouncedValidate]);
-
-  // Get Required field value
   const isFieldRequired = useCallback(async (fieldPath) => {
-    try {
-      if (!fieldPath || fieldPath.includes("uiState")) return;
-      const validationSchema = Yup.reach(productFormSchema, fieldPath);
-      const isRequired =
-        validationSchema?.tests?.some((test) => test.name === "validate") ||
-        false;
+    if (!fieldPath || fieldPath.includes("uiState")) return false;
 
-      return isRequired;
-    } catch (error) {
-      console.error("Field path not found in schema:", error);
+    try {
+      const validationSchema = Yup.reach(productFormSchema, fieldPath);
+      return (
+        validationSchema?.tests?.some((test) => test.name === "validate") ||
+        false
+      );
+    } catch {
       return false;
     }
   }, []);
 
-  // Handle form submission
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
       if (e.nativeEvent.submitter.name !== "submitBtn") return;
 
-      const isValid = await validateForm();
-      if (isValid) {
-        console.log("Form submitted successfully", state);
-        // Handle form submission logic (e.g., API call)
-      } else {
-        // Display validation errors in the UI
+      dispatch({ type: "SET_FORM_SUBMITTED", payload: true });
+      const isFormValid = await validateForm(state);
+      const currentErrorsExist = Object.keys(state.formErrors).length > 0;
+
+      if (!isFormValid) {
+        if (currentErrorsExist) {
+          console.error(
+            "Form submission blocked due to errors:",
+            state.formErrors
+          );
+        }
+        return; // Stop submission if there are errors
       }
+
+      console.log("Form submitted successfully", state);
     },
-    [state, validateForm]
+    [state, validateForm, dispatch]
   );
 
-  // Get nested keys to Fetch required fields
-  const getNestedKeys = (obj, parent = "") => {
-    let keys = [];
-    for (let key in obj) {
-      const fullKey = parent ? `${parent}.${key}` : key;
-      if (
-        typeof obj[key] === "object" &&
-        obj[key] !== null &&
-        !Array.isArray(obj[key])
-      ) {
-        keys = keys.concat(getNestedKeys(obj[key], fullKey));
-      } else {
-        keys.push(fullKey);
-      }
+  // Effect for debounced validation
+  useEffect(() => {
+    const hasErrors = Object.keys(state.formErrors).some(
+      (field) => touchedFields[field]
+    );
+    if (hasErrors) {
+      debouncedValidateForm(state);
     }
-    return keys;
-  };
+  }, [state.formErrors, touchedFields, debouncedValidateForm, state]);
 
-  // Fetch required fields on initial render to show Asterisk icons in label
+  // Fetch required fields
   useEffect(() => {
     const fetchRequiredFields = async () => {
-      let requiredFieldStatuses = {};
-      const formDataKeys = getNestedKeys(state);
-      console.log(formDataKeys);
-
-      await Promise.all(
-        formDataKeys.map(async (field) => {
-          const isRequired = await isFieldRequired(field);
-
-          if (isRequired === undefined) return;
-          requiredFieldStatuses[field] = isRequired;
-        })
-      );
-
-      // Dispatch required fields to the reducer
-      dispatch({ type: "SET_REQUIRED_FIELDS", payload: requiredFieldStatuses });
+      try {
+        const formDataKeys = getNestedKeys(initialState);
+        const requiredFieldStatuses = await Promise.all(
+          formDataKeys.map(async (field) => {
+            const isRequired = await isFieldRequired(field);
+            return isRequired !== undefined ? { [field]: isRequired } : null;
+          })
+        );
+        const filteredStatuses = Object.assign(
+          {},
+          ...requiredFieldStatuses.filter(Boolean)
+        );
+        dispatch({ type: "SET_REQUIRED_FIELDS", payload: filteredStatuses });
+      } catch (error) {
+        console.error("Error fetching required fields:", error);
+      }
     };
 
     fetchRequiredFields();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getNestedKeys, isFieldRequired]);
 
-  // Apply shipping condition based on multi-variant shipping
   useEffect(() => {
     if (!multiVariantShippingCondition) {
       dispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
     }
   }, [multiVariantShippingCondition, dispatch]);
 
-  // Create memoized state values
   const values = useMemo(
     () => ({
       state,
       dispatch,
-      formErrors: state.formErrors, // Now from state
-      requiredFields: state.requiredFields, // Now from state
+      formErrors: state.formErrors,
+      requiredFields: state.requiredFields,
+      validateForm,
       isFieldRequired,
       handleInputChange,
-      handleDebouncedChange,
       handleAddVariantItem,
       handleRemoveVariantItem,
       multiVariantShippingCondition,
@@ -240,9 +208,9 @@ const ProductFormProvider = ({ children }) => {
     }),
     [
       state,
-      isFieldRequired,
+      dispatch,
+      validateForm,
       handleInputChange,
-      handleDebouncedChange,
       handleAddVariantItem,
       handleRemoveVariantItem,
       multiVariantShippingCondition,
@@ -250,6 +218,7 @@ const ProductFormProvider = ({ children }) => {
       handleToggleVariantShipping,
       toggleAdditionalFields,
       handleSubmit,
+      isFieldRequired,
     ]
   );
 
@@ -260,9 +229,7 @@ const ProductFormProvider = ({ children }) => {
   );
 };
 
-// Custom hook to get values from the context
-export function useProductForm() {
-  return useContext(ProductFormContext);
-}
+// Custom hook to use product form context
+export const useProductForm = () => useContext(ProductFormContext);
 
 export default ProductFormProvider;

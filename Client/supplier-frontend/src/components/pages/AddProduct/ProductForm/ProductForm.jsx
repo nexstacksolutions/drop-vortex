@@ -2,16 +2,16 @@ import styles from "./ProductForm.module.css";
 import classNames from "classnames";
 import { get } from "lodash";
 import { useMemo } from "react";
-import FormSection from "../FormSection";
-import ProductVariations from "../ProductVariations";
-import ProductPriceStockWrapper from "../ProductPriceStock";
+import FormSection from "./FormSection";
+import ProductVariations from "./ProductVariations";
+import ProductPriceStockWrapper from "./ProductPriceStock";
 import { useProductForm } from "../../../../context/ProductForm";
 import {
   FormInput,
   MultiInputGroup,
   DropdownInput,
   MediaInput,
-} from "../ProductInputs";
+} from "./ProductInputs";
 
 const RenderInputField = (
   { name, formInputType, onChange, condition, ...rest },
@@ -190,14 +190,12 @@ function ProductForm({ customClass }) {
             name: "description.main",
             type: "textarea",
             formInputType: "textarea",
-            onChange: handleDebouncedChange,
           },
           {
             label: "Highlights",
             name: "description.highlights",
             type: "textarea",
             formInputType: "textarea",
-            onChange: handleDebouncedChange,
           },
           {
             label: "Tags",
@@ -288,7 +286,6 @@ function ProductForm({ customClass }) {
     [
       state,
       handleInputChange,
-      handleDebouncedChange,
       handleToggleVariantShipping,
       multiVariantShippingCondition,
     ]
