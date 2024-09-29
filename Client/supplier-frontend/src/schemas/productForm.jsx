@@ -39,7 +39,19 @@ const productFormSchema = Yup.object().shape({
         ", Image is missing. Please upload at least 1 image."
       ).of(fileValidation),
       buyerPromotionImage: nullableArray.of(fileValidation),
-      productVideo: nullableArray.of(fileValidation),
+      productVideo: nullableArray.of(
+        Yup.mixed().test(
+          "file-or-url",
+          "Must be either a file or a valid URL",
+          (value) => {
+            if (!value) return true; // No validation if value is empty
+            return (
+              value instanceof File ||
+              Yup.string().url("Invalid URL format").isValidSync(value)
+            );
+          }
+        )
+      ),
     }),
   }),
 
@@ -78,21 +90,7 @@ const productFormSchema = Yup.object().shape({
   specifications: Yup.object({
     brand: Yup.object({
       name: requiredString,
-      logo: Yup.mixed()
-        .test(
-          "url-or-file",
-          "Brand logo must be a valid URL or a file",
-          (value) => {
-            // Check if the value is a URL
-            const isValidUrl = Yup.string().url().isValidSync(value);
-
-            // Check if the value is a File object (assuming it's being uploaded from a form)
-            const isValidFile = value instanceof File;
-
-            return isValidUrl || isValidFile;
-          }
-        )
-        .nullable(),
+      logo: nullableArray.of(fileValidation),
     }),
     numberOfPieces: requiredNumber.min(
       1,
