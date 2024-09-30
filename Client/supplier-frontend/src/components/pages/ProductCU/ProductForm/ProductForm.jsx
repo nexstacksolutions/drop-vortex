@@ -16,14 +16,15 @@ import {
 const RenderInputField = (
   { name, formInputType, onChange, condition, ...rest },
   i,
-  state
+  state,
+  uiState
 ) => {
   const { handleInputChange } = useProductForm();
   const key = `${name}${i}`;
   const value = get(state, name);
   const handleChange = onChange || handleInputChange;
 
-  if (condition && !condition(state)) return null;
+  if (condition && !condition(uiState)) return null;
 
   const inputTypes = {
     media: MediaInput,
@@ -47,9 +48,9 @@ const RenderInputField = (
 function ProductForm({ customClass }) {
   const {
     state,
+    uiState,
     handleSubmit,
     handleInputChange,
-    handleDebouncedChange,
     handleToggleVariantShipping,
     multiVariantShippingCondition,
   } = useProductForm();
@@ -158,8 +159,7 @@ function ProductForm({ customClass }) {
             name: "specifications.additionalSpecs",
             type: "text",
             placeholder: "Additional Specifications",
-            condition: (formData) =>
-              formData.uiState.additionalFields.additionalSpecs,
+            condition: (uiState) => uiState.additionalFields.additionalSpecs,
           },
         ],
       },
@@ -176,7 +176,7 @@ function ProductForm({ customClass }) {
           {
             formInputType: "productPriceStockWrapper",
             variations: state.productDetails.variations,
-            variantShipping: state.uiState.variantShipping,
+            variantShipping: uiState.variantShipping,
           },
         ],
       },
@@ -206,16 +206,14 @@ function ProductForm({ customClass }) {
               handleInputChange(e, null, null, (value) =>
                 value.split(", ").map((tag) => tag.trim())
               ),
-            condition: (formData) =>
-              formData.uiState.additionalFields.description,
+            condition: (formData) => uiState.additionalFields.description,
           },
           {
             label: "What's in the Box",
             name: "description.whatsInBox",
             type: "text",
             placeholder: "Ex: 1x product, 1x accessory",
-            condition: (formData) =>
-              formData.uiState.additionalFields.description,
+            condition: (formData) => uiState.additionalFields.description,
           },
         ],
       },
@@ -225,7 +223,7 @@ function ProductForm({ customClass }) {
           "Switch to enter different package dimensions & weight for variations",
         customClass: styles.productSW,
         additionalJsxProps: {
-          currState: state.uiState.variantShipping,
+          currState: uiState.variantShipping,
           customClickHandler: handleToggleVariantShipping,
           disableCondition: !multiVariantShippingCondition,
         },
@@ -239,7 +237,7 @@ function ProductForm({ customClass }) {
             name: "shipping.packageWeight",
             type: "number",
             placeholder: "0.01 - 300",
-            condition: (formData) => !formData.uiState.variantShipping,
+            condition: (formData) => !uiState.variantShipping,
           },
           {
             label: "Package Dimensions (L x W x H)",
@@ -248,7 +246,7 @@ function ProductForm({ customClass }) {
             formInputType: "inputGroup",
             groupType: "input",
             placeholder: "0.01 - 300",
-            condition: (formData) => !formData.uiState.variantShipping,
+            condition: (formData) => !uiState.variantShipping,
           },
           {
             label: "Dangerous Goods",
@@ -264,27 +262,28 @@ function ProductForm({ customClass }) {
             name: "shipping.warranty.type",
             type: "text",
             placeholder: "Warranty Type",
-            condition: (formData) => formData.uiState.additionalFields.warranty,
+            condition: (formData) => uiState.additionalFields.warranty,
           },
           {
             label: "Warranty Period",
             name: "shipping.warranty.period",
             type: "text",
             placeholder: "Warranty Period",
-            condition: (formData) => formData.uiState.additionalFields.warranty,
+            condition: (formData) => uiState.additionalFields.warranty,
           },
           {
             label: "Warranty Policy",
             name: "shipping.warranty.policy",
             type: "text",
             placeholder: "Warranty Policy",
-            condition: (formData) => formData.uiState.additionalFields.warranty,
+            condition: (formData) => uiState.additionalFields.warranty,
           },
         ],
       },
     ],
     [
       state,
+      uiState,
       handleInputChange,
       handleToggleVariantShipping,
       multiVariantShippingCondition,
@@ -302,7 +301,7 @@ function ProductForm({ customClass }) {
     >
       {memoizedFormSections.map(({ title, fields, ...rest }, index) => (
         <FormSection key={`${title}${index}`} title={title} {...rest}>
-          {fields.map((field, i) => RenderInputField(field, i, state))}
+          {fields.map((field, i) => RenderInputField(field, i, state, uiState))}
         </FormSection>
       ))}
 

@@ -6,8 +6,8 @@ import { useProductForm } from "../../../../context/ProductForm";
 import { get } from "lodash";
 
 function ShowMoreBtn({ btnText = "Show More", section }) {
-  const { state, toggleAdditionalFields } = useProductForm();
-  const additionalFields = get(state, "uiState.additionalFields");
+  const { uiState, toggleAdditionalFields } = useProductForm();
+  const additionalFields = get(uiState, "additionalFields");
 
   return (
     <button
