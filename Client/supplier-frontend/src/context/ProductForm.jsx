@@ -36,7 +36,8 @@ const ProductFormProvider = ({ children }) => {
   const [uiState, uiDispatch] = useReducer(uiControl, formUI);
   const { validateForm, validateField } = useFormValidation(
     productFormSchema,
-    uiDispatch
+    uiDispatch,
+    uiState
   );
 
   const multiVariantShippingCondition = useMemo(

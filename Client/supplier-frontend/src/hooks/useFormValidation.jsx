@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-const useFormValidation = (schema, dispatch) => {
+const useFormValidation = (schema, dispatch, uiState) => {
   const handleErrors = (error, fallbackPath) => {
     return error.inner.reduce((acc, err) => {
       const path = err.path || fallbackPath;
@@ -12,7 +12,10 @@ const useFormValidation = (schema, dispatch) => {
   const validateField = async (fieldPath, value) => {
     try {
       const fieldSchema = Yup.reach(schema, fieldPath);
-      await fieldSchema.validate(value, { abortEarly: false });
+      await fieldSchema.validate(value, {
+        abortEarly: false,
+        context: { uiState },
+      });
 
       dispatch({
         type: "CLEAR_FIELD_ERROR",
@@ -34,7 +37,7 @@ const useFormValidation = (schema, dispatch) => {
 
   const validateForm = async (state) => {
     try {
-      await schema.validate(state, { abortEarly: false });
+      await schema.validate(state, { abortEarly: false, context: { uiState } });
       dispatch({ type: "CLEAR_FORM_ERRORS" });
       return true;
     } catch (error) {

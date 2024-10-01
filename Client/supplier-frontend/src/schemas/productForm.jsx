@@ -6,14 +6,15 @@ const requiredNumber = Yup.number()
   .transform((value, originalValue) =>
     originalValue === "" ? null : Number(originalValue)
   )
-  .required("The field value is required")
-  .positive("Must be a positive number");
+  .positive("Must be a positive number")
+  .required("The field value is required");
 
 const nullableString = Yup.string().nullable();
 const nullableNumber = Yup.number()
   .transform((value, originalValue) =>
     originalValue === "" ? null : Number(originalValue)
   )
+  .positive("Must be a positive number")
   .nullable();
 
 const requiredArray = (minItems = 1, errMsg = "") =>
@@ -28,6 +29,23 @@ const fileValidation = Yup.mixed().test(
     return value instanceof File;
   }
 );
+
+const measurementSchema = (variantShipping, schema) => {
+  const isVariantShipping = variantShipping[0];
+
+  return !isVariantShipping
+    ? schema
+        .transform((_, originalValue) =>
+          originalValue === "" ? null : Number(originalValue)
+        )
+        .required("the field value is required")
+        .positive("Must be a positive number")
+    : schema
+        .transform((_, originalValue) =>
+          originalValue === "" ? null : Number(originalValue)
+        )
+        .nullable();
+};
 
 const productFormSchema = Yup.object().shape({
   basicInfo: Yup.object({
@@ -57,15 +75,15 @@ const productFormSchema = Yup.object().shape({
 
   productDetails: Yup.object({
     pricing: Yup.object({
-      current: nullableNumber,
-      original: requiredNumber.when("current", (current, schema) =>
-        current
-          ? schema.moreThan(
-              current,
-              "Original price must be greater than current price"
+      current: nullableNumber.when("original", (original, schema) =>
+        original
+          ? schema.max(
+              original,
+              "Current price (special price) must be less than original price"
             )
           : schema
       ),
+      original: requiredNumber,
     }),
     stock: requiredNumber.min(0, "Stock cannot be negative"),
     availability: Yup.boolean(),
@@ -112,33 +130,44 @@ const productFormSchema = Yup.object().shape({
   }),
 
   shipping: Yup.object({
-    packageWeight: requiredNumber,
-    dimensions: Yup.object({
-      length: requiredNumber,
-      width: requiredNumber,
-      height: requiredNumber,
-    }).test(
-      "dimensions-required",
-      "All dimensions must be provided",
-      function (value) {
-        return Object.values(value || {}).every((v) => v);
-      }
+    packageWeight: Yup.number().when(
+      "$uiState.variantShipping",
+      (variantShipping, schema) => measurementSchema(variantShipping, schema)
     ),
+
+    dimensions: Yup.object({
+      length: Yup.number().when(
+        "$uiState.variantShipping",
+        (variantShipping, schema) => measurementSchema(variantShipping, schema)
+      ),
+      width: Yup.number().when(
+        "$uiState.variantShipping",
+        (variantShipping, schema) => measurementSchema(variantShipping, schema)
+      ),
+      height: Yup.number().when(
+        "$uiState.variantShipping",
+        (variantShipping, schema) => measurementSchema(variantShipping, schema)
+      ),
+    }).when("$uiState.variantShipping", (variantShipping, schema) => {
+      // Extract the first value from the array
+      const isVariantShipping = variantShipping[0];
+
+      return !isVariantShipping
+        ? schema.test(
+            "dimensions-required",
+            "All dimensions must be provided",
+            function (value) {
+              return Object.values(value || {}).every((v) => v);
+            }
+          )
+        : schema;
+    }),
     dangerousGoods: nullableString,
     warranty: Yup.object({
       type: nullableString,
       period: nullableString,
       policy: nullableString,
     }),
-  }),
-
-  uiState: Yup.object({
-    additionalFields: Yup.object({
-      warranty: Yup.boolean(),
-      additionalSpecs: Yup.boolean(),
-      description: Yup.boolean(),
-    }),
-    variantShipping: Yup.boolean(),
   }),
 });
 
