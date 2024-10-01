@@ -58,9 +58,13 @@ const productFormSchema = Yup.object().shape({
   productDetails: Yup.object({
     pricing: Yup.object({
       current: nullableNumber,
-      original: requiredNumber.moreThan(
-        Yup.ref("current"),
-        "Original price must be greater than current price"
+      original: requiredNumber.when("current", (current, schema) =>
+        current
+          ? schema.moreThan(
+              current,
+              "Original price must be greater than current price"
+            )
+          : schema
       ),
     }),
     stock: requiredNumber.min(0, "Stock cannot be negative"),
