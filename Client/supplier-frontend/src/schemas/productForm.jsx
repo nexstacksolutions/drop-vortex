@@ -15,52 +15,63 @@ const requiredNumber = transformToNumber(
     .required("This field is required.")
 );
 const nullableString = Yup.string().nullable();
-const nullableNumber = transformToNumber(
-  Yup.number().positive("Must be a positive number.").nullable()
-);
+const nullableNumber = transformToNumber(Yup.number().nullable());
 
 // File validation logic
 const fileValidation = Yup.mixed().test(
-  "is-file",
+  "file-validation",
   "Must be a valid file.",
-  (value) => value instanceof File
+  (value) => !value || value instanceof File
 );
 
 // Reusable array validation
-const requiredArray = (minItems = 1, errMsg = "This field is required.") =>
-  Yup.array().min(minItems, errMsg);
-const nullableArray = Yup.array().nullable();
-const nullableArrayOfString = Yup.array().of(Yup.string()).nullable();
+const requiredArrayOfSchema = (
+  schema,
+  minItems = 1,
+  errMsg = "This field is required."
+) => Yup.array().of(schema).min(minItems, errMsg);
 
-// Helper for handling measurement fields
+const nullableArrayOfSchema = (schema) => Yup.array().of(schema).nullable();
+
+// Helper function for price comparison
+const isCurrentLessThanOriginal = function (value) {
+  const { original } = this.options.context.parent || this.parent;
+  return original == null || value == null || value < original;
+};
+
+// Reusable pricing schema
+const pricingSchema = Yup.object({
+  current: transformToNumber(Yup.number())
+    .nullable()
+    .test(
+      "is-current-greater-than-original",
+      "Current price must be less than the original price.",
+      isCurrentLessThanOriginal
+    ),
+  original: requiredNumber,
+});
+
 // Helper for handling measurement fields
 const conditionalMeasurementField = (variantShipping, schema) =>
   transformToNumber(
-    variantShipping[0]
+    variantShipping
       ? schema.nullable()
       : schema.required("This field is required.").positive("Must be positive.")
   );
 
 // Shipping dimensions schema
-const dimensionSchema = () =>
+const dimensionFieldSchema = (name, variantShipping) =>
+  Yup.number().when(variantShipping, (variantShipping, schema) =>
+    conditionalMeasurementField(variantShipping, schema)
+  );
+
+const dimensionSchema = (variantShipping) =>
   Yup.object({
-    length: Yup.number().when(
-      "$uiState.variantShipping",
-      (variantShipping, schema) =>
-        conditionalMeasurementField(variantShipping, schema)
-    ),
-    width: Yup.number().when(
-      "$uiState.variantShipping",
-      (variantShipping, schema) =>
-        conditionalMeasurementField(variantShipping, schema)
-    ),
-    height: Yup.number().when(
-      "$uiState.variantShipping",
-      (variantShipping, schema) =>
-        conditionalMeasurementField(variantShipping, schema)
-    ),
+    length: dimensionFieldSchema("length", "$uiState.variantShipping"),
+    width: dimensionFieldSchema("width", "$uiState.variantShipping"),
+    height: dimensionFieldSchema("height", "$uiState.variantShipping"),
   }).when("$uiState.variantShipping", (variantShipping, schema) => {
-    if (!variantShipping[0]) {
+    if (!variantShipping) {
       return schema.test(
         "dimensions-required",
         "All dimensions must be provided.",
@@ -76,12 +87,9 @@ const productFormSchema = Yup.object().shape({
     productName: requiredString,
     category: requiredString,
     media: Yup.object({
-      productImages: requiredArray(
-        1,
-        "Image is required. Please upload at least one image."
-      ).of(fileValidation),
-      buyerPromotionImage: nullableArray.of(fileValidation),
-      productVideo: nullableArray.of(
+      productImages: requiredArrayOfSchema(fileValidation, 1),
+      buyerPromotionImage: nullableArrayOfSchema(fileValidation),
+      productVideo: nullableArrayOfSchema(
         Yup.mixed().test(
           "file-or-url",
           "Must be a valid file or URL.",
@@ -95,100 +103,60 @@ const productFormSchema = Yup.object().shape({
   }),
 
   productDetails: Yup.object({
-    pricing: Yup.object({
-      current: transformToNumber(Yup.number())
-        .nullable()
-        .test(
-          "is-current-greater-than-original",
-          "Current price must be less than the original price.",
-          function (value) {
-            let { parent } = this.options.context;
-            parent = parent ? parent : this.parent;
-
-            console.log("schema: ", parent);
-            const original = parent ? parent.original : null;
-            return original == null || original == "" || value < original;
-          }
-        ),
-      original: requiredNumber,
-    }),
+    pricing: pricingSchema,
 
     stock: requiredNumber.min(0, "Stock cannot be negative."),
     availability: Yup.boolean().default(true),
     freeItems: nullableNumber,
     sku: nullableString,
 
-    variations: Yup.array()
-      .of(
-        Yup.object({
-          type: requiredString,
+    variations: requiredArrayOfSchema(
+      Yup.object({
+        type: requiredString,
 
-          values: Yup.array()
-            .of(
-              Yup.object({
-                id: requiredString,
-                name: requiredString,
-                variantImages: nullableArray.of(fileValidation),
+        values: requiredArrayOfSchema(
+          Yup.object({
+            id: requiredString,
+            name: requiredString,
+            variantImages: nullableArrayOfSchema(fileValidation),
 
-                pricing: Yup.object({
-                  current: transformToNumber(Yup.number())
-                    .nullable()
-                    .test(
-                      "is-current-greater-than-original",
-                      "Current price must be less than the original price.",
-                      function (value) {
-                        let { parent } = this.options.context;
-                        parent = parent ? parent : this.parent;
+            pricing: pricingSchema,
 
-                        console.log("schema: ", parent);
-                        const original = parent ? parent.original : null;
-                        return (
-                          original == null || original == "" || value < original
-                        );
-                      }
-                    ),
-                  original: requiredNumber,
-                }),
+            stock: requiredNumber,
+            availability: Yup.boolean().default(true),
+            freeItems: nullableString,
+            sku: nullableString,
 
-                stock: requiredNumber,
-                availability: Yup.boolean().default(true),
-                freeItems: nullableString,
-                sku: nullableString,
+            packageWeight: Yup.number().when(
+              "$uiState.variantShipping",
+              (variantShipping, schema) =>
+                conditionalMeasurementField(!variantShipping[0], schema)
+            ),
 
-                packageWeight: Yup.number().when(
-                  "$uiState.variantShipping",
-                  (variantShipping, schema) =>
-                    conditionalMeasurementField(variantShipping, schema)
-                ),
-
-                dimensions: dimensionSchema(),
-              })
-            )
-            .required("Each variation must have at least one variant.")
-            .min(1, "Each variation must have at least one variant."),
-        })
-      )
-      .required("At least one variation is required.")
-      .min(1, "At least one variation must be provided."),
+            dimensions: dimensionSchema(),
+          })
+        ),
+      })
+    ),
   }),
 
   specifications: Yup.object({
     brand: Yup.object({
       name: requiredString,
-      logo: nullableArray.of(fileValidation),
+      logo: nullableArrayOfSchema(fileValidation),
     }),
     numberOfPieces: requiredNumber.min(
       1,
       "Number of pieces must be at least 1."
     ),
     powerSource: requiredString,
-    additionalSpecs: nullableArrayOfString,
+    additionalSpecs: nullableArrayOfSchema(Yup.string()),
   }),
 
   description: Yup.object({
     main: requiredString,
     highlights: requiredString,
-    tags: nullableArrayOfString,
+    tags: nullableArrayOfSchema(Yup.string()),
     whatsInBox: nullableString,
   }),
 
@@ -196,7 +164,7 @@ const productFormSchema = Yup.object().shape({
     packageWeight: Yup.number().when(
       "$uiState.variantShipping",
       (variantShipping, schema) =>
-        conditionalMeasurementField(variantShipping, schema)
+        conditionalMeasurementField(variantShipping[0], schema)
     ),
     dimensions: dimensionSchema(),
     dangerousGoods: nullableString,

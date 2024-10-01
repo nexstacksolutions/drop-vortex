@@ -15,7 +15,6 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
       const fieldSchema = Yup.reach(formSchema, fieldPath);
       const parentPath = fieldPath.split(".").slice(0, -1).join(".");
       const parent = get(formState, parentPath);
-      console.log(parentPath, parent);
 
       await fieldSchema.validate(value, {
         abortEarly: false,
