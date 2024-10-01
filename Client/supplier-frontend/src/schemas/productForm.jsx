@@ -1,52 +1,76 @@
 import * as Yup from "yup";
+import { get } from "lodash";
 
-// Reusable validation for required and nullable fields
-const requiredString = Yup.string().required("The field value is required");
-const requiredNumber = Yup.number()
-  .transform((value, originalValue) =>
+// Helper function to transform value to a number and handle empty strings
+const transformToNumber = (schema) =>
+  schema.transform((value, originalValue) =>
     originalValue === "" ? null : Number(originalValue)
-  )
-  .positive("Must be a positive number")
-  .required("The field value is required");
+  );
 
+// Helper function for required and nullable number/string
+const requiredString = Yup.string().required("This field is required.");
+const requiredNumber = transformToNumber(
+  Yup.number()
+    .positive("Must be a positive number.")
+    .required("This field is required.")
+);
 const nullableString = Yup.string().nullable();
-const nullableNumber = Yup.number()
-  .transform((value, originalValue) =>
-    originalValue === "" ? null : Number(originalValue)
-  )
-  .positive("Must be a positive number")
-  .nullable();
+const nullableNumber = transformToNumber(
+  Yup.number().positive("Must be a positive number.").nullable()
+);
 
-const requiredArray = (minItems = 1, errMsg = "") =>
-  Yup.array().min(minItems, `The field value is required ${errMsg}`);
+// File validation logic
+const fileValidation = Yup.mixed().test(
+  "is-file",
+  "Must be a valid file.",
+  (value) => value instanceof File
+);
+
+// Reusable array validation
+const requiredArray = (minItems = 1, errMsg = "This field is required.") =>
+  Yup.array().min(minItems, errMsg);
 const nullableArray = Yup.array().nullable();
 const nullableArrayOfString = Yup.array().of(Yup.string()).nullable();
 
-const fileValidation = Yup.mixed().test(
-  "is-file",
-  "Must be a file",
-  (value) => {
-    return value instanceof File;
-  }
-);
+// Helper for handling measurement fields
+// Helper for handling measurement fields
+const conditionalMeasurementField = (variantShipping, schema) =>
+  transformToNumber(
+    variantShipping[0]
+      ? schema.nullable()
+      : schema.required("This field is required.").positive("Must be positive.")
+  );
 
-const measurementSchema = (variantShipping, schema) => {
-  const isVariantShipping = variantShipping[0];
+// Shipping dimensions schema
+const dimensionSchema = () =>
+  Yup.object({
+    length: Yup.number().when(
+      "$uiState.variantShipping",
+      (variantShipping, schema) =>
+        conditionalMeasurementField(variantShipping, schema)
+    ),
+    width: Yup.number().when(
+      "$uiState.variantShipping",
+      (variantShipping, schema) =>
+        conditionalMeasurementField(variantShipping, schema)
+    ),
+    height: Yup.number().when(
+      "$uiState.variantShipping",
+      (variantShipping, schema) =>
+        conditionalMeasurementField(variantShipping, schema)
+    ),
+  }).when("$uiState.variantShipping", (variantShipping, schema) => {
+    if (!variantShipping[0]) {
+      return schema.test(
+        "dimensions-required",
+        "All dimensions must be provided.",
+        (value) => value && Object.values(value).every((v) => v)
+      );
+    }
+    return schema;
+  });
 
-  return !isVariantShipping
-    ? schema
-        .transform((_, originalValue) =>
-          originalValue === "" ? null : Number(originalValue)
-        )
-        .required("the field value is required")
-        .positive("Must be a positive number")
-    : schema
-        .transform((_, originalValue) =>
-          originalValue === "" ? null : Number(originalValue)
-        )
-        .nullable();
-};
-
+// Product form schema
 const productFormSchema = Yup.object().shape({
   basicInfo: Yup.object({
     productName: requiredString,
@@ -54,20 +78,17 @@ const productFormSchema = Yup.object().shape({
     media: Yup.object({
       productImages: requiredArray(
         1,
-        ", Image is missing. Please upload at least 1 image."
+        "Image is required. Please upload at least one image."
       ).of(fileValidation),
       buyerPromotionImage: nullableArray.of(fileValidation),
       productVideo: nullableArray.of(
         Yup.mixed().test(
           "file-or-url",
-          "Must be either a file or a valid URL",
-          (value) => {
-            if (!value) return true; // No validation if value is empty
-            return (
-              value instanceof File ||
-              Yup.string().url("Invalid URL format").isValidSync(value)
-            );
-          }
+          "Must be a valid file or URL.",
+          (value) =>
+            !value ||
+            value instanceof File ||
+            Yup.string().url("Invalid URL format").isValidSync(value)
         )
       ),
     }),
@@ -75,17 +96,21 @@ const productFormSchema = Yup.object().shape({
 
   productDetails: Yup.object({
     pricing: Yup.object({
-      current: nullableNumber.when("original", (original, schema) =>
-        original
-          ? schema.max(
-              original,
-              "Current price (special price) must be less than original price"
-            )
-          : schema
-      ),
+      current: nullableNumber,
       original: requiredNumber,
-    }),
-    stock: requiredNumber.min(0, "Stock cannot be negative"),
+    }).test(
+      "is-current-greater-than-original",
+      "Current price must be less than the original price.",
+      function (value) {
+        console.log(this, this.parent);
+
+        const { current, original } = value || {};
+        // Check if current is defined and greater than original
+        return current === null || current < original;
+      }
+    ),
+
+    stock: requiredNumber.min(0, "Stock cannot be negative."),
     availability: Yup.boolean(),
     freeItems: nullableNumber,
     sku: nullableString,
@@ -95,18 +120,16 @@ const productFormSchema = Yup.object().shape({
           type: requiredString,
           values: requiredArray(1).test(
             "at-least-one-object",
-            "Each variation must have at least one variant",
+            "Each variation must have at least one variant.",
             (values) => values && values.length > 0
           ),
         })
       )
-      .required("At least one variation is required"),
+      .required("At least one variation is required."),
   }).test(
     "at-least-one-variation",
-    "At least one variation must be provided if variations are specified",
-    function (value) {
-      return !(value?.variations?.length === 0);
-    }
+    "At least one variation must be provided.",
+    (value) => !(value?.variations?.length === 0)
   ),
 
   specifications: Yup.object({
@@ -116,7 +139,7 @@ const productFormSchema = Yup.object().shape({
     }),
     numberOfPieces: requiredNumber.min(
       1,
-      "Number of pieces must be at least 1"
+      "Number of pieces must be at least 1."
     ),
     powerSource: requiredString,
     additionalSpecs: nullableArrayOfString,
@@ -132,36 +155,10 @@ const productFormSchema = Yup.object().shape({
   shipping: Yup.object({
     packageWeight: Yup.number().when(
       "$uiState.variantShipping",
-      (variantShipping, schema) => measurementSchema(variantShipping, schema)
+      (variantShipping, schema) =>
+        conditionalMeasurementField(variantShipping, schema)
     ),
-
-    dimensions: Yup.object({
-      length: Yup.number().when(
-        "$uiState.variantShipping",
-        (variantShipping, schema) => measurementSchema(variantShipping, schema)
-      ),
-      width: Yup.number().when(
-        "$uiState.variantShipping",
-        (variantShipping, schema) => measurementSchema(variantShipping, schema)
-      ),
-      height: Yup.number().when(
-        "$uiState.variantShipping",
-        (variantShipping, schema) => measurementSchema(variantShipping, schema)
-      ),
-    }).when("$uiState.variantShipping", (variantShipping, schema) => {
-      // Extract the first value from the array
-      const isVariantShipping = variantShipping[0];
-
-      return !isVariantShipping
-        ? schema.test(
-            "dimensions-required",
-            "All dimensions must be provided",
-            function (value) {
-              return Object.values(value || {}).every((v) => v);
-            }
-          )
-        : schema;
-    }),
+    dimensions: dimensionSchema(),
     dangerousGoods: nullableString,
     warranty: Yup.object({
       type: nullableString,

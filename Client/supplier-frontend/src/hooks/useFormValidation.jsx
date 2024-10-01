@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-const useFormValidation = (schema, dispatch, uiState) => {
+const useFormValidation = (formSchema, uiState, uiDispatch) => {
   const handleErrors = (error, fallbackPath) => {
     return error.inner.reduce((acc, err) => {
       const path = err.path || fallbackPath;
@@ -11,13 +11,13 @@ const useFormValidation = (schema, dispatch, uiState) => {
 
   const validateField = async (fieldPath, value) => {
     try {
-      const fieldSchema = Yup.reach(schema, fieldPath);
+      const fieldSchema = Yup.reach(formSchema, fieldPath);
       await fieldSchema.validate(value, {
         abortEarly: false,
         context: { uiState },
       });
 
-      dispatch({
+      uiDispatch({
         type: "CLEAR_FIELD_ERROR",
         payload: fieldPath,
       });
@@ -25,7 +25,7 @@ const useFormValidation = (schema, dispatch, uiState) => {
       return {};
     } catch (error) {
       const errors = handleErrors(error, fieldPath);
-      dispatch({
+      uiDispatch({
         type: "SET_FIELD_ERROR",
         payload: { fieldPath, error: errors[fieldPath] },
       });
@@ -37,12 +37,15 @@ const useFormValidation = (schema, dispatch, uiState) => {
 
   const validateForm = async (state) => {
     try {
-      await schema.validate(state, { abortEarly: false, context: { uiState } });
-      dispatch({ type: "CLEAR_FORM_ERRORS" });
+      await formSchema.validate(state, {
+        abortEarly: false,
+        context: { uiState },
+      });
+      uiDispatch({ type: "CLEAR_FORM_ERRORS" });
       return true;
     } catch (error) {
       const errors = handleErrors(error);
-      dispatch({ type: "SET_FORM_ERRORS", payload: errors });
+      uiDispatch({ type: "SET_FORM_ERRORS", payload: errors });
       return false;
     }
   };
