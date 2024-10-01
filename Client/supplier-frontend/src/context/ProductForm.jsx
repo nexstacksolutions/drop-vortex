@@ -49,9 +49,9 @@ const ProductFormProvider = ({ children }) => {
   const updateFormData = useCallback(
     async (name, value) => {
       dispatch({ type: actionTypes.UPDATE_FIELD, payload: { name, value } });
-      await validateField(name, value);
+      await validateField(name, value, state);
     },
-    [validateField]
+    [validateField, state]
   );
 
   const handleInputChange = useCallback(
@@ -83,10 +83,11 @@ const ProductFormProvider = ({ children }) => {
       });
       await validateField(
         `productDetails.variations[${variationIndex}].values`,
-        [...state.productDetails.variations[variationIndex].values, newVariant]
+        [...state.productDetails.variations[variationIndex].values, newVariant],
+        state
       );
     },
-    [dispatch, state.productDetails.variations, validateField]
+    [dispatch, state, validateField]
   );
 
   const handleRemoveVariantItem = useCallback(
@@ -100,10 +101,11 @@ const ProductFormProvider = ({ children }) => {
       ].values.filter((_, idx) => idx !== valueIndex);
       await validateField(
         `productDetails.variations[${variationIndex}].values`,
-        updatedVariants
+        updatedVariants,
+        state
       );
     },
-    [dispatch, state.productDetails.variations, validateField]
+    [dispatch, state, validateField]
   );
 
   const handleApplyToAll = useCallback(() => {

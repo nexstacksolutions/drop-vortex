@@ -96,41 +96,81 @@ const productFormSchema = Yup.object().shape({
 
   productDetails: Yup.object({
     pricing: Yup.object({
-      current: nullableNumber,
-      original: requiredNumber,
-    }).test(
-      "is-current-greater-than-original",
-      "Current price must be less than the original price.",
-      function (value) {
-        console.log(this, this.parent);
+      current: transformToNumber(Yup.number())
+        .nullable()
+        .test(
+          "is-current-greater-than-original",
+          "Current price must be less than the original price.",
+          function (value) {
+            let { parent } = this.options.context;
+            parent = parent ? parent : this.parent;
 
-        const { current, original } = value || {};
-        // Check if current is defined and greater than original
-        return current === null || current < original;
-      }
-    ),
+            console.log("schema: ", parent);
+            const original = parent ? parent.original : null;
+            return original == null || original == "" || value < original;
+          }
+        ),
+      original: requiredNumber,
+    }),
 
     stock: requiredNumber.min(0, "Stock cannot be negative."),
-    availability: Yup.boolean(),
+    availability: Yup.boolean().default(true),
     freeItems: nullableNumber,
     sku: nullableString,
+
     variations: Yup.array()
       .of(
         Yup.object({
           type: requiredString,
-          values: requiredArray(1).test(
-            "at-least-one-object",
-            "Each variation must have at least one variant.",
-            (values) => values && values.length > 0
-          ),
+
+          values: Yup.array()
+            .of(
+              Yup.object({
+                id: requiredString,
+                name: requiredString,
+                variantImages: nullableArray.of(fileValidation),
+
+                pricing: Yup.object({
+                  current: transformToNumber(Yup.number())
+                    .nullable()
+                    .test(
+                      "is-current-greater-than-original",
+                      "Current price must be less than the original price.",
+                      function (value) {
+                        let { parent } = this.options.context;
+                        parent = parent ? parent : this.parent;
+
+                        console.log("schema: ", parent);
+                        const original = parent ? parent.original : null;
+                        return (
+                          original == null || original == "" || value < original
+                        );
+                      }
+                    ),
+                  original: requiredNumber,
+                }),
+
+                stock: requiredNumber,
+                availability: Yup.boolean().default(true),
+                freeItems: nullableString,
+                sku: nullableString,
+
+                packageWeight: Yup.number().when(
+                  "$uiState.variantShipping",
+                  (variantShipping, schema) =>
+                    conditionalMeasurementField(variantShipping, schema)
+                ),
+
+                dimensions: dimensionSchema(),
+              })
+            )
+            .required("Each variation must have at least one variant.")
+            .min(1, "Each variation must have at least one variant."),
         })
       )
-      .required("At least one variation is required."),
-  }).test(
-    "at-least-one-variation",
-    "At least one variation must be provided.",
-    (value) => !(value?.variations?.length === 0)
-  ),
+      .required("At least one variation is required.")
+      .min(1, "At least one variation must be provided."),
+  }),
 
   specifications: Yup.object({
     brand: Yup.object({

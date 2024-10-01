@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { get } from "lodash";
 
 const useFormValidation = (formSchema, uiState, uiDispatch) => {
   const handleErrors = (error, fallbackPath) => {
@@ -9,12 +10,16 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
     }, {});
   };
 
-  const validateField = async (fieldPath, value) => {
+  const validateField = async (fieldPath, value, formState) => {
     try {
       const fieldSchema = Yup.reach(formSchema, fieldPath);
+      const parentPath = fieldPath.split(".").slice(0, -1).join(".");
+      const parent = get(formState, parentPath);
+      console.log(parentPath, parent);
+
       await fieldSchema.validate(value, {
         abortEarly: false,
-        context: { uiState },
+        context: { uiState, parent },
       });
 
       uiDispatch({
@@ -35,9 +40,9 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
     }
   };
 
-  const validateForm = async (state) => {
+  const validateForm = async (formState) => {
     try {
-      await formSchema.validate(state, {
+      await formSchema.validate(formState, {
         abortEarly: false,
         context: { uiState },
       });
