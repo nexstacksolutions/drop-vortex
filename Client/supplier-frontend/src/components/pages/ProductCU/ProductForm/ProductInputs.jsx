@@ -191,7 +191,7 @@ function MultiInputGroup({
         ? Object.keys(value).map((dimension, index) => (
             <FormInput
               key={index}
-              name={dimension}
+              name={`${name}.${dimension}`}
               value={value[dimension]}
               type={type}
               wrapInput={false}

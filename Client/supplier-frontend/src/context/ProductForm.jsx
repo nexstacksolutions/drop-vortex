@@ -12,6 +12,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import { get } from "lodash";
 
 export const ProductFormContext = createContext();
 
@@ -164,34 +165,36 @@ const ProductFormProvider = ({ children }) => {
         : [...keys, fullKey];
     }, []);
 
-  const isFieldRequired = useCallback(async (fieldPath) => {
-    if (!fieldPath) return false;
-
-    try {
-      const validationSchema = Yup.reach(productFormSchema, fieldPath);
-      return (
-        validationSchema?.tests?.some((test) => test.name === "validate") ||
-        false
-      );
-    } catch {
-      return false;
-    }
-  }, []);
-
-  // Fetch required fields only on first render for to show * sign on labels
+  // Fetch required fields only on first render
   const fetchRequiredFields = useCallback(async () => {
     try {
       const formDataKeys = getNestedKeys(formState);
+      // Define additional keys to include
+      const additionalKeys = [
+        "shipping.dimensions",
+        "productDetails.variations",
+      ];
+      // Concatenate the existing keys with the extra keys
+      const allKeys = [...formDataKeys, ...additionalKeys];
+
       const requiredFieldStatuses = await Promise.all(
-        formDataKeys.map(async (field) => {
-          const isRequired = await isFieldRequired(field);
-          return isRequired !== undefined ? { [field]: isRequired } : null;
+        allKeys.map(async (fieldPath) => {
+          const value = get(state, fieldPath);
+          const isRequired = await validateField(
+            fieldPath,
+            value,
+            state,
+            false
+          );
+          return isRequired !== undefined ? { [fieldPath]: isRequired } : null;
         })
       );
+
       const filteredStatuses = Object.assign(
         {},
         ...requiredFieldStatuses.filter(Boolean)
       );
+
       uiDispatch({
         type: "SET_REQUIRED_FIELDS",
         payload: filteredStatuses,
@@ -221,8 +224,8 @@ const ProductFormProvider = ({ children }) => {
       handleApplyToAll,
       handleInputChange,
       handleAddVariantItem,
-      handleRemoveVariantItem,
       toggleAdditionalFields,
+      handleRemoveVariantItem,
       handleToggleVariantShipping,
       multiVariantShippingCondition,
       formErrors: uiState.formErrors,

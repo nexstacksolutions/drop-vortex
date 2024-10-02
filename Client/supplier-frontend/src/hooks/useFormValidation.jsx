@@ -1,7 +1,9 @@
 import * as Yup from "yup";
 import { get } from "lodash";
 
+// Custom hook for form validation
 const useFormValidation = (formSchema, uiState, uiDispatch) => {
+  // Handle validation errors from Yup
   const handleErrors = (error, fallbackPath) => {
     return error.inner.reduce((acc, err) => {
       let path = err.path || fallbackPath;
@@ -13,7 +15,13 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
     }, {});
   };
 
-  const validateField = async (fieldPath, value, formState) => {
+  // Validate a single field in the form
+  const validateField = async (
+    fieldPath,
+    value,
+    formState,
+    shouldDispatchUpdates = true
+  ) => {
     try {
       const fieldSchema = Yup.reach(formSchema, fieldPath);
       const parentPath = fieldPath.split(".").slice(0, -1).join(".");
@@ -24,25 +32,30 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
         context: { uiState, parent },
       });
 
-      uiDispatch({
-        type: "CLEAR_FIELD_ERROR",
-        payload: fieldPath,
-      });
+      if (shouldDispatchUpdates) {
+        uiDispatch({
+          type: "CLEAR_FIELD_ERROR",
+          payload: fieldPath,
+        });
+      }
 
-      return {};
+      return false; // No error
     } catch (error) {
       const errors = handleErrors(error, fieldPath);
       if (errors[fieldPath] === undefined) return;
 
-      uiDispatch({
-        type: "SET_FIELD_ERROR",
-        payload: { fieldPath, error: errors[fieldPath] },
-      });
+      if (shouldDispatchUpdates) {
+        uiDispatch({
+          type: "SET_FIELD_ERROR",
+          payload: { fieldPath, error: errors[fieldPath] },
+        });
+      }
 
-      return errors;
+      return true; // Error occurred
     }
   };
 
+  // Validate the entire form
   const validateForm = async (formState) => {
     try {
       await formSchema.validate(formState, {
@@ -50,11 +63,11 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
         context: { uiState },
       });
       uiDispatch({ type: "CLEAR_FORM_ERRORS" });
-      return true;
+      return true; // Form is valid
     } catch (error) {
       const errors = handleErrors(error);
       uiDispatch({ type: "SET_FORM_ERRORS", payload: errors });
-      return false;
+      return false; // Form is invalid
     }
   };
 
