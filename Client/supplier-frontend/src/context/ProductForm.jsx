@@ -1,5 +1,4 @@
 import * as Yup from "yup";
-import { produce } from "immer";
 import { v4 as uuidv4 } from "uuid";
 import productFormSchema from "../schemas/productForm";
 import useFormValidation from "../hooks/useFormValidation";
@@ -154,7 +153,7 @@ const ProductFormProvider = ({ children }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state, validateForm, uiState.isSubmitting]
+    [state, validateForm, uiState.isSubmitting, canSubmit]
   );
 
   const getNestedKeys = (obj, parent = "") =>
