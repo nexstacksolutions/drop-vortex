@@ -10,7 +10,8 @@ const formUI = {
   showVariantImages: true,
   formErrors: {},
   requiredFields: {},
-  formSubmitted: false,
+  isSubmitting: false,
+  isSubmitted: false,
 };
 
 const uiControl = (state, action) =>
@@ -53,8 +54,8 @@ const uiControl = (state, action) =>
         }
         break;
 
-      case "SET_FORM_SUBMITTED":
-        draft.formSubmitted = payload;
+      case "SET_IS_SUBMITTING":
+        draft.isSubmitting = payload;
         break;
 
       default:

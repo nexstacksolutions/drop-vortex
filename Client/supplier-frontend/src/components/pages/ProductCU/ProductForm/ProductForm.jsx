@@ -294,6 +294,7 @@ function ProductForm({ customClass }) {
     <form
       className={classNames(styles.productForm, customClass, "flex flex-col")}
       onSubmit={handleSubmit}
+      autoComplete="off"
       action="/products/manage"
       method="post"
       noValidate

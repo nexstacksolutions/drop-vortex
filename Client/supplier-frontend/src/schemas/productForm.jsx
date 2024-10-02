@@ -52,26 +52,33 @@ const pricingSchema = Yup.object({
 });
 
 // Helper for handling measurement fields
-const conditionalMeasurementField = (variantShipping, schema) =>
-  transformToNumber(
-    variantShipping
-      ? schema.nullable()
-      : schema.required("This field is required.").positive("Must be positive.")
-  );
+const conditionalMeasurementField = (customizer) =>
+  Yup.number().when("$uiState.variantShipping", (variantShipping, schema) => {
+    const customizeCondition = customizer
+      ? customizer(variantShipping[0])
+      : variantShipping[0];
 
-// Shipping dimensions schema
-const dimensionFieldSchema = (name, variantShipping) =>
-  Yup.number().when(variantShipping, (variantShipping, schema) =>
-    conditionalMeasurementField(variantShipping, schema)
-  );
+    return transformToNumber(
+      customizeCondition
+        ? schema
+            .required("This field is required.")
+            .positive("Must be positive.")
+        : schema.nullable()
+    );
+  });
 
-const dimensionSchema = (variantShipping) =>
+// Updated dimensionSchema to accept variantShipping argument dynamically
+const dimensionSchema = (customizer = false) =>
   Yup.object({
-    length: dimensionFieldSchema("length", "$uiState.variantShipping"),
-    width: dimensionFieldSchema("width", "$uiState.variantShipping"),
-    height: dimensionFieldSchema("height", "$uiState.variantShipping"),
+    length: conditionalMeasurementField(customizer),
+    width: conditionalMeasurementField(customizer),
+    height: conditionalMeasurementField(customizer),
   }).when("$uiState.variantShipping", (variantShipping, schema) => {
-    if (!variantShipping) {
+    const customizeCondition = customizer
+      ? customizer(variantShipping[0])
+      : variantShipping[0];
+
+    if (customizeCondition) {
       return schema.test(
         "dimensions-required",
         "All dimensions must be provided.",
@@ -126,13 +133,7 @@ const productFormSchema = Yup.object().shape({
             availability: Yup.boolean().default(true),
             freeItems: nullableString,
             sku: nullableString,
-
-            packageWeight: Yup.number().when(
-              "$uiState.variantShipping",
-              (variantShipping, schema) =>
-                conditionalMeasurementField(!variantShipping[0], schema)
-            ),
-
+            packageWeight: conditionalMeasurementField(),
             dimensions: dimensionSchema(),
           })
         ),
@@ -161,12 +162,8 @@ const productFormSchema = Yup.object().shape({
   }),
 
   shipping: Yup.object({
-    packageWeight: Yup.number().when(
-      "$uiState.variantShipping",
-      (variantShipping, schema) =>
-        conditionalMeasurementField(variantShipping[0], schema)
-    ),
-    dimensions: dimensionSchema(),
+    packageWeight: conditionalMeasurementField((value) => !value),
+    dimensions: dimensionSchema((value) => !value),
     dangerousGoods: nullableString,
     warranty: Yup.object({
       type: nullableString,

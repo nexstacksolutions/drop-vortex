@@ -4,7 +4,10 @@ import { get } from "lodash";
 const useFormValidation = (formSchema, uiState, uiDispatch) => {
   const handleErrors = (error, fallbackPath) => {
     return error.inner.reduce((acc, err) => {
-      const path = err.path || fallbackPath;
+      let path = err.path || fallbackPath;
+      if (path.startsWith("[") || path.startsWith(".")) {
+        path = `${fallbackPath}${path}`;
+      }
       acc[path] = err.message;
       return acc;
     }, {});
@@ -29,11 +32,12 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
       return {};
     } catch (error) {
       const errors = handleErrors(error, fieldPath);
+      if (errors[fieldPath] === undefined) return;
+
       uiDispatch({
         type: "SET_FIELD_ERROR",
         payload: { fieldPath, error: errors[fieldPath] },
       });
-      console.log(errors);
 
       return errors;
     }

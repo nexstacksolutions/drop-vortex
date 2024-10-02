@@ -16,21 +16,6 @@ import React, {
 
 export const ProductFormContext = createContext();
 
-const actionTypes = Object.freeze({
-  UPDATE_FIELD: "UPDATE_FIELD",
-  SET_FIELD_ERROR: "SET_FIELD_ERROR",
-  SET_FORM_ERRORS: "SET_FORM_ERRORS",
-  CLEAR_FORM_ERRORS: "CLEAR_FORM_ERRORS",
-  ADD_VARIANT_ITEM: "ADD_VARIANT_ITEM",
-  REMOVE_VARIANT_ITEM: "REMOVE_VARIANT_ITEM",
-  APPLY_TO_ALL_VARIANTS: "APPLY_TO_ALL_VARIANTS",
-  TOGGLE_VARIANT_SHIPPING: "TOGGLE_VARIANT_SHIPPING",
-  TOGGLE_ADDITIONAL_FIELDS: "TOGGLE_ADDITIONAL_FIELDS",
-  SET_FORM_SUBMITTED: "SET_FORM_SUBMITTED",
-  SET_REQUIRED_FIELDS: "SET_REQUIRED_FIELDS",
-  SET_VARIANT_SHIPPING_FALSE: "SET_VARIANT_SHIPPING_FALSE",
-});
-
 const ProductFormProvider = ({ children }) => {
   const [state, dispatch] = useReducer(formControl, formState);
   const [uiState, uiDispatch] = useReducer(uiControl, formUI);
@@ -45,11 +30,14 @@ const ProductFormProvider = ({ children }) => {
     [state.productDetails?.variations]
   );
 
-  // Utility function to handle field updates and validation
   const updateFormData = useCallback(
     async (name, value) => {
-      dispatch({ type: actionTypes.UPDATE_FIELD, payload: { name, value } });
-      await validateField(name, value, state);
+      try {
+        dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
+        await validateField(name, value, state);
+      } catch (error) {
+        console.error("Error updating form data:", error);
+      }
     },
     [validateField, state]
   );
@@ -65,6 +53,7 @@ const ProductFormProvider = ({ children }) => {
   const handleAddVariantItem = useCallback(
     async (inputValue, variantImages = [], variationIndex) => {
       if (!inputValue.trim()) return;
+
       const newVariant = {
         id: uuidv4(),
         name: inputValue,
@@ -77,13 +66,20 @@ const ProductFormProvider = ({ children }) => {
         packageWeight: "",
         dimensions: { length: "", width: "", height: "" },
       };
+
+      const updatedVariants = [
+        ...state.productDetails.variations[variationIndex].values,
+        newVariant,
+      ];
+
       dispatch({
-        type: actionTypes.ADD_VARIANT_ITEM,
+        type: "ADD_VARIANT_ITEM",
         payload: { newVariant, variationIndex },
       });
+
       await validateField(
         `productDetails.variations[${variationIndex}].values`,
-        [...state.productDetails.variations[variationIndex].values, newVariant],
+        updatedVariants,
         state
       );
     },
@@ -92,13 +88,15 @@ const ProductFormProvider = ({ children }) => {
 
   const handleRemoveVariantItem = useCallback(
     async (variationIndex, valueIndex) => {
-      dispatch({
-        type: actionTypes.REMOVE_VARIANT_ITEM,
-        payload: { variationIndex, valueIndex },
-      });
       const updatedVariants = state.productDetails.variations[
         variationIndex
       ].values.filter((_, idx) => idx !== valueIndex);
+
+      dispatch({
+        type: "REMOVE_VARIANT_ITEM",
+        payload: { variationIndex, valueIndex },
+      });
+
       await validateField(
         `productDetails.variations[${variationIndex}].values`,
         updatedVariants,
@@ -111,56 +109,61 @@ const ProductFormProvider = ({ children }) => {
   const handleApplyToAll = useCallback(() => {
     const { pricing, stock, sku } = state.productDetails;
     dispatch({
-      type: actionTypes.APPLY_TO_ALL_VARIANTS,
+      type: "APPLY_TO_ALL_VARIANTS",
       payload: { pricing, stock, sku },
     });
   }, [dispatch, state.productDetails]);
 
   const handleToggleVariantShipping = useCallback(() => {
-    uiDispatch({ type: actionTypes.TOGGLE_VARIANT_SHIPPING });
+    uiDispatch({ type: "TOGGLE_VARIANT_SHIPPING" });
   }, [uiDispatch]);
 
   const toggleAdditionalFields = useCallback(
     (section) => {
       uiDispatch({
-        type: actionTypes.TOGGLE_ADDITIONAL_FIELDS,
+        type: "TOGGLE_ADDITIONAL_FIELDS",
         payload: { section },
       });
     },
     [uiDispatch]
   );
 
+  const canSubmit = useCallback(
+    (e) =>
+      !(uiState.isSubmitting || e.nativeEvent.submitter.name !== "submitBtn"),
+    [uiState.isSubmitting]
+  );
+
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      if (e.nativeEvent.submitter.name !== "submitBtn") return;
+      if (!canSubmit(e)) return;
 
-      uiDispatch({ type: actionTypes.SET_FORM_SUBMITTED, payload: true });
-      if (
-        (await validateForm(state)) &&
-        !Object.keys(uiState.formErrors).length
-      ) {
-        console.log("Form submitted successfully", state);
-      } else {
-        console.error(
-          "Form submission blocked due to errors:",
-          uiState.formErrors
-        );
+      uiDispatch({ type: "SET_IS_SUBMITTING", payload: true });
+      try {
+        const isValid = await validateForm(state);
+        if (isValid) {
+          console.log("Form submitted successfully", state);
+        } else {
+          console.log("Validation failed", uiState.formErrors);
+        }
+      } catch (error) {
+        console.error("Error during submission", error);
+      } finally {
+        uiDispatch({ type: "SET_IS_SUBMITTING", payload: false });
       }
     },
-    [state, validateForm, uiDispatch, uiState.formErrors]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state, validateForm, uiState.isSubmitting]
   );
 
-  const getNestedKeys = useCallback((obj, parent = "") => {
-    return Object.keys(obj).reduce((keys, key) => {
+  const getNestedKeys = (obj, parent = "") =>
+    Object.entries(obj).reduce((keys, [key, value]) => {
       const fullKey = parent ? `${parent}.${key}` : key;
-      return typeof obj[key] === "object" &&
-        obj[key] !== null &&
-        !Array.isArray(obj[key])
-        ? keys.concat(getNestedKeys(obj[key], fullKey))
-        : keys.concat(fullKey);
+      return typeof value === "object" && value && !Array.isArray(value)
+        ? [...keys, ...getNestedKeys(value, fullKey)]
+        : [...keys, fullKey];
     }, []);
-  }, []);
 
   const isFieldRequired = useCallback(async (fieldPath) => {
     if (!fieldPath) return false;
@@ -176,37 +179,37 @@ const ProductFormProvider = ({ children }) => {
     }
   }, []);
 
-  // Fetch required fields only on first render
-  useEffect(() => {
-    const fetchRequiredFields = async () => {
-      try {
-        const formDataKeys = getNestedKeys(formState);
-        const requiredFieldStatuses = await Promise.all(
-          formDataKeys.map(async (field) => {
-            const isRequired = await isFieldRequired(field);
-            return isRequired !== undefined ? { [field]: isRequired } : null;
-          })
-        );
-        const filteredStatuses = Object.assign(
-          {},
-          ...requiredFieldStatuses.filter(Boolean)
-        );
-        uiDispatch({
-          type: actionTypes.SET_REQUIRED_FIELDS,
-          payload: filteredStatuses,
-        });
-      } catch (error) {
-        console.error("Error fetching required fields:", error);
-      }
-    };
-
-    fetchRequiredFields();
+  // Fetch required fields only on first render for to show * sign on labels
+  const fetchRequiredFields = useCallback(async () => {
+    try {
+      const formDataKeys = getNestedKeys(formState);
+      const requiredFieldStatuses = await Promise.all(
+        formDataKeys.map(async (field) => {
+          const isRequired = await isFieldRequired(field);
+          return isRequired !== undefined ? { [field]: isRequired } : null;
+        })
+      );
+      const filteredStatuses = Object.assign(
+        {},
+        ...requiredFieldStatuses.filter(Boolean)
+      );
+      uiDispatch({
+        type: "SET_REQUIRED_FIELDS",
+        payload: filteredStatuses,
+      });
+    } catch (error) {
+      console.error("Error fetching required fields:", error);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    fetchRequiredFields();
+  }, [fetchRequiredFields]);
+
+  useEffect(() => {
     if (!multiVariantShippingCondition)
-      uiDispatch({ type: actionTypes.SET_VARIANT_SHIPPING_FALSE });
+      uiDispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
   }, [multiVariantShippingCondition, uiDispatch]);
 
   const values = useMemo(
