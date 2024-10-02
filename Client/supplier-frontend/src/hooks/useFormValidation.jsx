@@ -42,6 +42,7 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
       return false; // No error
     } catch (error) {
       const errors = handleErrors(error, fieldPath);
+
       if (errors[fieldPath] === undefined) return;
 
       if (shouldDispatchUpdates) {

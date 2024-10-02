@@ -1,5 +1,4 @@
 import * as Yup from "yup";
-import { get } from "lodash";
 
 // Helper function to transform value to a number and handle empty strings
 const transformToNumber = (schema) =>
@@ -15,7 +14,9 @@ const requiredNumber = transformToNumber(
     .required("This field is required.")
 );
 const nullableString = Yup.string().nullable();
-const nullableNumber = transformToNumber(Yup.number().nullable());
+const nullableNumber = transformToNumber(
+  Yup.number().positive("Must be a positive number.").nullable()
+);
 
 // File validation logic
 const fileValidation = Yup.mixed().test(

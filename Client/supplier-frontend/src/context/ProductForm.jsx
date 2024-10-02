@@ -169,10 +169,11 @@ const ProductFormProvider = ({ children }) => {
   const fetchRequiredFields = useCallback(async () => {
     try {
       const formDataKeys = getNestedKeys(formState);
+
       // Define additional keys to include
       const additionalKeys = [
         "shipping.dimensions",
-        "productDetails.variations",
+        "productDetails.variations[0].values",
       ];
       // Concatenate the existing keys with the extra keys
       const allKeys = [...formDataKeys, ...additionalKeys];
