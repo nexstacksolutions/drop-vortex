@@ -1,4 +1,3 @@
-import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
 import productFormSchema from "../schemas/productForm";
 import useFormValidation from "../hooks/useFormValidation";
