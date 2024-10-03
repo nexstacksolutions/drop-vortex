@@ -1,6 +1,7 @@
 .statusSidebar {
-  position: relative;
-  min-height: 100vh;
+  position: sticky;
+  top: 10px;
+  height: 100vh;
   width: 100%;
   min-width: var(--sidebar--width);
   max-width: 23rem;
