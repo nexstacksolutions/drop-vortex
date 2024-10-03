@@ -306,13 +306,15 @@ function ProductForm({ customClass }) {
         </FormSection>
       ))}
 
-      <button
-        type="submit"
-        name="submitBtn"
-        className={`${styles.submitButton} primary-btn`}
-      >
-        Submit
-      </button>
+      <div className={`${styles.formActions} flex justify-end`}>
+        <button
+          type="submit"
+          name="submitBtn"
+          className={`${styles.submitButton} primary-btn`}
+        >
+          Submit
+        </button>
+      </div>
     </form>
   );
 }

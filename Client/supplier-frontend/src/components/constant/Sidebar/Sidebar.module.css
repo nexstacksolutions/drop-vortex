@@ -112,8 +112,8 @@
     min-height: 8rem;
   }
 
-  .topLogo img,
-  .bottomLogo img {
+  .topLogo svg,
+  .bottomLogo svg {
     width: 15rem;
     height: 4rem;
     object-fit: cover;
@@ -184,8 +184,8 @@
     }
   }
 
-  & .topLogo img,
-  .bottomLogo img {
+  & .topLogo svg,
+  .bottomLogo svg {
     width: 2.6rem;
     height: 2.6rem;
   }

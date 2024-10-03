@@ -2,7 +2,7 @@ import styles from "./Sidebar.module.css";
 import navigation from "../../../constant/navigation";
 import classNames from "classnames";
 import { useTheme } from "../../../context/ThemeContext";
-import mediaExport from "../../../assets/mediaExport/mediaExport";
+import useMediaExport from "../../../hooks/useMediaExport";
 import { useState, useCallback, useMemo } from "react";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
 import { Link, NavLink } from "react-router-dom";
@@ -67,26 +67,22 @@ function NavItems({
   );
 }
 
-function RenderLogo({ expandSideBar, showDivider = false, customClass = "" }) {
+function RenderLogo({ expandSideBar, showDivider = false, customClass }) {
   const { theme } = useTheme();
-  const { light, dark, miniLight, miniDark } = mediaExport.logo || {};
+  const { LogoLight, LogoDark, MiniLogoLight, MiniLogoDark } = useMediaExport();
 
-  const logoSrc = useMemo(
-    () =>
-      expandSideBar
-        ? theme === "light"
-          ? light
-          : dark
-        : theme === "light"
-        ? miniLight
-        : miniDark,
-    [light, dark, miniLight, miniDark, theme, expandSideBar]
-  );
+  const Logo = expandSideBar
+    ? theme === "light"
+      ? LogoLight
+      : LogoDark
+    : theme === "light"
+    ? MiniLogoLight
+    : MiniLogoDark;
 
   return (
     <Link className={classNames("flex", customClass)}>
       {showDivider && <Divider />}
-      <img src={logoSrc} alt="Logo" />
+      <Logo />
     </Link>
   );
 }

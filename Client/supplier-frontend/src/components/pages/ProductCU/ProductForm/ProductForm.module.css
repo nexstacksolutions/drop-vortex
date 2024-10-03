@@ -1,6 +1,6 @@
 .productForm {
   width: 100%;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-lg);
 
   & .formSection {
     flex: 1;
@@ -416,7 +416,14 @@
     }
   }
 
-  & > button {
-    color: var(--white-color);
+  & .formActions {
+    flex: 1;
+    padding: var(--spacing-md) 2rem;
+    border-radius: var(--radius-md);
+    background-color: var(--canvas-color);
+
+    & > button {
+      color: var(--white-color);
+    }
   }
 }

@@ -1,8 +1,118 @@
 .statusSidebar {
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
-  min-width: 65px;
-  max-width: var(--sidebar-width);
+  min-width: var(--sidebar--width);
+  max-width: 23rem;
   gap: var(--spacing-md);
+
+  & > div {
+    width: 100%;
+    position: relative;
+    min-height: 10rem;
+    background-color: var(--canvas-color);
+    padding: var(--spacing-md) 2rem;
+    border-radius: var(--radius-md);
+
+    & h3 {
+      color: var(--accent-color);
+    }
+  }
+
+  & .tipsCard {
+    width: 100%;
+    max-height: 20rem;
+    white-space: pre-wrap;
+
+    & .tipsContent {
+      width: 100%;
+      z-index: 10;
+      position: relative;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: transparent;
+    }
+
+    & svg {
+      position: absolute;
+      top: var(--spacing-md);
+      right: var(--spacing-md);
+      width: 7rem;
+      height: 7rem;
+      color: var(--overlay-bg);
+    }
+  }
+
+  & .contentStatus {
+    width: 100%;
+    gap: var(--spacing-xs);
+
+    & .statusHeader .progressWrapper {
+      width: 100%;
+
+      & .progressBarContainer .progressBar {
+        flex: 1 1;
+        height: 8px;
+        overflow: hidden;
+        border-radius: var(--radius-md);
+        background-color: var(--primary-bg);
+
+        & .progressIndicator {
+          width: 2px;
+          height: 100%;
+          background-color: var(--accent-color);
+        }
+      }
+
+      & .progressDesc {
+        color: var(--accent-color);
+      }
+    }
+
+    & .statusGuide {
+      flex: 1;
+      gap: var(--spacing-md);
+
+      & .guideSection {
+        width: 100%;
+
+        & .sectionTitle {
+          cursor: pointer;
+          text-wrap: nowrap;
+
+          & .activeIndicator {
+            width: 1rem;
+            height: 1rem;
+            border-radius: var(--rounded);
+            border: var(--border-accent);
+          }
+
+          & svg {
+            margin-left: auto;
+          }
+        }
+
+        & .sectionItems {
+          width: 100%;
+          margin-left: 0.4rem;
+          padding: 0 var(--spacing-base);
+          border-left: var(--border-accent);
+
+          & li {
+            color: var(--secondary-text);
+          }
+        }
+
+        &.activeSection .sectionTitle {
+          & .activeIndicator {
+            background-color: var(--accent-color);
+          }
+
+          & svg {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+  }
 }
