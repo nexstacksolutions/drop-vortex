@@ -3,5 +3,4 @@
   position: relative;
   padding: var(--spacing-md);
   gap: var(--spacing-md);
-  overflow: hidden;
 }
