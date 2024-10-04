@@ -9,6 +9,7 @@ import React, {
   useContext,
   useMemo,
   useEffect,
+  useRef,
   useCallback,
 } from "react";
 import { get } from "lodash";
@@ -23,6 +24,15 @@ const ProductFormProvider = ({ children }) => {
     uiState,
     uiDispatch
   );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const sectionRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
 
   const multiVariantShippingCondition = useMemo(
     () => state.productDetails?.variations?.[0]?.values?.length > 1,
@@ -220,6 +230,7 @@ const ProductFormProvider = ({ children }) => {
       dispatch,
       uiState,
       uiDispatch,
+      sectionRefs,
       handleSubmit,
       handleApplyToAll,
       handleInputChange,
@@ -234,6 +245,7 @@ const ProductFormProvider = ({ children }) => {
     [
       state,
       uiState,
+      sectionRefs,
       handleSubmit,
       handleApplyToAll,
       handleInputChange,

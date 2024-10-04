@@ -1,10 +1,11 @@
 import styles from "./StatusSidebar.module.css";
+import classNames from "classnames";
 import { RxReload } from "react-icons/rx";
 import { FaAngleDown } from "react-icons/fa6";
-import useMediaExport from "../../../../hooks/useMediaExport";
-import { useState } from "react";
-import classNames from "classnames";
 import Divider from "../../../constant/Divider/Divider";
+import useMediaExport from "../../../../hooks/useMediaExport";
+import { useProductForm } from "../../../../context/ProductForm";
+import useSectionScroll from "../../../../hooks/useSectionScroll";
 
 // Guide component to display a section with title and collapsible items
 function StatusGuide({ title, items, onToggle, isActive }) {
@@ -35,21 +36,13 @@ function StatusGuide({ title, items, onToggle, isActive }) {
 
 // Component to display content status progress and status guides
 function ContentStatus() {
-  const [activeSection, setActiveSection] = useState(0);
+  const { sectionRefs } = useProductForm();
+  const { activeSection, scrollToSection } = useSectionScroll(sectionRefs);
 
   const statusSections = [
-    {
-      title: "Basic Information",
-      items: ["Add at least 3 main images"],
-    },
-    {
-      title: "Product Specification",
-      items: ["Fill mandatory attributes"],
-    },
-    {
-      title: "Price, Stock & Variants",
-      items: [],
-    },
+    { title: "Basic Information", items: ["Add at least 3 main images"] },
+    { title: "Product Specification", items: ["Fill mandatory attributes"] },
+    { title: "Price, Stock & Variants", items: [] },
     {
       title: "Product Description",
       items: [
@@ -57,10 +50,7 @@ function ContentStatus() {
         "Add at least 30 words in the description",
       ],
     },
-    {
-      title: "Shipping & Warranty",
-      items: [],
-    },
+    { title: "Shipping & Warranty", items: [] },
   ];
 
   return (
@@ -75,7 +65,6 @@ function ContentStatus() {
             <RxReload />
           </button>
         </div>
-
         <div className={styles.progressWrapper}>
           <div
             className={`${styles.progressBarContainer} flex justify-between align-center`}
@@ -96,9 +85,7 @@ function ContentStatus() {
             title={title}
             items={items}
             isActive={activeSection === index}
-            onToggle={() =>
-              setActiveSection(activeSection === index ? null : index)
-            }
+            onToggle={() => scrollToSection(index)}
           />
         ))}
       </div>

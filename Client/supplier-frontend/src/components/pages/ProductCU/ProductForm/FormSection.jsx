@@ -39,6 +39,7 @@ function FormSection({
   title,
   message,
   children,
+  sectionRef,
   customClass,
   showMoreBtnProps,
   additionalJsxProps,
@@ -46,6 +47,7 @@ function FormSection({
   return (
     <section
       className={classNames(styles.formSection, customClass, "flex flex-col")}
+      ref={sectionRef}
     >
       <div className={styles.sectionHeader}>
         <h2>{title}</h2>

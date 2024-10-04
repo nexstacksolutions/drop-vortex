@@ -49,6 +49,7 @@ function ProductForm({ customClass }) {
   const {
     state,
     uiState,
+    sectionRefs,
     handleSubmit,
     handleInputChange,
     handleToggleVariantShipping,
@@ -301,7 +302,12 @@ function ProductForm({ customClass }) {
       encType="multipart/form-data"
     >
       {memoizedFormSections.map(({ title, fields, ...rest }, index) => (
-        <FormSection key={`${title}${index}`} title={title} {...rest}>
+        <FormSection
+          key={`${title}${index}`}
+          title={title}
+          {...rest}
+          sectionRef={sectionRefs[index]}
+        >
           {fields.map((field, i) => RenderInputField(field, i, state, uiState))}
         </FormSection>
       ))}
