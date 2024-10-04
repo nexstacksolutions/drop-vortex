@@ -23,7 +23,6 @@ const useSectionScroll = (sectionRefs) => {
           const visibleSectionIndex = sectionRefs.findIndex(
             (ref) => ref.current === entry.target
           );
-          console.log("Visible Section Index:", visibleSectionIndex);
           setActiveSection(visibleSectionIndex);
         }
       });

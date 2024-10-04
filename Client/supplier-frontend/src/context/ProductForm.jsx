@@ -12,7 +12,6 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import { get } from "lodash";
 
 export const ProductFormContext = createContext();
 
@@ -43,7 +42,7 @@ const ProductFormProvider = ({ children }) => {
     async (name, value) => {
       try {
         dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
-        await validateField(name, value, state);
+        await validateField(state, name, value);
       } catch (error) {
         console.error("Error updating form data:", error);
       }
@@ -87,9 +86,9 @@ const ProductFormProvider = ({ children }) => {
       });
 
       await validateField(
+        state,
         `productDetails.variations[${variationIndex}].values`,
-        updatedVariants,
-        state
+        updatedVariants
       );
     },
     [dispatch, state, validateField]
@@ -107,9 +106,9 @@ const ProductFormProvider = ({ children }) => {
       });
 
       await validateField(
+        state,
         `productDetails.variations[${variationIndex}].values`,
-        updatedVariants,
-        state
+        updatedVariants
       );
     },
     [dispatch, state, validateField]
@@ -189,13 +188,7 @@ const ProductFormProvider = ({ children }) => {
 
       const requiredFieldStatuses = await Promise.all(
         allKeys.map(async (fieldPath) => {
-          const value = get(state, fieldPath);
-          const isRequired = await validateField(
-            fieldPath,
-            value,
-            state,
-            false
-          );
+          const isRequired = await validateField(state, fieldPath, null, false);
           return isRequired !== undefined ? { [fieldPath]: isRequired } : null;
         })
       );
@@ -215,6 +208,19 @@ const ProductFormProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const fetchEmptyFields = useCallback(async () => {
+    try {
+      const emptyFieldStatuses = await validateForm(state, true);
+    } catch (error) {
+      console.error("Error fetching empty fields:", error);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    fetchEmptyFields();
+  }, [fetchEmptyFields]);
+
   useEffect(() => {
     fetchRequiredFields();
   }, [fetchRequiredFields]);
@@ -232,6 +238,7 @@ const ProductFormProvider = ({ children }) => {
       uiDispatch,
       sectionRefs,
       handleSubmit,
+      validateField,
       handleApplyToAll,
       handleInputChange,
       handleAddVariantItem,
@@ -240,6 +247,7 @@ const ProductFormProvider = ({ children }) => {
       handleToggleVariantShipping,
       multiVariantShippingCondition,
       formErrors: uiState.formErrors,
+      emptyFields: uiState.emptyFields,
       requiredFields: uiState.requiredFields,
     }),
     [
@@ -247,6 +255,7 @@ const ProductFormProvider = ({ children }) => {
       uiState,
       sectionRefs,
       handleSubmit,
+      validateField,
       handleApplyToAll,
       handleInputChange,
       handleAddVariantItem,

@@ -9,6 +9,7 @@ const formUI = {
   variantShipping: false,
   showVariantImages: true,
   formErrors: {},
+  emptyFields: {},
   requiredFields: {},
   isSubmitting: false,
   isSubmitted: false,
@@ -37,6 +38,10 @@ const uiControl = (state, action) =>
 
       case "SET_FORM_ERRORS":
         draft.formErrors = payload;
+        break;
+
+      case "SET_EMPTY_FIELDS":
+        draft.emptyFields = Object.keys(payload);
         break;
 
       case "CLEAR_FORM_ERRORS":
