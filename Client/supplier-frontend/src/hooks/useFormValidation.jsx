@@ -26,7 +26,8 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
       const fieldSchema = Yup.reach(formSchema, fieldPath);
       const parentPath = fieldPath.split(".").slice(0, -1).join(".");
       const parent = get(formState, parentPath);
-      const updatedValue = value || get(formState, fieldPath);
+      const updatedValue =
+        value !== undefined ? value : get(formState, fieldPath);
 
       await fieldSchema.validate(updatedValue, {
         abortEarly: false,
@@ -66,7 +67,11 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
   };
 
   // Validate the entire form
-  const validateForm = async (formState, emptyFieldsUpdates = false) => {
+  const validateForm = async (
+    formState,
+    additionalDispatchUpdate = false,
+    dispatchType
+  ) => {
     try {
       await formSchema.validate(formState, {
         abortEarly: false,
@@ -77,8 +82,8 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
     } catch (error) {
       const errors = handleErrors(error);
 
-      if (emptyFieldsUpdates) {
-        uiDispatch({ type: "SET_EMPTY_FIELDS", payload: errors });
+      if (additionalDispatchUpdate) {
+        uiDispatch({ type: dispatchType, payload: errors });
       } else {
         uiDispatch({ type: "SET_FORM_ERRORS", payload: errors });
       }

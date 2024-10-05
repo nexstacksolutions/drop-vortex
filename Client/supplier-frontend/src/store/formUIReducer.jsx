@@ -41,7 +41,7 @@ const uiControl = (state, action) =>
         break;
 
       case "SET_EMPTY_FIELDS":
-        draft.emptyFields = Object.keys(payload);
+        draft.emptyFields = payload;
         break;
 
       case "CLEAR_FORM_ERRORS":
@@ -50,12 +50,14 @@ const uiControl = (state, action) =>
 
       case "CLEAR_FIELD_ERROR":
         delete draft.formErrors[payload];
+        draft.emptyFields[payload] = false;
         break;
 
       case "SET_FIELD_ERROR":
         {
           const { fieldPath, error } = payload;
           draft.formErrors[fieldPath] = error;
+          draft.emptyFields[fieldPath] = true;
         }
         break;
 

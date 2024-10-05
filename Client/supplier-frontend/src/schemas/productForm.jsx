@@ -95,7 +95,11 @@ const productFormSchema = Yup.object().shape({
     productName: requiredString,
     category: requiredString,
     media: Yup.object({
-      productImages: requiredArrayOfSchema(fileValidation, 1),
+      productImages: requiredArrayOfSchema(
+        fileValidation,
+        1,
+        "The field value is required, Image is missing. Please upload at least 1 image."
+      ),
       buyerPromotionImage: nullableArrayOfSchema(fileValidation),
       productVideo: nullableArrayOfSchema(
         Yup.mixed().test(

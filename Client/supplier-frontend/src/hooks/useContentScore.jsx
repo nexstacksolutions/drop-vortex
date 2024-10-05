@@ -1,83 +1,82 @@
 import { get } from "lodash";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
-const useContentScore = (formState, emptyFields, validateField) => {
+const useContentScore = (formState, emptyFields, requiredFields) => {
   const [contentScore, setContentScore] = useState(0);
 
-  const isFieldEmpty = useCallback(
-    async (fieldPath) => {
-      return validateField(formState, fieldPath, null, false);
-    },
-    [formState, validateField]
+  const additionalEmptyFields = useMemo(
+    () => [
+      "shipping.dimensions.height",
+      "shipping.dimensions.length",
+      "shipping.dimensions.width",
+    ],
+    []
   );
 
-  // Calculate the base score
-  const calculateBaseScore = (totalFields, filledFields) => {
+  const calculateBaseScore = useCallback((totalFields, filledFields) => {
     return Math.round((filledFields / totalFields) * 75);
-  };
+  }, []);
 
-  const calculateAdditionalScore = (formState, emptyFields) => {
+  const calculateAdditionalScore = useCallback((formState) => {
     let additionalScore = 0;
 
-    if (emptyFields.basicInfo) {
-      const productImages = get(formState, "basicInfo.media.productImages");
-      if (productImages.length > 2) additionalScore += 10;
-    }
+    const productImages = get(formState, "basicInfo.media.productImages", []);
+    if (productImages.length > 2) additionalScore += 10;
 
-    if (emptyFields.description) {
-      const descriptionMain = get(formState, "description.main");
-      if (descriptionMain.length > 40) additionalScore += 10;
-      if (descriptionMain.includes("<img")) additionalScore += 5;
-    }
+    const descriptionMain = get(formState, "description.main", "");
+    if (descriptionMain.length > 40) additionalScore += 10;
+    if (descriptionMain.includes("<img")) additionalScore += 5;
 
     return additionalScore;
-  };
+  }, []);
 
-  // Main score calculation
-  const calculateScore = useCallback(
-    (emptyFields) => {
-      let totalFields = 0;
-      let filledFields = 0;
+  const excludeFields = useCallback(
+    (emptyFields, requiredFields) => {
+      const filteredFields = {};
 
-      for (const section in emptyFields) {
-        const sectionFields = emptyFields[section];
-        totalFields += Object.keys(sectionFields).length;
-        filledFields += Object.values(sectionFields).filter(
-          (status) => !status
-        ).length;
-      }
+      Object.keys(emptyFields).forEach((field) => {
+        if (
+          requiredFields[field] !== undefined &&
+          !additionalEmptyFields.includes(field)
+        ) {
+          filteredFields[field] = emptyFields[field];
+        }
+      });
 
-      const baseScore = calculateBaseScore(totalFields, filledFields);
-      const additionalScore = calculateAdditionalScore(formState, emptyFields);
-      return Math.min(baseScore + additionalScore, 100);
+      return filteredFields;
     },
-    [formState]
+    [additionalEmptyFields]
   );
 
-  // Get the empty fields and update the content score
+  const filteredEmptyFields = useMemo(
+    () => excludeFields(emptyFields, requiredFields),
+    [emptyFields, requiredFields, excludeFields]
+  );
+
+  const calculateScore = useCallback(() => {
+    let totalFields = 0;
+    let filledFields = 0;
+
+    Object.keys(filteredEmptyFields).forEach((field) => {
+      totalFields++;
+      if (!filteredEmptyFields[field]) filledFields++; // Counting filled fields (false means filled)
+    });
+
+    const baseScore = calculateBaseScore(totalFields, filledFields);
+    const additionalScore = calculateAdditionalScore(formState);
+    return Math.min(baseScore + additionalScore, 100);
+  }, [
+    filteredEmptyFields,
+    calculateBaseScore,
+    calculateAdditionalScore,
+    formState,
+  ]);
+
   useEffect(() => {
-    const fetchEmptyFields = async () => {
-      const groupedFields = {};
-      const firstLevelKeys = Object.keys(formState);
+    setContentScore(calculateScore());
+  }, [formState, emptyFields, requiredFields, calculateScore]);
 
-      for (const field of emptyFields) {
-        const [firstKey] = field.split(".");
-        const fieldStatus = await isFieldEmpty(field);
-        if (firstLevelKeys.includes(firstKey)) {
-          if (!groupedFields[firstKey]) groupedFields[firstKey] = {};
-          groupedFields[firstKey][field] = fieldStatus;
-        }
-      }
-
-      setContentScore(calculateScore(groupedFields));
-    };
-
-    fetchEmptyFields();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState, isFieldEmpty, calculateScore]);
-
-  // Return the necessary functions and score
-  return { contentScore, isFieldEmpty };
+  return { contentScore };
 };
 
 export default useContentScore;

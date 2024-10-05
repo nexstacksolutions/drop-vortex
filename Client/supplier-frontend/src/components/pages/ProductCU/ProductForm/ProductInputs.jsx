@@ -182,11 +182,12 @@ function MultiInputGroup({
   type,
   groupType,
   label,
+  hideValidation = false,
 }) {
   const id = `${name}-multi-input-group`;
 
   return (
-    <InputWrapper {...{ label, id, name, customClass }}>
+    <InputWrapper {...{ label, id, name, customClass, hideValidation }}>
       {groupType === "input"
         ? Object.keys(value).map((dimension, index) => (
             <FormInput

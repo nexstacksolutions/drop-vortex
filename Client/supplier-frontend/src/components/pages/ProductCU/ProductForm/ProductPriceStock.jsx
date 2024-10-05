@@ -182,7 +182,11 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
     ...(variantShipping && hasVariationRows
       ? [
           { fieldPath: "packageWeight", placeholder: "0.001 - 300" },
-          { fieldPath: "dimensions", placeholder: "0.01 - 300" },
+          {
+            fieldPath: "dimensions",
+            hideValidation: true,
+            placeholder: "0.01 - 300",
+          },
         ]
       : []),
     {

@@ -39,9 +39,9 @@ function ScoreImproverGuide({ title, guinness, onToggle, isActive }) {
 
 // Component to display content status progress and status guides
 function ContentStatus() {
-  const { state, emptyFields, sectionRefs, validateField } = useProductForm();
+  const { state, emptyFields, requiredFields, sectionRefs } = useProductForm();
   const { activeSection, scrollToSection } = useSectionScroll(sectionRefs);
-  const { contentScore } = useContentScore(state, emptyFields, validateField);
+  const { contentScore } = useContentScore(state, emptyFields, requiredFields);
 
   // Determine content status sections
   const statusSections = useMemo(() => {
@@ -53,12 +53,10 @@ function ContentStatus() {
       !get(state, "description.main").includes("img");
 
     const SpecCondition = () => {
-      const fieldsPath = emptyFields.filter((field) =>
+      const fieldsPath = Object.keys(requiredFields).filter((field) =>
         field.includes("specifications")
       );
-
       const fieldStatus = fieldsPath.map((field) => get(state, field) === "");
-
       return fieldStatus.includes(true);
     };
 
@@ -83,7 +81,7 @@ function ContentStatus() {
       },
       { title: "Shipping & Warranty", guinness: [] },
     ];
-  }, [state, emptyFields]);
+  }, [state, requiredFields]);
 
   return (
     <div className={`${styles.contentStatus} flex flex-col`}>

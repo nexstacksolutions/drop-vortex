@@ -136,16 +136,14 @@ const ProductFormProvider = ({ children }) => {
     [uiDispatch]
   );
 
-  const canSubmit = useCallback(
-    (e) =>
-      !(uiState.isSubmitting || e.nativeEvent.submitter.name !== "submitBtn"),
-    [uiState.isSubmitting]
-  );
-
   const handleSubmit = useCallback(
     async (e) => {
+      const canSubmit = !(
+        uiState.isSubmitting || e.nativeEvent.submitter.name !== "submitBtn"
+      );
+
       e.preventDefault();
-      if (!canSubmit(e)) return;
+      if (!canSubmit) return;
 
       uiDispatch({ type: "SET_IS_SUBMITTING", payload: true });
       try {
@@ -162,55 +160,23 @@ const ProductFormProvider = ({ children }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state, validateForm, uiState.isSubmitting, canSubmit]
+    [state, validateForm, uiState.isSubmitting]
   );
-
-  const getNestedKeys = (obj, parent = "") =>
-    Object.entries(obj).reduce((keys, [key, value]) => {
-      const fullKey = parent ? `${parent}.${key}` : key;
-      return typeof value === "object" && value && !Array.isArray(value)
-        ? [...keys, ...getNestedKeys(value, fullKey)]
-        : [...keys, fullKey];
-    }, []);
 
   // Fetch required fields only on first render
   const fetchRequiredFields = useCallback(async () => {
     try {
-      const formDataKeys = getNestedKeys(formState);
-
-      // Define additional keys to include
-      const additionalKeys = [
-        "shipping.dimensions",
-        "productDetails.variations[0].values",
-      ];
-      // Concatenate the existing keys with the extra keys
-      const allKeys = [...formDataKeys, ...additionalKeys];
-
-      const requiredFieldStatuses = await Promise.all(
-        allKeys.map(async (fieldPath) => {
-          const isRequired = await validateField(state, fieldPath, null, false);
-          return isRequired !== undefined ? { [fieldPath]: isRequired } : null;
-        })
-      );
-
-      const filteredStatuses = Object.assign(
-        {},
-        ...requiredFieldStatuses.filter(Boolean)
-      );
-
-      uiDispatch({
-        type: "SET_REQUIRED_FIELDS",
-        payload: filteredStatuses,
-      });
+      await validateForm(state, true, "SET_REQUIRED_FIELDS");
     } catch (error) {
       console.error("Error fetching required fields:", error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Fetch Empty fields only on first render
   const fetchEmptyFields = useCallback(async () => {
     try {
-      const emptyFieldStatuses = await validateForm(state, true);
+      await validateForm(state, true, "SET_EMPTY_FIELDS");
     } catch (error) {
       console.error("Error fetching empty fields:", error);
     }

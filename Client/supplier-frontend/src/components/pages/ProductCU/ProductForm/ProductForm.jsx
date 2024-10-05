@@ -238,7 +238,7 @@ function ProductForm({ customClass }) {
             name: "shipping.packageWeight",
             type: "number",
             placeholder: "0.01 - 300",
-            // condition: (formData) => !uiState.variantShipping,
+            condition: (formData) => !uiState.variantShipping,
           },
           {
             label: "Package Dimensions (L x W x H)",
@@ -247,7 +247,7 @@ function ProductForm({ customClass }) {
             formInputType: "inputGroup",
             groupType: "input",
             placeholder: "0.01 - 300",
-            // condition: (formData) => !uiState.variantShipping,
+            condition: (formData) => !uiState.variantShipping,
           },
           {
             label: "Dangerous Goods",
