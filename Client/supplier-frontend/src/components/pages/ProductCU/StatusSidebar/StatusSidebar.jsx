@@ -1,14 +1,15 @@
 import styles from "./StatusSidebar.module.css";
+import { get } from "lodash";
+import { useMemo } from "react";
 import classNames from "classnames";
 import { RxReload } from "react-icons/rx";
 import { FaAngleDown } from "react-icons/fa6";
 import Divider from "../../../constant/Divider/Divider";
+import useFormGuide from "../../../../hooks/useFormGuide";
 import useMediaExport from "../../../../hooks/useMediaExport";
+import useContentScore from "../../../../hooks/useContentScore";
 import { useProductForm } from "../../../../context/ProductForm";
 import useSectionScroll from "../../../../hooks/useSectionScroll";
-import useContentScore from "../../../../hooks/useContentScore";
-import { useMemo } from "react";
-import { get } from "lodash";
 
 // Guide component to display a section with title and collapsible items
 function ScoreImproverGuide({ title, guinness, onToggle, isActive }) {
@@ -136,32 +137,26 @@ function ContentStatus() {
 
 // Component to display a card with helpful tips
 function TipsCard() {
+  const { guideContent } = useProductForm();
   const { TipsIcon } = useMediaExport();
+
   return (
     <div className={`${styles.tipsCard} flex flex-col`}>
-      <h3 className={styles.tipsTitle}>Tips</h3>
+      <h3 className={styles.tipsTitle}>{guideContent?.title}</h3>
       <TipsIcon />
       <div className={`${styles.tipsContent} flex flex-col`}>
-        <p className={styles.tipsText}>
-          Please ensure to upload product images, fill in the product name, and
-          select the correct category to publish your product.
-        </p>
+        <p className={styles.tipsText}>{guideContent?.content}</p>
       </div>
     </div>
   );
 }
 
 // Main component for the sidebar that combines content status and tips card
-function StatusSidebar({
-  showContentStatus = true,
-  showTipsCard = true,
-  contentStatusProps,
-  tipsCardProps,
-}) {
+function StatusSidebar() {
   return (
     <aside className={`${styles.statusSidebar} flex flex-col`}>
-      {showContentStatus && <ContentStatus {...contentStatusProps} />}
-      {showTipsCard && <TipsCard {...tipsCardProps} />}
+      <ContentStatus />
+      <TipsCard />
     </aside>
   );
 }

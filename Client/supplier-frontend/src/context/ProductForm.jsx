@@ -12,12 +12,14 @@ import React, {
   useRef,
   useCallback,
 } from "react";
+import useFormGuide from "../hooks/useFormGuide";
 
 export const ProductFormContext = createContext();
 
 const ProductFormProvider = ({ children }) => {
   const [state, dispatch] = useReducer(formControl, formState);
   const [uiState, uiDispatch] = useReducer(uiControl, formUI);
+  const { guideContent, updateGuideContent } = useFormGuide();
   const { validateForm, validateField } = useFormValidation(
     productFormSchema,
     uiState,
@@ -205,6 +207,8 @@ const ProductFormProvider = ({ children }) => {
       sectionRefs,
       handleSubmit,
       validateField,
+      guideContent,
+      updateGuideContent,
       handleApplyToAll,
       handleInputChange,
       handleAddVariantItem,
@@ -222,6 +226,8 @@ const ProductFormProvider = ({ children }) => {
       sectionRefs,
       handleSubmit,
       validateField,
+      guideContent,
+      updateGuideContent,
       handleApplyToAll,
       handleInputChange,
       handleAddVariantItem,

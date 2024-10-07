@@ -9,6 +9,14 @@ import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useProductForm } from "../../../../context/ProductForm";
 
+// Utility function to handle key-down events for input fields
+const handleInputKeyDown = (e, callback) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    if (callback) callback(e);
+  }
+};
+
 function Guidelines({ content, customClass }) {
   if (!content.length) return null;
   return (
@@ -28,10 +36,11 @@ function InputWrapper({
   label,
   children,
   customClass,
+  hideLabel,
   hideValidation,
   formInputWrapperProps,
 }) {
-  const { requiredFields, formErrors } = useProductForm();
+  const { requiredFields, formErrors, updateGuideContent } = useProductForm();
 
   const isRequired = get(requiredFields, name);
   const errorMessage = get(formErrors, name);
@@ -42,11 +51,14 @@ function InputWrapper({
         [customClass]: customClass,
         [styles.invalidInput]: errorMessage,
       })}
+      onClick={() => updateGuideContent(name, label)}
     >
-      {label && (
+      {!hideLabel && label && (
         <label htmlFor={id} className="flex align-center">
-          {!hideValidation && isRequired && <FaAsterisk />}
-          <span>{label}</span>
+          {!hideValidation && isRequired && (
+            <FaAsterisk className={styles.requiredFieldIcon} />
+          )}
+          {label?.type ? label : <span>{label}</span>}
         </label>
       )}
 
@@ -67,112 +79,68 @@ function InputWrapper({
   );
 }
 
-function GenerateInputByType({
-  type,
-  name,
-  value,
-  checked,
-  id,
-  suffixDisplay,
-  placeholder,
-  fileType,
-  multiple,
-  inputRef,
-  isSwitch,
-  onChange,
-  onFocus,
-  onBlur,
-  handleQuillChange,
-  onKeyDown,
-}) {
-  const { icon, maxValue } = suffixDisplay || {};
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-
-      if (onKeyDown) {
-        onKeyDown(e);
-      }
-    }
-  };
-
-  if (isSwitch)
-    return <SwitchBtn currState={value} name={name} onChange={onChange} />;
-
-  switch (type) {
-    case "textarea":
-      return (
-        <ReactQuill
-          value={value}
-          id={id}
-          onChange={handleQuillChange}
-          className={styles.reactQuillInput}
-        />
-      );
-    default:
-      return (
-        <div
-          className={classNames(
-            styles.inputWrapper,
-            "flex align-center justify-between"
-          )}
-        >
-          <input
-            type={type}
-            name={name}
-            id={id}
-            value={value}
-            checked={checked}
-            placeholder={placeholder}
-            accept={fileType && (fileType === "image" ? "image/*" : "video/*")}
-            multiple={multiple}
-            onChange={onChange}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            ref={inputRef}
-            onKeyDown={handleKeyDown}
-          />
-          {suffixDisplay && (
-            <div className={`${styles.suffixDisplay} flex`}>
-              {maxValue && (
-                <>
-                  <span>{value?.length}</span> / <span>{maxValue}</span>
-                </>
-              )}
-              {icon && icon}
-            </div>
-          )}
-        </div>
-      );
-  }
-}
+const inputComponents = {
+  textarea: (props) => (
+    <ReactQuill {...props} className={styles.reactQuillInput} />
+  ),
+  default: ({ inputRef, ...rest }) => <input ref={inputRef} {...rest} />,
+  switch: (props) => <SwitchBtn currState={props?.value} {...props} />,
+};
 
 function FormInput({
+  type = "text",
   name,
-  label,
-  onChange,
-  customClass,
+  value,
+  id,
+  suffixDisplay,
+  onKeyDown,
   wrapInput = true,
-  hideValidation = false,
   ...rest
 }) {
-  const id = `${name}-form-input`;
-  const handleQuillChange = useCallback(
-    (content) => onChange(null, name, content),
-    [name, onChange]
-  );
+  const { icon, maxValue } = suffixDisplay || {};
+  const handleKeyDown = (e) => handleInputKeyDown(e, onKeyDown);
 
-  const generateInputProps = { id, name, onChange, ...rest, handleQuillChange };
+  const inputProps = {
+    type,
+    name,
+    value,
+    id: id || `${name}-form-input`,
+    onKeyDown: handleKeyDown,
+    ...rest,
+  };
+
+  const InputComponent = inputComponents[type] || inputComponents.default;
+
+  const renderedInput = (
+    <div
+      className={classNames(
+        styles.inputWrapper,
+        "flex align-center justify-between"
+      )}
+    >
+      <InputComponent {...inputProps} />
+      {suffixDisplay && (
+        <div className={`${styles.suffixDisplay} flex`}>
+          {maxValue && (
+            <>
+              <span>{value?.length}</span> / <span>{maxValue}</span>
+            </>
+          )}
+          {icon && icon}
+        </div>
+      )}
+    </div>
+  );
 
   return wrapInput ? (
-    <InputWrapper {...{ label, id, name, customClass, hideValidation }}>
-      {GenerateInputByType(generateInputProps)}
+    <InputWrapper {...{ id: inputProps.id, name, ...rest }}>
+      {renderedInput}
     </InputWrapper>
   ) : (
-    GenerateInputByType(generateInputProps)
+    renderedInput
   );
 }
+
 function MultiInputGroup({
   customClass,
   value,
@@ -182,7 +150,7 @@ function MultiInputGroup({
   type,
   groupType,
   label,
-  hideValidation = false,
+  hideValidation,
 }) {
   const id = `${name}-multi-input-group`;
 
@@ -210,28 +178,18 @@ function MultiInputGroup({
               htmlFor={`${name}${index}`}
               className={classNames(styles.radioItem, "flex flex-center")}
             >
-              <GenerateInputByType
+              <FormInput
                 {...{ type, name }}
                 id={`${name}${index}`}
                 value={option}
                 checked={value === option}
                 onChange={onChange}
               />
-
               <span>{option}</span>
             </label>
           ))}
     </InputWrapper>
   );
-}
-function renderMediaFiles(mediaFiles, fileType, handleRemoveFile) {
-  return mediaFiles.map((file, index) => (
-    <MediaPreviewItem
-      key={index}
-      {...{ file, fileType }}
-      onRemove={() => handleRemoveFile(index)}
-    />
-  ));
 }
 
 function MediaInput({
@@ -252,14 +210,12 @@ function MediaInput({
   const handleFileChange = useCallback(
     (e) => {
       const files = Array.from(e.target.files);
-      if (mediaFiles.length + files.length <= maxFiles) {
-        const updatedFiles = [...mediaFiles, ...files];
-        setMediaFiles(updatedFiles);
-        onChange(null, name, updatedFiles);
-        if (fileInputRef.current) fileInputRef.current.value = null;
-      }
+      const updatedFiles = [...mediaFiles, ...files].slice(0, maxFiles);
+      setMediaFiles(updatedFiles);
+      onChange(null, name, updatedFiles);
+      if (fileInputRef.current) fileInputRef.current.value = null;
     },
-    [mediaFiles, name, maxFiles, onChange]
+    [mediaFiles, maxFiles, name, onChange]
   );
 
   const handleRemoveFile = useCallback(
@@ -285,23 +241,31 @@ function MediaInput({
     }
   }, [resetTrigger, name, onChange]);
 
-  const id = `${name}-file-upload`;
+  const renderMediaPreview = (mediaFiles) =>
+    mediaFiles.map((file, index) => (
+      <MediaPreviewItem
+        key={index}
+        file={file}
+        fileType={fileType}
+        onRemove={() => handleRemoveFile(index)}
+      />
+    ));
 
   return (
     <InputWrapper
-      {...{ label, id, name }}
+      {...{ label, name }}
       customClass={classNames(styles.mediaInputContainer, customClass)}
     >
       <div className={`${styles.mediaPreviewWrapper} flex`}>
-        {renderMediaFiles(mediaFiles, fileType, handleRemoveFile)}
+        {renderMediaPreview(mediaFiles)}
         {mediaFiles.length < maxFiles && (
           <FormInput
             label={<FaPlus />}
             {...{ name, type, fileType }}
-            multiple={maxFiles && maxFiles > 1 ? true : false}
+            multiple={maxFiles > 1}
+            hideValidation={true}
             inputRef={fileInputRef}
             onChange={handleFileChange}
-            hideValidation={true}
             customClass={styles.addMediaWrapper}
           />
         )}
@@ -310,6 +274,7 @@ function MediaInput({
     </InputWrapper>
   );
 }
+
 function MediaPreviewItem({ file, fileType, onRemove }) {
   return (
     <div className={`${styles.mediaPreviewItem} flex flex-center`}>
@@ -341,24 +306,21 @@ function MediaPreviewItem({ file, fileType, onRemove }) {
     </div>
   );
 }
-function DropdownInput(props) {
-  const { customClass, label, name, options, value, onChange } = props || {};
+
+function DropdownInput({ customClass, name, options, onChange, ...rest }) {
   const [isFocused, setIsFocused] = useState(false);
   const id = `${name}-dropdown-input`;
 
-  // Handle input focus
   const handleFocus = () => {
     setIsFocused(true);
   };
 
-  // Handle input blur
   const handleBlur = () => {
     setIsFocused(false);
   };
 
-  // Filter options based on the input value
   const filteredOptions = options.filter((option) =>
-    option.toLowerCase().includes(value.toLowerCase())
+    option.toLowerCase().includes(rest.value.toLowerCase())
   );
 
   const handleOptionClick = (e) => {
@@ -370,48 +332,38 @@ function DropdownInput(props) {
 
   return (
     <InputWrapper
-      {...{ label, id, name }}
-      customClass={classNames(styles.dropdownInputContainer, customClass, {
+      {...{ id, name, ...rest }}
+      customClass={classNames(styles.dropdownWrapper, customClass, {
         [styles.dropdownInputFocused]: isFocused,
       })}
     >
       <FormInput
-        {...props}
+        type="text"
+        {...{ name, onChange, ...rest }}
         wrapInput={false}
         suffixDisplay={{ icon: <FaAngleDown /> }}
-        onFocus={handleFocus} // Trigger dropdown on focus
-        onBlur={handleBlur} // Close dropdown on blur
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
-
-      {/* Dropdown menu that shows when input is focused */}
       {isFocused && (
-        <div className={`${styles.dropdownInputWrapper} flex align-center`}>
-          <ul className={`${styles.dropdownList} custom-scrollbar-sm`}>
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, index) => (
-                <li
-                  onMouseDown={handleOptionClick}
-                  key={index}
-                  className={styles.dropdownItem}
-                >
-                  {option}
-                </li>
-              ))
-            ) : (
-              <li className={styles.noOptions}>No options found</li>
-            )}
-          </ul>
-        </div>
+        <ul className={classNames(styles.dropdownList, customClass)}>
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option, index) => (
+              <li
+                onMouseDown={handleOptionClick}
+                key={index}
+                className={styles.dropdownOption}
+              >
+                {option}
+              </li>
+            ))
+          ) : (
+            <li className={styles.noOptions}>No options found</li>
+          )}
+        </ul>
       )}
     </InputWrapper>
   );
 }
 
-export {
-  FormInput,
-  MultiInputGroup,
-  InputWrapper,
-  DropdownInput,
-  MediaInput,
-  GenerateInputByType,
-};
+export { FormInput, MultiInputGroup, MediaInput, DropdownInput, InputWrapper };

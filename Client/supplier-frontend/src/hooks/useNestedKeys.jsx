@@ -1,9 +1,21 @@
-const getNestedKeys = (obj, parent = "") =>
-  Object.entries(obj).reduce((keys, [key, value]) => {
-    const fullKey = parent ? `${parent}.${key}` : key;
-    return typeof value === "object" && value && !Array.isArray(value)
-      ? [...keys, ...getNestedKeys(value, fullKey)]
-      : [...keys, fullKey];
-  }, []);
+const useObjectKeys = () => {
+  const getNestedKeys = (obj, parentKey = "") => {
+    return Object.entries(obj).reduce((collectedKeys, [key, value]) => {
+      const newKey = parentKey ? `${parentKey}.${key}` : key;
 
-export default getNestedKeys;
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        return [...collectedKeys, ...getNestedKeys(value, newKey)];
+      }
+
+      return [...collectedKeys, newKey];
+    }, []);
+  };
+
+  return { getNestedKeys };
+};
+
+export default useObjectKeys;

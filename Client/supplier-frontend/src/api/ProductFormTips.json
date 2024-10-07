@@ -1,0 +1,118 @@
+{
+  "basicInfo.productName": {
+    "title": "Product Name",
+    "content": "Use brand name and unique selling points of your product to boost searchability by up to 6x. For example: Adidas 100% Cotton Men's Sport T-Shirt. Avoid stacking irrelevant keywords as this will result in product suspension."
+  },
+  "basicInfo.category": {
+    "title": "Category",
+    "content": "Please make sure to upload product images(s), fill product name, and select the correct category to publish a product."
+  },
+  "basicInfo.media.productImages": {
+    "title": "Product Images",
+    "content": "Product images are the main images of your item. For some cases and categories, you can also upload variant level image below on Price & Stock section.Click to view item image usage "
+  },
+  "basicInfo.media.buyerPromotionImage": {
+    "title": "Buyer Promotion Image",
+    "content": "A buyer promotion image represents your product in various places, such as search result page, product recommendation page, etc. Having a buyer promotion image will inspire buyers to click on your product."
+  },
+  "basicInfo.media.productVideo": {
+    "title": "Video",
+    "content": "Please make sure to upload product images(s), fill product name, and select the correct category to publish a product."
+  },
+  "productDetails.pricing.current": {
+    "title": "Price & Stock",
+    "content": "Sales Price for a Product for Promotion. The rate of the special price to the price must be between 0.05 and 1.00"
+  },
+  "productDetails.pricing.original": {
+    "title": "Price & Stock",
+    "content": "This is the price, that the customer has to pay for the product. This price includes the taxes. The price is separated with a point delimiter"
+  },
+  "productDetails.stock": {
+    "title": "Price & Stock",
+    "content": "Please make sure to upload product images(s), fill product name, and select the correct category to publish a product."
+  },
+  "productDetails.availability": {
+    "title": "Price & Stock",
+    "content": "Please make sure to upload product images(s), fill product name, and select the correct category to publish a product."
+  },
+  "productDetails.freeItems": {
+    "title": "Price & Stock",
+    "content": "*Only if applicable* Free merchandise, free items, free products, free gifts, free accessories or advertising gifts that come along with the package."
+  },
+  "productDetails.sku": {
+    "title": "Price & Stock",
+    "content": "Identifier for a product provieded by the Seller. Product is mandatory for Seller, even when the column Mandaroy says something different."
+  },
+  "productDetails.variations": {
+    "title": "Total Variants ",
+    "content": "Type and press enter to create, or just to quickly select standard values"
+  },
+  "specifications.brand.name": {
+    "title": "Brand",
+    "content": "Brand of the product Search your brand by typing a keyword. If your brand is not on the list, please Submit New Brand"
+  },
+  "specifications.brand.logo": {
+    "title": "",
+    "content": ""
+  },
+  "specifications.numberOfPieces": {
+    "title": "",
+    "content": ""
+  },
+  "specifications.powerSource": {
+    "title": "",
+    "content": ""
+  },
+  "specifications.additionalSpecs": {
+    "title": "",
+    "content": ""
+  },
+  "description.main": {
+    "title": "Main Description",
+    "content": "The product description should give the customer useful information about the product to ensure a purchase."
+  },
+  "description.highlights": {
+    "title": "Highlights",
+    "content": "Enter a minimum of three short highlights of the product to make the purchase decision easier for the customer. Please format as a bulleted list."
+  },
+  "description.tags": {
+    "title": "What's in the box",
+    "content": "Indicates the items that customer will get when they receive this product. For example, for a smartphone, a customer may get: 1 x Phone, 1 x Cable, 1 x Headset"
+  },
+  "description.whatsInBox": {
+    "title": "What's in the box",
+    "content": "Indicates the items that customer will get when they receive this product. For example, for a smartphone, a customer may get: 1 x Phone, 1 x Cable, 1 x Headset"
+  },
+  "shipping.packageWeight": {
+    "title": "Package Weight",
+    "content": "Weight and packaging size: Please fill in the weight including packaging. Inaccurate information will results in extra shipping costs and failed shipping."
+  },
+  "shipping.dimensions.length": {
+    "title": "Package Length(cm) * Width(cm) * Height(cm)",
+    "content": "Please fill in the logistics size accurately to avoid the loss of freight caused by filling in the wrong."
+  },
+  "shipping.dimensions.width": {
+    "title": "Package Length(cm) * Width(cm) * Height(cm)",
+    "content": "Please fill in the logistics size accurately to avoid the loss of freight caused by filling in the wrong."
+  },
+  "shipping.dimensions.height": {
+    "title": "Package Length(cm) * Width(cm) * Height(cm)",
+    "content": "Please fill in the logistics size accurately to avoid the loss of freight caused by filling in the wrong."
+  },
+  "shipping.dangerousGoods": {
+    "title": "Dangerous Goods",
+    "content": "Please indicate if your product contains battery, liquid or other dangerous components so as to ensure smooth logistics process, multiple selection is available."
+  },
+  "shipping.warranty.type": {
+    "title": "Warranty Type",
+    "content": "For Warranty Type 1. No Warranty: Select this if the product does not have a warranty 2. Brand Warranty: Select this if Warranty is offered by the Brand. for e.g Apple in the case of a new Iphone 3. Seller Warranty: Select this if Warranty is offered by the seller, and not the brand. for e.g in the case of a refurbished Iphone without Apple Warranty"
+  },
+  "shipping.warranty.period": {
+    "title": "Warranty Period",
+    "content": "Please select a warranty duration for your product."
+  },
+  "shipping.warranty.policy": {
+    "title": "Warranty Policy",
+    "content": "Please provide more details about your warranty policy such as documentation required, warranty locations/address, etc."
+  }
+}

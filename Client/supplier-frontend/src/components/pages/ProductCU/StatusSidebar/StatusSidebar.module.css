@@ -100,6 +100,7 @@
 
           & .guideItem {
             color: var(--secondary-text);
+            line-height: var(--line-sm);
           }
         }
 

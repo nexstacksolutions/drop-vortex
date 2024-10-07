@@ -2,12 +2,24 @@ import styles from "./ProductForm.module.css";
 import { useCallback, useState } from "react";
 import { RiDeleteBin5Line, RiMenuFill } from "react-icons/ri";
 import { useProductForm } from "../../../../context/ProductForm";
-import {
-  FormInput,
-  MediaInput,
-  InputWrapper,
-  GenerateInputByType,
-} from "./ProductInputs";
+import { FormInput, MediaInput, InputWrapper } from "./ProductInputs";
+
+function VariantActionButtons({ handleRemove }) {
+  return (
+    <div className={`${styles.variantActions} flex justify-end`}>
+      <button
+        type="button"
+        onClick={handleRemove}
+        className={styles.removeVariant}
+      >
+        <RiDeleteBin5Line />
+      </button>
+      <button type="button" className={styles.moveVariant}>
+        <RiMenuFill />
+      </button>
+    </div>
+  );
+}
 
 function VariantItem({
   handleAddVariantItem,
@@ -18,22 +30,23 @@ function VariantItem({
   showVariantImages,
   onChange,
 }) {
-  const [state, setState] = useState({
+  const [inputState, setInputState] = useState({
     inputValue: "",
     variantImages: [],
     resetTrigger: false,
   });
 
-  const { inputValue, variantImages, resetTrigger } = state;
+  const { inputValue, variantImages, resetTrigger } = inputState;
 
-  const resetVariantImages = useCallback(() => {
-    setState({
+  const resetInputValues = useCallback(() => {
+    setInputState({
       inputValue: "",
       variantImages: [],
       resetTrigger: !resetTrigger,
     });
     setTimeout(
-      () => setState((prevState) => ({ ...prevState, resetTrigger: false })),
+      () =>
+        setInputState((prevState) => ({ ...prevState, resetTrigger: false })),
       0
     );
   }, [resetTrigger]);
@@ -41,12 +54,12 @@ function VariantItem({
   const handleKeyDown = useCallback(() => {
     if (inputValue.trim()) {
       handleAddVariantItem(inputValue, variantImages, variationIndex);
-      resetVariantImages();
+      resetInputValues();
     }
   }, [
     inputValue,
     variantImages,
-    resetVariantImages,
+    resetInputValues,
     variationIndex,
     handleAddVariantItem,
   ]);
@@ -66,7 +79,8 @@ function VariantItem({
         onChange={
           onChange
             ? onChange
-            : (e) => setState({ ...state, inputValue: e.target.value })
+            : (e) =>
+                setInputState({ ...inputState, inputValue: e.target.value })
         }
         onKeyDown={handleKeyDown}
       />
@@ -82,7 +96,7 @@ function VariantItem({
             onChange
               ? onChange
               : (_, __, newMedia) =>
-                  setState((prevState) => ({
+                  setInputState((prevState) => ({
                     ...prevState,
                     variantImages: newMedia,
                   }))
@@ -91,18 +105,11 @@ function VariantItem({
       )}
 
       {onChange && (
-        <div className={`${styles.variantActions} flex justify-end`}>
-          <button
-            type="button"
-            onClick={() => handleRemoveVariantItem(variationIndex, valueIndex)}
-            className={styles.removeVariant}
-          >
-            <RiDeleteBin5Line />
-          </button>
-          <button type="button" className={styles.moveVariant}>
-            <RiMenuFill />
-          </button>
-        </div>
+        <VariantActionButtons
+          handleRemove={() =>
+            handleRemoveVariantItem(variationIndex, valueIndex)
+          }
+        />
       )}
     </div>
   );
@@ -131,24 +138,19 @@ function ProductVariations({ variations, onChange }) {
               </div>
               <div className={`${styles.variationDetails} flex flex-col`}>
                 <span>Total Variants</span>
-                <div
-                  className={`${styles.showImageCheckbox} flex align-center`}
-                >
-                  <GenerateInputByType
-                    name="showImageCheckbox"
-                    id="showImageCheckbox"
-                    type="checkbox"
-                    value={showVariantImages}
-                    onChange={(e) => setShowVariantImages(e.target.checked)}
-                  />
-                  <label
-                    htmlFor="showImageCheckbox"
-                    className="flex align-center"
-                  >
-                    <span>Add Image</span>
-                    <span>Max 8 images for each variant.</span>
-                  </label>
-                </div>
+                <FormInput
+                  name="showImageCheckbox"
+                  label={
+                    <>
+                      <span>Add Image</span>
+                      <span>Max 8 images for each variant.</span>
+                    </>
+                  }
+                  type="checkbox"
+                  value={showVariantImages}
+                  onChange={(e) => setShowVariantImages(e.target.checked)}
+                  customClass={styles.showImageCheckbox}
+                />
               </div>
             </div>
 
@@ -157,20 +159,20 @@ function ProductVariations({ variations, onChange }) {
                 {values.map((variantData, valueIndex) => (
                   <VariantItem
                     key={`${variationIndex}-${variantData.id}`}
-                    variantData={variantData}
-                    onChange={onChange}
-                    variationIndex={variationIndex}
-                    valueIndex={valueIndex}
-                    showVariantImages={showVariantImages}
-                    handleRemoveVariantItem={handleRemoveVariantItem}
+                    {...{
+                      variantData,
+                      onChange,
+                      variationIndex,
+                      valueIndex,
+                      showVariantImages,
+                      handleRemoveVariantItem,
+                    }}
                   />
                 ))}
               </div>
 
               <VariantItem
-                handleAddVariantItem={handleAddVariantItem}
-                variationIndex={variationIndex}
-                showVariantImages={showVariantImages}
+                {...{ handleAddVariantItem, variationIndex, showVariantImages }}
               />
             </div>
           </InputWrapper>
