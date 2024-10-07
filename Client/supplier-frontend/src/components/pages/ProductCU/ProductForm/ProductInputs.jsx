@@ -95,17 +95,32 @@ function FormInput({
   suffixDisplay,
   onKeyDown,
   wrapInput = true,
+  hideLabel,
+  customClass,
+  hideValidation,
+  fileType,
   ...rest
 }) {
   const { icon, maxValue } = suffixDisplay || {};
+  const inputId = id || `${name}-form-input`;
   const handleKeyDown = (e) => handleInputKeyDown(e, onKeyDown);
 
   const inputProps = {
     type,
     name,
     value,
-    id: id || `${name}-form-input`,
+    id: inputId,
     onKeyDown: handleKeyDown,
+    ...rest,
+  };
+
+  const inputWrapperProps = {
+    name,
+    hideLabel,
+    id: inputId,
+    customClass,
+    hideValidation,
+    fileType,
     ...rest,
   };
 
@@ -133,9 +148,7 @@ function FormInput({
   );
 
   return wrapInput ? (
-    <InputWrapper {...{ id: inputProps.id, name, ...rest }}>
-      {renderedInput}
-    </InputWrapper>
+    <InputWrapper {...inputWrapperProps}>{renderedInput}</InputWrapper>
   ) : (
     renderedInput
   );
