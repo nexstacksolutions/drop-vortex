@@ -80,11 +80,15 @@ function InputWrapper({
 }
 
 const inputComponents = {
-  textarea: (props) => (
-    <ReactQuill {...props} className={styles.reactQuillInput} />
+  textarea: ({ name, onChange, ...rest }) => (
+    <ReactQuill
+      {...rest}
+      onChange={(content) => onChange(null, name, content)}
+      className={styles.reactQuillInput}
+    />
   ),
   default: ({ inputRef, ...rest }) => <input ref={inputRef} {...rest} />,
-  switch: (props) => <SwitchBtn currState={props?.value} {...props} />,
+  switch: ({ value, ...rest }) => <SwitchBtn currState={value} {...rest} />,
 };
 
 function FormInput({

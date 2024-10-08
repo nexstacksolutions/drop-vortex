@@ -4,11 +4,13 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 const useContentScore = (formState, emptyFields, requiredFields) => {
   const [contentScore, setContentScore] = useState(0);
 
-  const additionalEmptyFields = useMemo(
+  const additionalEmptyFieldSuffixes = useMemo(
     () => [
-      "shipping.dimensions.height",
-      "shipping.dimensions.length",
       "shipping.dimensions.width",
+      "shipping.dimensions.length",
+      "shipping.dimensions.height",
+      "].stock",
+      "].pricing.original",
     ],
     []
   );
@@ -32,20 +34,23 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
 
   const excludeFields = useCallback(
     (emptyFields, requiredFields) => {
-      const filteredFields = {};
+      return Object.keys(emptyFields).reduce((filteredFields, field) => {
+        const endsWithAnySuffix = additionalEmptyFieldSuffixes
+          .slice(3, additionalEmptyFieldSuffixes.length)
+          .some((suffix) => field.endsWith(suffix));
 
-      Object.keys(emptyFields).forEach((field) => {
-        if (
-          requiredFields[field] !== undefined &&
-          !additionalEmptyFields.includes(field)
-        ) {
+        const isRequiredField = requiredFields[field] !== undefined;
+        const isAdditionalEmptyField =
+          additionalEmptyFieldSuffixes.includes(field);
+
+        if ((isRequiredField && !isAdditionalEmptyField) || endsWithAnySuffix) {
           filteredFields[field] = emptyFields[field];
         }
-      });
 
-      return filteredFields;
+        return filteredFields;
+      }, {});
     },
-    [additionalEmptyFields]
+    [additionalEmptyFieldSuffixes]
   );
 
   const filteredEmptyFields = useMemo(
@@ -57,10 +62,10 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     let totalFields = 0;
     let filledFields = 0;
 
-    Object.keys(filteredEmptyFields).forEach((field) => {
+    for (const field in filteredEmptyFields) {
       totalFields++;
-      if (!filteredEmptyFields[field]) filledFields++; // Counting filled fields (false means filled)
-    });
+      if (!filteredEmptyFields[field]) filledFields++;
+    }
 
     const baseScore = calculateBaseScore(totalFields, filledFields);
     const additionalScore = calculateAdditionalScore(formState);
@@ -72,9 +77,11 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     formState,
   ]);
 
+  const resetTrigger = Object.keys(emptyFields).length;
+
   useEffect(() => {
     setContentScore(calculateScore());
-  }, [formState, emptyFields, requiredFields, calculateScore]);
+  }, [formState, emptyFields, resetTrigger, requiredFields, calculateScore]);
 
   return { contentScore };
 };
