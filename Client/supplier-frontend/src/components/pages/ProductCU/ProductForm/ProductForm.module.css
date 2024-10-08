@@ -26,7 +26,7 @@
       position: relative;
 
       & label > .requiredFieldIcon {
-        color: red;
+        color: var(--danger-color);
         font-size: 1rem;
       }
 
@@ -75,14 +75,14 @@
       }
 
       & .errorMsg {
-        color: red;
+        color: var(--danger-color);
       }
 
       &.invalidInput {
         /* width: 100%; */
 
         & .formInputWrapper .inputWrapper {
-          border-color: red;
+          border-color: var(--danger-color);
 
           &:focus-within {
             box-shadow: var(--shadow-xs)
@@ -91,7 +91,7 @@
         }
 
         & .reactQuillInput > div {
-          border-color: red;
+          border-color: var(--danger-color);
         }
       }
     }
@@ -150,6 +150,7 @@
 
             & button svg {
               font-size: var(--font-lg);
+              color: var(--white-color);
             }
           }
 
@@ -173,6 +174,7 @@
 
             & svg {
               font-size: var(--font-lg);
+              color: var(--secondary-text);
             }
           }
 
@@ -280,6 +282,16 @@
           & > div {
             border: none;
             max-width: max-content;
+
+            & > div {
+              border: none !important;
+
+              &:focus-within,
+              &:hover {
+                border: none !important;
+                box-shadow: none !important;
+              }
+            }
           }
         }
       }
@@ -364,7 +376,7 @@
         }
 
         & th label > svg {
-          color: red;
+          color: var(--danger-color);
           font-size: 1rem;
         }
 
@@ -418,12 +430,18 @@
     & > div:nth-child(3) > div {
       gap: var(--spacing-md);
 
-      & > div * {
+      & > label {
         cursor: pointer;
-      }
 
-      & input {
-        width: auto;
+        & > div > div > div {
+          border: none !important;
+
+          &:focus-within,
+          &:hover {
+            border: none !important;
+            box-shadow: none !important;
+          }
+        }
       }
     }
   }

@@ -3,7 +3,7 @@ import styles from "./FeatureCard.module.css";
 import { Link } from "react-router-dom";
 
 function FeatureCard({ customClass, cardData }) {
-  const { icon, title } = cardData;
+  const { Icon, title } = cardData;
 
   return (
     <Link
@@ -11,7 +11,7 @@ function FeatureCard({ customClass, cardData }) {
         [customClass]: customClass,
       })}
     >
-      <img src={icon} alt="" />
+      <Icon />
       <span className={styles.cardTitle}>{title}</span>
     </Link>
   );

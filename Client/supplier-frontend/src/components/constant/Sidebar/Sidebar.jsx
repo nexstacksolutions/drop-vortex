@@ -3,11 +3,12 @@ import navigation from "../../../constant/navigation";
 import classNames from "classnames";
 import { useTheme } from "../../../context/ThemeContext";
 import useMediaExport from "../../../hooks/useMediaExport";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
 import { Link, NavLink } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import Divider from "../Divider/Divider";
+import { useLocation } from "react-router-dom";
 
 function NavSubLinks({ subLinks, isActive }) {
   if (!subLinks?.length) return null;
@@ -22,7 +23,14 @@ function NavSubLinks({ subLinks, isActive }) {
       <ul className={styles.subLinks} aria-hidden={!isActive}>
         {subLinks.map(({ label, to }, subIndex) => (
           <li key={subIndex} className={styles.subLinkWrapper}>
-            <NavLink to={to} className={styles.subLink}>
+            <NavLink
+              to={to}
+              className={({ isActive }) =>
+                isActive
+                  ? classNames(styles.subLinkActive, styles.subLink)
+                  : styles.subLink
+              }
+            >
               {label}
             </NavLink>
           </li>
@@ -39,6 +47,13 @@ function NavItems({
   handleMouseEnter,
   handleToggleSubLinks,
 }) {
+  const location = useLocation();
+
+  const getActiveNavItem = useCallback(
+    (subLinks) => subLinks.some((link) => link.to === location.pathname),
+    [location.pathname]
+  );
+
   return (
     <nav className={styles.nav} aria-label="Main navigation">
       <ul className={styles.navWrapper}>
@@ -50,7 +65,9 @@ function NavItems({
             })}
           >
             <div
-              className={`${styles.navItem} flex align-center`}
+              className={classNames(styles.navItem, "flex align-center", {
+                [styles.navItemActive]: activeIndex === index,
+              })}
               onClick={() => handleToggleSubLinks(index)}
               onMouseEnter={() => handleMouseEnter(index)}
               aria-expanded={activeIndex === index}

@@ -33,10 +33,6 @@ body {
   --feature-color: #f97316;
   --switch-btn-bg: #cbced5;
   --scrollbar-bg: transparent;
-  --danger-color: #dc2626;
-  --success-color: #16a34a;
-  --danger-Rgb: 220, 38, 38;
-  --success-Rgb: 22, 163, 74;
   --accent-Rgb: 59, 130, 246;
 
   /* Typography */
@@ -116,12 +112,17 @@ body {
   --canvas-color: #2c2c2c;
   --primary-text: #e0e0e0;
   --secondary-text: #b0b0b0;
-  --subtle-bg: #cccccc;
   --inactive-text: #959595;
+  --subtle-bg: #;
   --wrapper-bg: #292929;
   --block-bg: #383838;
-  --section-bg: ;
   --overlay-bg: #383838;
+  --danger-color: #ff4b4b;
+  --warning-color: #f0a500;
+  --success-color: #30d158;
+  --danger-Rgb: 255, 75, 75;
+  --warning-Rgb: 240, 165, 0;
+  --success-Rgb: 48, 209, 88;
   --border-color: #444444;
   --shadow-light-Rgb: 0, 0, 0, 0.2;
   --shadow-base-Rgb: 0, 0, 0, 0.3;
@@ -136,12 +137,17 @@ body {
   --canvas-color: #ffffff;
   --primary-text: #333333;
   --secondary-text: #666666;
-  --subtle-bg: #e0e0e0;
   --inactive-text: #959595;
-  --wrapper-bg: #e5e7eb;
+  --subtle-bg: #;
+  --wrapper-bg: var(--primary-bg);
   --block-bg: var(--white-color);
-  --section-bg: ;
-  --overlay-bg: #eff6ff;
+  --overlay-bg: #f5f8fd;
+  --danger-color: #e64a4a;
+  --warning-color: #f9ac2a;
+  --success-color: #2cb360;
+  --danger-Rgb: 230, 74, 74;
+  --warning-Rgb: 249, 172, 42;
+  --success-Rgb: 44, 179, 96;
   --border-color: #d1d5db;
   --shadow-light-Rgb: 0, 0, 0, 0.1;
   --shadow-base-Rgb: 0, 0, 0, 0.06;

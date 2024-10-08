@@ -8,19 +8,19 @@ function FeatureSection() {
     useMediaExport();
   const showcaseList = [
     {
-      icon: FeatureIcon1,
+      Icon: FeatureIcon1,
       title: "Marketing Solutions",
     },
     {
-      icon: FeatureIcon2,
+      Icon: FeatureIcon2,
       title: "Regular Voucher",
     },
     {
-      icon: FeatureIcon3,
+      Icon: FeatureIcon3,
       title: " Free Shipping",
     },
     {
-      icon: FeatureIcon4,
+      Icon: FeatureIcon4,
       title: "Education Livestream",
     },
   ];

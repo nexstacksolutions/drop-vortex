@@ -1,7 +1,7 @@
 .featureCard {
   flex: 1 1;
 
-  & img {
+  & svg {
     width: 3.2rem;
     height: 3.2rem;
     object-fit: cover;

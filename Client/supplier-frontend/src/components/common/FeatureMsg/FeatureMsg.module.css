@@ -2,12 +2,11 @@
   width: 100%;
   margin-bottom: auto;
   padding: calc(var(--spacing-md) - var(--spacing-xs));
-  background-color: var(--muted-bg);
+  background-color: var(--overlay-bg);
   border-radius: var(--radius-sm);
 
   & .msgWrapper {
     width: calc(100% - var(--spacing-xl));
-    /* gap: var(--spacing-md); */
 
     & p {
       line-height: inherit;
