@@ -3,12 +3,12 @@ import navigation from "../../../constant/navigation";
 import classNames from "classnames";
 import { useTheme } from "../../../context/ThemeContext";
 import useMediaExport from "../../../hooks/useMediaExport";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink, useLocation, Link } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import Divider from "../Divider/Divider";
-import { useLocation } from "react-router-dom";
+import { debounce } from "lodash";
 
 function NavSubLinks({ subLinks, isActive }) {
   if (!subLinks?.length) return null;
@@ -26,9 +26,7 @@ function NavSubLinks({ subLinks, isActive }) {
             <NavLink
               to={to}
               className={({ isActive }) =>
-                isActive
-                  ? classNames(styles.subLinkActive, styles.subLink)
-                  : styles.subLink
+                classNames(styles.subLink, { [styles.subLinkActive]: isActive })
               }
             >
               {label}
@@ -40,45 +38,57 @@ function NavSubLinks({ subLinks, isActive }) {
   );
 }
 
-// NavItems component
 function NavItems({
-  activeIndex,
+  activeSubLinks,
   expandSideBar,
   handleMouseEnter,
-  handleToggleSubLinks,
+  toggleSubLinks,
 }) {
   const location = useLocation();
 
-  const getActiveNavItem = useCallback(
-    (subLinks) => subLinks.some((link) => link.to === location.pathname),
-    [location.pathname]
-  );
+  useEffect(() => {
+    navigation.sidebar.forEach(({ subLinks }, index) => {
+      if (subLinks.some((link) => link.to === location.pathname)) {
+        toggleSubLinks(index, true);
+      }
+    });
+  }, [location.pathname, toggleSubLinks]);
 
   return (
     <nav className={styles.nav} aria-label="Main navigation">
       <ul className={styles.navWrapper}>
-        {navigation.sidebar.map(({ icon, label, subLinks }, index) => (
-          <li
-            key={index}
-            className={classNames(styles.navItemWrapper, "flex-col", {
-              [styles.activeNavItemWrapper]: activeIndex === index,
-            })}
-          >
-            <div
-              className={classNames(styles.navItem, "flex align-center", {
-                [styles.navItemActive]: activeIndex === index,
+        {navigation.sidebar.map(({ icon, label, subLinks }, index) => {
+          const isExpanded = activeSubLinks.toggleIndex === index;
+          const isActive = activeSubLinks.routeIndex === index;
+          const keepExpanded = isActive && activeSubLinks.keepActive;
+
+          return (
+            <li
+              key={index}
+              className={classNames(styles.navItemWrapper, "flex-col", {
+                [styles.activeNavItemWrapper]: isExpanded || keepExpanded,
               })}
-              onClick={() => handleToggleSubLinks(index)}
-              onMouseEnter={() => handleMouseEnter(index)}
-              aria-expanded={activeIndex === index}
             >
-              {icon}
-              {expandSideBar && <span>{label}</span>}
-              {expandSideBar && <FaAngleDown />}
-            </div>
-            <NavSubLinks subLinks={subLinks} isActive={activeIndex === index} />
-          </li>
-        ))}
+              <div
+                className={classNames(styles.navItem, "flex flex-center", {
+                  [styles.navItemActive]: isActive,
+                })}
+                onClick={() => toggleSubLinks(index)}
+                onMouseEnter={() => handleMouseEnter(index)}
+                aria-expanded={isExpanded || isActive}
+              >
+                {icon}
+                {expandSideBar && <span>{label}</span>}
+                {expandSideBar && <FaAngleDown />}
+              </div>
+
+              <NavSubLinks
+                subLinks={subLinks}
+                isActive={isExpanded || keepExpanded}
+              />
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
@@ -88,16 +98,20 @@ function RenderLogo({ expandSideBar, showDivider = false, customClass }) {
   const { theme } = useTheme();
   const { LogoLight, LogoDark, MiniLogoLight, MiniLogoDark } = useMediaExport();
 
-  const Logo = expandSideBar
-    ? theme === "light"
-      ? LogoLight
-      : LogoDark
-    : theme === "light"
-    ? MiniLogoLight
-    : MiniLogoDark;
+  const Logo = useMemo(() => {
+    const logos = {
+      light: expandSideBar ? LogoLight : MiniLogoLight,
+      dark: expandSideBar ? LogoDark : MiniLogoDark,
+    };
+    return logos[theme];
+  }, [expandSideBar, theme, LogoLight, LogoDark, MiniLogoLight, MiniLogoDark]);
 
   return (
-    <Link className={classNames("flex", customClass)}>
+    <Link
+      className={classNames("flex", customClass, {
+        "flex-center": !expandSideBar,
+      })}
+    >
       {showDivider && <Divider />}
       <Logo />
     </Link>
@@ -114,24 +128,41 @@ function ToggleSidebarBtn({ toggleSideBar }) {
 
 function Sidebar() {
   const [expandSideBar, setExpandSideBar] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [activeSubLinks, setActiveSubLinks] = useState({
+    toggleIndex: null,
+    routeIndex: null,
+    keepActive: false,
+  });
 
   const toggleSideBar = useCallback(() => {
     setExpandSideBar((prev) => !prev);
-    setActiveIndex(null); // Reset active index when collapsing sidebar
+    setActiveSubLinks((prev) => ({
+      ...prev,
+      toggleIndex: null,
+      keepActive: !prev.keepActive && prev.routeIndex === null,
+    }));
   }, []);
 
-  const toggleSubLinks = useCallback((index) => {
-    setActiveIndex((prev) => (prev === index ? null : index)); // Toggle sublinks
-  }, []);
+  const toggleSubLinks = useCallback(
+    (index, isRouteActive) => {
+      setActiveSubLinks((prev) => ({
+        toggleIndex: prev.toggleIndex === index ? null : index,
+        routeIndex: isRouteActive ? index : prev.routeIndex,
+        keepActive: isRouteActive && expandSideBar,
+      }));
+    },
+    [expandSideBar]
+  );
 
   const handleMouseLeave = useCallback(() => {
-    if (!expandSideBar) setActiveIndex(null); // Reset when not expanded
+    if (!expandSideBar)
+      setActiveSubLinks((prev) => ({ ...prev, toggleIndex: null }));
   }, [expandSideBar]);
 
   const handleMouseEnter = useCallback(
     (index) => {
-      if (!expandSideBar) setActiveIndex(index);
+      if (!expandSideBar)
+        setActiveSubLinks((prev) => ({ ...prev, toggleIndex: index }));
     },
     [expandSideBar]
   );
@@ -145,24 +176,12 @@ function Sidebar() {
       })}
     >
       <ToggleSidebarBtn toggleSideBar={toggleSideBar} />
-
-      <RenderLogo
-        handleToggleSideBar={toggleSideBar}
-        expandSideBar={expandSideBar}
-        customClass={styles.topLogo}
-      />
-
+      <RenderLogo expandSideBar={expandSideBar} customClass={styles.topLogo} />
       <NavItems
-        activeIndex={activeIndex}
-        expandSideBar={expandSideBar}
-        handleMouseEnter={handleMouseEnter}
-        handleToggleSubLinks={toggleSubLinks}
+        {...{ activeSubLinks, expandSideBar, handleMouseEnter, toggleSubLinks }}
       />
-
       <RenderLogo
-        handleToggleSideBar={toggleSideBar}
         expandSideBar={expandSideBar}
-        showDivider
         customClass={`${styles.bottomLogo} flex-col justify-end`}
       />
     </aside>
