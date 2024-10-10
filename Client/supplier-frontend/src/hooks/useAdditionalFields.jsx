@@ -63,7 +63,13 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
       ...field,
     }));
 
-  return applyDefaults([...commonFields, ...variantFields]);
+  const totalAdditionalFields = [
+    ...commonFields.slice(0, 3),
+    ...variantFields,
+    ...commonFields.slice(3, commonFields.length),
+  ];
+
+  return applyDefaults(totalAdditionalFields);
 };
 
 export default useAdditionalFields;

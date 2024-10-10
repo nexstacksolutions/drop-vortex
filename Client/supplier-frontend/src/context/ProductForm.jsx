@@ -87,6 +87,11 @@ const ProductFormProvider = ({ children }) => {
         payload: { newVariant, variationIndex },
       });
 
+      uiDispatch({
+        type: "TOGGLE_VARIANT_PRICING",
+        payload: updatedVariants?.length > 0,
+      });
+
       await validateField(
         state,
         `productDetails.variations[${variationIndex}].values`,
@@ -105,6 +110,11 @@ const ProductFormProvider = ({ children }) => {
       dispatch({
         type: "REMOVE_VARIANT_ITEM",
         payload: { variationIndex, valueIndex },
+      });
+
+      uiDispatch({
+        type: "TOGGLE_VARIANT_PRICING",
+        payload: updatedVariants?.length > 0,
       });
 
       await validateField(

@@ -1,8 +1,11 @@
 import { get } from "lodash";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import useFormValidation from "./useFormValidation";
 
 const useContentScore = (formState, emptyFields, requiredFields) => {
   const [contentScore, setContentScore] = useState(0);
+
+  const { validateForm } = useFormValidation();
 
   const additionalEmptyFieldSuffixes = useMemo(
     () => [
@@ -77,11 +80,9 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     formState,
   ]);
 
-  const resetTrigger = Object.keys(emptyFields).length;
-
   useEffect(() => {
     setContentScore(calculateScore());
-  }, [formState, emptyFields, resetTrigger, requiredFields, calculateScore]);
+  }, [formState, emptyFields, requiredFields, calculateScore]);
 
   return { contentScore };
 };

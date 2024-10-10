@@ -7,6 +7,7 @@ const formUI = {
     description: false,
   },
   variantShipping: false,
+  variantPricing: false,
   showVariantImages: true,
   formErrors: {},
   emptyFields: {},
@@ -26,6 +27,10 @@ const uiControl = (state, action) =>
 
       case "TOGGLE_VARIANT_SHIPPING":
         draft.variantShipping = !draft.variantShipping;
+        break;
+
+      case "TOGGLE_VARIANT_PRICING":
+        draft.variantPricing = payload;
         break;
 
       case "SET_VARIANT_SHIPPING_FALSE":
