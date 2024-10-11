@@ -10,6 +10,7 @@ import {
   dimensionSchema,
   nullableArrayOfSchema,
   fileValidation,
+  requiredNumber,
 } from "./validationHelpers";
 
 export const productDetailsSchema = Yup.object({
@@ -31,7 +32,7 @@ export const productDetailsSchema = Yup.object({
           name: requiredString,
           variantImages: nullableArrayOfSchema(fileValidation),
           pricing: pricingSchema("uiState.variantPricing", null),
-          stock: nullableNumber,
+          stock: requiredNumber,
           availability: Yup.boolean().default(true),
           freeItems: nullableString,
           sku: nullableString,

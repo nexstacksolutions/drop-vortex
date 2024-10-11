@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import productFormSchema from "../schemas/productForm";
+import { get } from "lodash";
+import formSchema from "../schemas/productForm";
 import useFormValidation from "../hooks/useFormValidation";
 import { formUI, uiControl } from "../store/formUIReducer";
 import { formState, formControl } from "../store/formStateReducer";
@@ -21,19 +22,16 @@ const ProductFormProvider = ({ children }) => {
   const [uiState, uiDispatch] = useReducer(uiControl, formUI);
   const { guideContent, updateGuideContent } = useFormGuide();
   const { validateForm, validateField } = useFormValidation(
-    productFormSchema,
+    formSchema,
     uiState,
     uiDispatch
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const sectionRefs = [
-    useRef(null),
-    useRef(null),
-    useRef(null),
-    useRef(null),
-    useRef(null),
-  ];
+  const sectionRefs = useRef(
+    Array.from({ length: 5 }, () => React.createRef())
+  );
+
+  console.log(sectionRefs);
 
   const multiVariantShippingCondition = useMemo(
     () => state.productDetails?.variations?.[0]?.values?.length > 1,
@@ -42,14 +40,10 @@ const ProductFormProvider = ({ children }) => {
 
   const updateFormData = useCallback(
     async (name, value) => {
-      try {
-        dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
-        await validateField(state, name, value);
-      } catch (error) {
-        console.error("Error updating form data:", error);
-      }
+      dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
+      await validateField(state, name, value);
     },
-    [validateField, state]
+    [dispatch, state, validateField]
   );
 
   const handleInputChange = useCallback(
@@ -60,8 +54,19 @@ const ProductFormProvider = ({ children }) => {
     [updateFormData]
   );
 
+  const updateVariantData = useCallback(
+    async (basePath, updatedVariants) => {
+      updateFormData(basePath, updatedVariants);
+      uiDispatch({
+        type: "TOGGLE_VARIANT_PRICING",
+        payload: updatedVariants.length > 0,
+      });
+    },
+    [updateFormData]
+  );
+
   const handleAddVariantItem = useCallback(
-    async (inputValue, variantImages = [], variationIndex) => {
+    async (inputValue, variantImages = [], variationIndex, valueIndex) => {
       if (!inputValue.trim()) return;
 
       const newVariant = {
@@ -77,28 +82,24 @@ const ProductFormProvider = ({ children }) => {
         dimensions: { length: "", width: "", height: "" },
       };
 
-      const updatedVariants = [
-        ...state.productDetails.variations[variationIndex].values,
-        newVariant,
-      ];
+      const basePath = `productDetails.variations[${variationIndex}].values`;
+      const updatedVariants = [...get(state, basePath), newVariant];
 
-      dispatch({
-        type: "ADD_VARIANT_ITEM",
-        payload: { newVariant, variationIndex },
-      });
+      await updateVariantData(basePath, updatedVariants);
+
+      const AdditionalEmptyFields = {
+        [`${basePath}[${updatedVariants.length - 1}].pricing.original`]: true,
+        [`${basePath}[${updatedVariants.length - 1}].stock`]: true,
+        [`${basePath}[${updatedVariants.length - 1}].dimensions`]: true,
+        [`${basePath}[${updatedVariants.length - 1}].packageWeight`]: true,
+      };
 
       uiDispatch({
-        type: "TOGGLE_VARIANT_PRICING",
-        payload: updatedVariants?.length > 0,
+        type: "SET_EMPTY_FIELDS",
+        payload: AdditionalEmptyFields,
       });
-
-      await validateField(
-        state,
-        `productDetails.variations[${variationIndex}].values`,
-        updatedVariants
-      );
     },
-    [dispatch, state, validateField]
+    [state, updateVariantData]
   );
 
   const handleRemoveVariantItem = useCallback(
@@ -122,6 +123,20 @@ const ProductFormProvider = ({ children }) => {
         `productDetails.variations[${variationIndex}].values`,
         updatedVariants
       );
+
+      const basePath = `productDetails.variations[${variationIndex}].values${valueIndex}]`;
+
+      const fieldsToRemove = {
+        [`${basePath}.pricing.original`]: true,
+        [`${basePath}.stock`]: true,
+        [`${basePath}.dimensions`]: true,
+        [`${basePath}.packageWeight`]: true,
+      };
+
+      uiDispatch({
+        type: "CLEAR_EMPTY_FIELDS",
+        payload: fieldsToRemove,
+      });
     },
     [dispatch, state, validateField]
   );
@@ -150,28 +165,23 @@ const ProductFormProvider = ({ children }) => {
 
   const handleSubmit = useCallback(
     async (e) => {
-      const canSubmit = !(
-        uiState.isSubmitting || e.nativeEvent.submitter.name !== "submitBtn"
-      );
-
       e.preventDefault();
-      if (!canSubmit) return;
+      if (uiState.isSubmitting || e.nativeEvent.submitter.name !== "submitBtn")
+        return;
 
       uiDispatch({ type: "SET_IS_SUBMITTING", payload: true });
       try {
         const isValid = await validateForm(state);
-        if (isValid) {
-          console.log("Form submitted successfully", state);
-        } else {
-          console.log("Validation failed", uiState.formErrors);
-        }
+        console.log(
+          isValid ? "Form submitted successfully" : "Validation failed",
+          state
+        );
       } catch (error) {
         console.error("Error during submission", error);
       } finally {
         uiDispatch({ type: "SET_IS_SUBMITTING", payload: false });
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [state, validateForm, uiState.isSubmitting]
   );
 
@@ -197,11 +207,8 @@ const ProductFormProvider = ({ children }) => {
 
   useEffect(() => {
     fetchEmptyFields();
-  }, [fetchEmptyFields]);
-
-  useEffect(() => {
     fetchRequiredFields();
-  }, [fetchRequiredFields]);
+  }, [fetchEmptyFields, fetchRequiredFields]);
 
   useEffect(() => {
     if (!multiVariantShippingCondition)

@@ -1,27 +1,51 @@
 import { get } from "lodash";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import useFormValidation from "./useFormValidation";
+import { useProductForm } from "../context/ProductForm";
 
 const useContentScore = (formState, emptyFields, requiredFields) => {
   const [contentScore, setContentScore] = useState(0);
 
-  const { validateForm } = useFormValidation();
+  const {
+    uiState: { variantShipping, variantPricing },
+  } = useProductForm();
 
-  const additionalEmptyFieldSuffixes = useMemo(
-    () => [
+  const fieldEndsWithSuffix = (field, suffixes) =>
+    suffixes.some((suffix) => field.endsWith(suffix));
+
+  const additionalEmptyFieldSuffixes = useMemo(() => {
+    const baseSuffixes = [
+      "].stock",
+      "].pricing.original",
+      ...(variantShipping ? ["].dimensions", "].packageWeight"] : []),
       "shipping.dimensions.width",
       "shipping.dimensions.length",
       "shipping.dimensions.height",
-      "].stock",
-      "].pricing.original",
-    ],
+    ];
+
+    return [
+      ...baseSuffixes,
+      ...(variantShipping
+        ? ["shipping.packageWeight", "shipping.dimensions"]
+        : []),
+      ...(variantPricing
+        ? [
+            "productDetails.pricing",
+            "productDetails.stock",
+            "productDetails.pricing.current",
+            "productDetails.pricing.original",
+          ]
+        : []),
+    ];
+  }, [variantShipping, variantPricing]);
+
+  // Calculate the base score
+  const calculateBaseScore = useCallback(
+    (totalFields, filledFields) =>
+      Math.round((filledFields / totalFields) * 75),
     []
   );
 
-  const calculateBaseScore = useCallback((totalFields, filledFields) => {
-    return Math.round((filledFields / totalFields) * 75);
-  }, []);
-
+  // Calculate the additional score
   const calculateAdditionalScore = useCallback((formState) => {
     let additionalScore = 0;
 
@@ -35,43 +59,39 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     return additionalScore;
   }, []);
 
-  const excludeFields = useCallback(
-    (emptyFields, requiredFields) => {
-      return Object.keys(emptyFields).reduce((filteredFields, field) => {
-        const endsWithAnySuffix = additionalEmptyFieldSuffixes
-          .slice(3, additionalEmptyFieldSuffixes.length)
-          .some((suffix) => field.endsWith(suffix));
+  // Exclude unnecessary fields
+  const filteredEmptyFields = useMemo(() => {
+    return Object.keys(emptyFields).reduce((filtered, field) => {
+      const isRequired = requiredFields[field] !== undefined;
+      const isAdditionalField = additionalEmptyFieldSuffixes.includes(field);
+      const endsWithSuffix = fieldEndsWithSuffix(
+        field,
+        additionalEmptyFieldSuffixes.slice(0, variantShipping ? 4 : 2)
+      );
 
-        const isRequiredField = requiredFields[field] !== undefined;
-        const isAdditionalEmptyField =
-          additionalEmptyFieldSuffixes.includes(field);
+      if ((isRequired && !isAdditionalField) || endsWithSuffix) {
+        filtered[field] = emptyFields[field];
+      }
 
-        if ((isRequiredField && !isAdditionalEmptyField) || endsWithAnySuffix) {
-          filteredFields[field] = emptyFields[field];
-        }
+      return filtered;
+    }, {});
+  }, [
+    emptyFields,
+    requiredFields,
+    additionalEmptyFieldSuffixes,
+    variantShipping,
+  ]);
 
-        return filteredFields;
-      }, {});
-    },
-    [additionalEmptyFieldSuffixes]
-  );
-
-  const filteredEmptyFields = useMemo(
-    () => excludeFields(emptyFields, requiredFields),
-    [emptyFields, requiredFields, excludeFields]
-  );
-
+  // Main score calculation
   const calculateScore = useCallback(() => {
-    let totalFields = 0;
-    let filledFields = 0;
-
-    for (const field in filteredEmptyFields) {
-      totalFields++;
-      if (!filteredEmptyFields[field]) filledFields++;
-    }
+    const totalFields = Object.keys(filteredEmptyFields).length;
+    const filledFields = Object.values(filteredEmptyFields).filter(
+      (value) => !value
+    ).length;
 
     const baseScore = calculateBaseScore(totalFields, filledFields);
     const additionalScore = calculateAdditionalScore(formState);
+
     return Math.min(baseScore + additionalScore, 100);
   }, [
     filteredEmptyFields,
@@ -80,9 +100,10 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     formState,
   ]);
 
+  // Update content score on relevant changes
   useEffect(() => {
     setContentScore(calculateScore());
-  }, [formState, emptyFields, requiredFields, calculateScore]);
+  }, [calculateScore]);
 
   return { contentScore };
 };

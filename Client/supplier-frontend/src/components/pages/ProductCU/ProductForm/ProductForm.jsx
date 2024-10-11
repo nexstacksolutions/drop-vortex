@@ -306,7 +306,7 @@ function ProductForm({ customClass }) {
           key={`${title}${index}`}
           title={title}
           {...rest}
-          sectionRef={sectionRefs[index]}
+          sectionRef={sectionRefs.current[index]}
         >
           {fields.map((field, i) => RenderInputField(field, i, state, uiState))}
         </FormSection>

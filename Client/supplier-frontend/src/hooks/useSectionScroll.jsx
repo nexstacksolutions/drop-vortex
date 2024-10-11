@@ -7,7 +7,9 @@ const useSectionScroll = (sectionRefs) => {
 
   const scrollToSection = (sectionId) => {
     setIsManualScroll(true);
-    sectionRefs[sectionId].current.scrollIntoView({ behavior: "smooth" });
+    sectionRefs.current[sectionId].current.scrollIntoView({
+      behavior: "smooth",
+    });
     setActiveSection(sectionId);
 
     clearTimeout(manualScrollTimeoutRef.current);
@@ -20,7 +22,7 @@ const useSectionScroll = (sectionRefs) => {
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting && !isManualScroll) {
-          const visibleSectionIndex = sectionRefs.findIndex(
+          const visibleSectionIndex = sectionRefs.current.findIndex(
             (ref) => ref.current === entry.target
           );
           setActiveSection(visibleSectionIndex);
@@ -37,16 +39,19 @@ const useSectionScroll = (sectionRefs) => {
       threshold: 0.6,
     });
 
-    sectionRefs.forEach((ref) => {
+    // Store the current refs in a variable to avoid the lint warning
+    const currentRefs = sectionRefs.current;
+
+    currentRefs.forEach((ref) => {
       if (ref.current) observer.observe(ref.current);
     });
 
     return () => {
-      sectionRefs.forEach((ref) => {
+      currentRefs.forEach((ref) => {
         if (ref.current) observer.unobserve(ref.current);
       });
     };
-  }, [sectionRefs, observerCallback]);
+  }, [observerCallback, sectionRefs]);
 
   return { activeSection, scrollToSection };
 };

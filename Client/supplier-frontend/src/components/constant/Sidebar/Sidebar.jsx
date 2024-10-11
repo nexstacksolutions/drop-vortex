@@ -146,7 +146,11 @@ function Sidebar() {
   const toggleSubLinks = useCallback(
     (index, isRouteActive) => {
       setActiveSubLinks((prev) => ({
-        toggleIndex: prev.toggleIndex === index ? null : index,
+        toggleIndex: isRouteActive
+          ? null
+          : prev.toggleIndex === index
+          ? null
+          : index,
         routeIndex: isRouteActive ? index : prev.routeIndex,
         keepActive: isRouteActive && expandSideBar,
       }));

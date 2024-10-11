@@ -136,7 +136,7 @@
     width: 2rem;
     height: 2rem;
     border-radius: var(--rounded);
-    background-color: aliceblue;
+    background-color: var(--wrapper-bg);
     opacity: 0;
 
     & svg {

@@ -46,7 +46,13 @@ const uiControl = (state, action) =>
         break;
 
       case "SET_EMPTY_FIELDS":
-        draft.emptyFields = payload;
+        draft.emptyFields = { ...draft.emptyFields, ...payload };
+        break;
+
+      case "CLEAR_EMPTY_FIELDS":
+        Object.keys(payload).forEach((key) => {
+          delete draft.emptyFields[key];
+        });
         break;
 
       case "CLEAR_FORM_ERRORS":

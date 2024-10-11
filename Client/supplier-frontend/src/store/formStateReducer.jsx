@@ -47,12 +47,6 @@ const formControl = (state, action) =>
         set(draft, payload.name, payload.value);
         break;
 
-      case "ADD_VARIANT_ITEM":
-        draft.productDetails.variations[payload.variationIndex].values.push(
-          payload.newVariant
-        );
-        break;
-
       case "REMOVE_VARIANT_ITEM":
         draft.productDetails.variations[payload.variationIndex].values.splice(
           payload.valueIndex,

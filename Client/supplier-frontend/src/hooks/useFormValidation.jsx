@@ -15,7 +15,7 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
     }, {});
   };
 
-  // Validate a single field in the form
+  // Validate a single field in the form on change input
   const validateField = async (
     formState,
     fieldPath,
@@ -69,7 +69,7 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
   // Validate the entire form
   const validateForm = async (
     formState,
-    additionalDispatchUpdate = false,
+    additionalUpdate = false,
     dispatchType
   ) => {
     try {
@@ -82,8 +82,11 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
     } catch (error) {
       const errors = handleErrors(error);
 
-      if (additionalDispatchUpdate) {
+      // set the require and empty fields oon first render
+      if (additionalUpdate) {
         uiDispatch({ type: dispatchType, payload: errors });
+
+        // run if usr submit form
       } else {
         uiDispatch({ type: "SET_FORM_ERRORS", payload: errors });
       }
