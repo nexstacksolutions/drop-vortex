@@ -47,13 +47,6 @@ const formControl = (state, action) =>
         set(draft, payload.name, payload.value);
         break;
 
-      case "REMOVE_VARIANT_ITEM":
-        draft.productDetails.variations[payload.variationIndex].values.splice(
-          payload.valueIndex,
-          1
-        );
-        break;
-
       case "APPLY_TO_ALL_VARIANTS":
         draft.productDetails.variations.forEach((variation) => {
           variation.values.forEach((value) => {

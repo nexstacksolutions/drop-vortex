@@ -16,51 +16,33 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
   };
 
   // Validate a single field in the form on change input
-  const validateField = async (
-    formState,
-    fieldPath,
-    value,
-    shouldDispatchUpdates = true
-  ) => {
+  const validateField = async (formState, fieldPath, fieldValue) => {
     try {
       const fieldSchema = Yup.reach(formSchema, fieldPath);
       const parentPath = fieldPath.split(".").slice(0, -1).join(".");
       const parent = get(formState, parentPath);
       const updatedValue =
-        value !== undefined ? value : get(formState, fieldPath);
+        fieldValue !== undefined ? fieldValue : get(formState, fieldPath);
 
       await fieldSchema.validate(updatedValue, {
         abortEarly: false,
         context: { uiState, parent },
       });
 
-      if (shouldDispatchUpdates) {
-        uiDispatch({
-          type: "CLEAR_FIELD_ERROR",
-          payload: fieldPath,
-        });
-      }
+      uiDispatch({
+        type: "CLEAR_FIELD_ERROR",
+        payload: fieldPath,
+      });
 
       return false; // No error
     } catch (error) {
       const errors = handleErrors(error, fieldPath);
+      if (errors[fieldPath] === undefined) return false;
 
-      if (errors[fieldPath] === undefined) {
-        if (shouldDispatchUpdates) {
-          uiDispatch({
-            type: "CLEAR_FIELD_ERROR",
-            payload: fieldPath,
-          });
-        }
-        return false;
-      }
-
-      if (shouldDispatchUpdates) {
-        uiDispatch({
-          type: "SET_FIELD_ERROR",
-          payload: { fieldPath, error: errors[fieldPath] },
-        });
-      }
+      uiDispatch({
+        type: "SET_FIELD_ERROR",
+        payload: { fieldPath, error: errors[fieldPath] },
+      });
 
       return true; // Error occurred
     }
@@ -82,11 +64,8 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
     } catch (error) {
       const errors = handleErrors(error);
 
-      // set the require and empty fields oon first render
       if (additionalUpdate) {
         uiDispatch({ type: dispatchType, payload: errors });
-
-        // run if usr submit form
       } else {
         uiDispatch({ type: "SET_FORM_ERRORS", payload: errors });
       }

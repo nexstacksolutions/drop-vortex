@@ -22,11 +22,10 @@ function VariantActionButtons({ handleRemove }) {
 }
 
 function VariantItem({
-  handleAddVariantItem,
-  handleRemoveVariantItem,
   variantData,
   variationIndex,
   valueIndex,
+  updateVariantItem,
   showVariantImages,
   onChange,
 }) {
@@ -53,7 +52,7 @@ function VariantItem({
 
   const handleKeyDown = useCallback(() => {
     if (inputValue.trim()) {
-      handleAddVariantItem(inputValue, variantImages, variationIndex);
+      updateVariantItem(inputValue, variantImages, variationIndex, null, true);
       resetInputValues();
     }
   }, [
@@ -61,7 +60,7 @@ function VariantItem({
     variantImages,
     resetInputValues,
     variationIndex,
-    handleAddVariantItem,
+    updateVariantItem,
   ]);
 
   const updatedValueIndex =
@@ -107,7 +106,7 @@ function VariantItem({
       {onChange && (
         <VariantActionButtons
           handleRemove={() =>
-            handleRemoveVariantItem(variationIndex, valueIndex)
+            updateVariantItem(null, null, variationIndex, valueIndex, false)
           }
         />
       )}
@@ -116,7 +115,7 @@ function VariantItem({
 }
 
 function ProductVariations({ variations, onChange }) {
-  const { handleRemoveVariantItem, handleAddVariantItem } = useProductForm();
+  const { updateVariantItem } = useProductForm();
   const [showVariantImages, setShowVariantImages] = useState(false);
 
   return (
@@ -165,14 +164,14 @@ function ProductVariations({ variations, onChange }) {
                       variationIndex,
                       valueIndex,
                       showVariantImages,
-                      handleRemoveVariantItem,
+                      updateVariantItem,
                     }}
                   />
                 ))}
               </div>
 
               <VariantItem
-                {...{ handleAddVariantItem, variationIndex, showVariantImages }}
+                {...{ updateVariantItem, variationIndex, showVariantImages }}
               />
             </div>
           </InputWrapper>

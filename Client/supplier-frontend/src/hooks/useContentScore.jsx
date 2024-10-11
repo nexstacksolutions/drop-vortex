@@ -9,9 +9,13 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     uiState: { variantShipping, variantPricing },
   } = useProductForm();
 
-  const fieldEndsWithSuffix = (field, suffixes) =>
-    suffixes.some((suffix) => field.endsWith(suffix));
+  // Memoize the field check function
+  const fieldEndsWithSuffix = useCallback(
+    (field, suffixes) => suffixes.some((suffix) => field.endsWith(suffix)),
+    []
+  );
 
+  // Memoize additional empty field suffixes based on variantShipping and variantPricing
   const additionalEmptyFieldSuffixes = useMemo(() => {
     const baseSuffixes = [
       "].stock",
@@ -22,20 +26,20 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
       "shipping.dimensions.height",
     ];
 
-    return [
-      ...baseSuffixes,
-      ...(variantShipping
-        ? ["shipping.packageWeight", "shipping.dimensions"]
-        : []),
-      ...(variantPricing
-        ? [
-            "productDetails.pricing",
-            "productDetails.stock",
-            "productDetails.pricing.current",
-            "productDetails.pricing.original",
-          ]
-        : []),
-    ];
+    if (variantShipping) {
+      baseSuffixes.push("shipping.packageWeight", "shipping.dimensions");
+    }
+
+    if (variantPricing) {
+      baseSuffixes.push(
+        "productDetails.pricing",
+        "productDetails.stock",
+        "productDetails.pricing.current",
+        "productDetails.pricing.original"
+      );
+    }
+
+    return baseSuffixes;
   }, [variantShipping, variantPricing]);
 
   // Calculate the base score
@@ -59,7 +63,7 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     return additionalScore;
   }, []);
 
-  // Exclude unnecessary fields
+  // Filter out unnecessary empty fields
   const filteredEmptyFields = useMemo(() => {
     return Object.keys(emptyFields).reduce((filtered, field) => {
       const isRequired = requiredFields[field] !== undefined;
@@ -79,11 +83,14 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     emptyFields,
     requiredFields,
     additionalEmptyFieldSuffixes,
+    fieldEndsWithSuffix,
     variantShipping,
   ]);
 
+  // console.log(emptyFields);
+
   // Main score calculation
-  const calculateScore = useCallback(() => {
+  const calculateScore = useMemo(() => {
     const totalFields = Object.keys(filteredEmptyFields).length;
     const filledFields = Object.values(filteredEmptyFields).filter(
       (value) => !value
@@ -102,7 +109,7 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
 
   // Update content score on relevant changes
   useEffect(() => {
-    setContentScore(calculateScore());
+    setContentScore(calculateScore);
   }, [calculateScore]);
 
   return { contentScore };

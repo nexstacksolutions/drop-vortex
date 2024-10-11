@@ -52,8 +52,8 @@ function ProductForm({ customClass }) {
     sectionRefs,
     handleSubmit,
     handleInputChange,
-    handleToggleVariantShipping,
-    multiVariantShippingCondition,
+    toggleVariantShipping,
+    isVariantShipping,
   } = useProductForm();
 
   const memoizedFormSections = useMemo(
@@ -225,8 +225,8 @@ function ProductForm({ customClass }) {
         customClass: styles.productSW,
         additionalJsxProps: {
           currState: uiState.variantShipping,
-          customClickHandler: handleToggleVariantShipping,
-          disableCondition: !multiVariantShippingCondition,
+          customClickHandler: toggleVariantShipping,
+          disableCondition: !isVariantShipping,
         },
         showMoreBtnProps: {
           btnText: "More Warranty Settings",
@@ -286,8 +286,8 @@ function ProductForm({ customClass }) {
       state,
       uiState,
       handleInputChange,
-      handleToggleVariantShipping,
-      multiVariantShippingCondition,
+      toggleVariantShipping,
+      isVariantShipping,
     ]
   );
 

@@ -21,8 +21,7 @@ const uiControl = (state, action) =>
     const { type, payload } = action;
     switch (type) {
       case "TOGGLE_ADDITIONAL_FIELDS":
-        draft.additionalFields[payload.section] =
-          !draft.additionalFields[payload.section];
+        draft.additionalFields[payload] = !draft.additionalFields[payload];
         break;
 
       case "TOGGLE_VARIANT_SHIPPING":

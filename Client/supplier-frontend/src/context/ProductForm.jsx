@@ -4,6 +4,7 @@ import formSchema from "../schemas/productForm";
 import useFormValidation from "../hooks/useFormValidation";
 import { formUI, uiControl } from "../store/formUIReducer";
 import { formState, formControl } from "../store/formStateReducer";
+import useFormGuide from "../hooks/useFormGuide";
 import React, {
   createContext,
   useReducer,
@@ -13,7 +14,6 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import useFormGuide from "../hooks/useFormGuide";
 
 export const ProductFormContext = createContext();
 
@@ -31,16 +31,10 @@ const ProductFormProvider = ({ children }) => {
     Array.from({ length: 5 }, () => React.createRef())
   );
 
-  console.log(sectionRefs);
-
-  const multiVariantShippingCondition = useMemo(
-    () => state.productDetails?.variations?.[0]?.values?.length > 1,
-    [state.productDetails?.variations]
-  );
-
   const updateFormData = useCallback(
     async (name, value) => {
       dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
+
       await validateField(state, name, value);
     },
     [dispatch, state, validateField]
@@ -55,20 +49,25 @@ const ProductFormProvider = ({ children }) => {
   );
 
   const updateVariantData = useCallback(
-    async (basePath, updatedVariants) => {
+    async (basePath, updatedVariants, dispatchType, payload) => {
       updateFormData(basePath, updatedVariants);
       uiDispatch({
         type: "TOGGLE_VARIANT_PRICING",
         payload: updatedVariants.length > 0,
       });
+      uiDispatch({ type: dispatchType, payload });
     },
     [updateFormData]
   );
 
-  const handleAddVariantItem = useCallback(
-    async (inputValue, variantImages = [], variationIndex, valueIndex) => {
-      if (!inputValue.trim()) return;
-
+  const updateVariantItem = useCallback(
+    async (
+      inputValue,
+      variantImages = [],
+      variationIndex,
+      valueIndex,
+      isAdding
+    ) => {
       const newVariant = {
         id: uuidv4(),
         name: inputValue,
@@ -83,62 +82,36 @@ const ProductFormProvider = ({ children }) => {
       };
 
       const basePath = `productDetails.variations[${variationIndex}].values`;
-      const updatedVariants = [...get(state, basePath), newVariant];
+      const updatedVariants = isAdding
+        ? [...get(state, basePath), newVariant]
+        : state.productDetails.variations[variationIndex].values.filter(
+            (_, idx) => idx !== valueIndex
+          );
 
-      await updateVariantData(basePath, updatedVariants);
+      const additionalFields = isAdding
+        ? {
+            [`${basePath}[${
+              updatedVariants.length - 1
+            }].pricing.original`]: true,
+            [`${basePath}[${updatedVariants.length - 1}].stock`]: true,
+            [`${basePath}[${updatedVariants.length - 1}].dimensions`]: true,
+            [`${basePath}[${updatedVariants.length - 1}].packageWeight`]: true,
+          }
+        : {
+            [`${basePath}[${valueIndex}].pricing.original`]: true,
+            [`${basePath}[${valueIndex}].stock`]: true,
+            [`${basePath}[${valueIndex}].dimensions`]: true,
+            [`${basePath}[${valueIndex}].packageWeight`]: true,
+          };
 
-      const AdditionalEmptyFields = {
-        [`${basePath}[${updatedVariants.length - 1}].pricing.original`]: true,
-        [`${basePath}[${updatedVariants.length - 1}].stock`]: true,
-        [`${basePath}[${updatedVariants.length - 1}].dimensions`]: true,
-        [`${basePath}[${updatedVariants.length - 1}].packageWeight`]: true,
-      };
-
-      uiDispatch({
-        type: "SET_EMPTY_FIELDS",
-        payload: AdditionalEmptyFields,
-      });
+      await updateVariantData(
+        basePath,
+        updatedVariants,
+        isAdding ? "SET_EMPTY_FIELDS" : "CLEAR_EMPTY_FIELDS",
+        additionalFields
+      );
     },
     [state, updateVariantData]
-  );
-
-  const handleRemoveVariantItem = useCallback(
-    async (variationIndex, valueIndex) => {
-      const updatedVariants = state.productDetails.variations[
-        variationIndex
-      ].values.filter((_, idx) => idx !== valueIndex);
-
-      dispatch({
-        type: "REMOVE_VARIANT_ITEM",
-        payload: { variationIndex, valueIndex },
-      });
-
-      uiDispatch({
-        type: "TOGGLE_VARIANT_PRICING",
-        payload: updatedVariants?.length > 0,
-      });
-
-      await validateField(
-        state,
-        `productDetails.variations[${variationIndex}].values`,
-        updatedVariants
-      );
-
-      const basePath = `productDetails.variations[${variationIndex}].values${valueIndex}]`;
-
-      const fieldsToRemove = {
-        [`${basePath}.pricing.original`]: true,
-        [`${basePath}.stock`]: true,
-        [`${basePath}.dimensions`]: true,
-        [`${basePath}.packageWeight`]: true,
-      };
-
-      uiDispatch({
-        type: "CLEAR_EMPTY_FIELDS",
-        payload: fieldsToRemove,
-      });
-    },
-    [dispatch, state, validateField]
   );
 
   const handleApplyToAll = useCallback(() => {
@@ -149,16 +122,13 @@ const ProductFormProvider = ({ children }) => {
     });
   }, [dispatch, state.productDetails]);
 
-  const handleToggleVariantShipping = useCallback(() => {
+  const toggleVariantShipping = useCallback(() => {
     uiDispatch({ type: "TOGGLE_VARIANT_SHIPPING" });
   }, [uiDispatch]);
 
   const toggleAdditionalFields = useCallback(
     (section) => {
-      uiDispatch({
-        type: "TOGGLE_ADDITIONAL_FIELDS",
-        payload: { section },
-      });
+      uiDispatch({ type: "TOGGLE_ADDITIONAL_FIELDS", payload: section });
     },
     [uiDispatch]
   );
@@ -185,35 +155,32 @@ const ProductFormProvider = ({ children }) => {
     [state, validateForm, uiState.isSubmitting]
   );
 
-  // Fetch required fields only on first render
-  const fetchRequiredFields = useCallback(async () => {
-    try {
-      await validateForm(state, true, "SET_REQUIRED_FIELDS");
-    } catch (error) {
-      console.error("Error fetching required fields:", error);
-    }
+  const fetchFields = useCallback(
+    async (fieldType) => {
+      try {
+        await validateForm(state, true, fieldType);
+      } catch (error) {
+        console.error(`Error fetching ${fieldType}:`, error);
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    []
+  );
 
-  // Fetch Empty fields only on first render
-  const fetchEmptyFields = useCallback(async () => {
-    try {
-      await validateForm(state, true, "SET_EMPTY_FIELDS");
-    } catch (error) {
-      console.error("Error fetching empty fields:", error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const isVariantShipping = useMemo(
+    () => state.productDetails?.variations?.[0]?.values?.length > 1,
+    [state.productDetails?.variations]
+  );
+
+  // Fetch fields only on first render
+  useEffect(() => {
+    fetchFields("SET_EMPTY_FIELDS");
+    fetchFields("SET_REQUIRED_FIELDS");
+  }, [fetchFields]);
 
   useEffect(() => {
-    fetchEmptyFields();
-    fetchRequiredFields();
-  }, [fetchEmptyFields, fetchRequiredFields]);
-
-  useEffect(() => {
-    if (!multiVariantShippingCondition)
-      uiDispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
-  }, [multiVariantShippingCondition, uiDispatch]);
+    if (!isVariantShipping) uiDispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
+  }, [isVariantShipping, uiDispatch]);
 
   const values = useMemo(
     () => ({
@@ -228,11 +195,10 @@ const ProductFormProvider = ({ children }) => {
       updateGuideContent,
       handleApplyToAll,
       handleInputChange,
-      handleAddVariantItem,
+      updateVariantItem,
       toggleAdditionalFields,
-      handleRemoveVariantItem,
-      handleToggleVariantShipping,
-      multiVariantShippingCondition,
+      toggleVariantShipping,
+      isVariantShipping,
       formErrors: uiState.formErrors,
       emptyFields: uiState.emptyFields,
       requiredFields: uiState.requiredFields,
@@ -247,11 +213,10 @@ const ProductFormProvider = ({ children }) => {
       updateGuideContent,
       handleApplyToAll,
       handleInputChange,
-      handleAddVariantItem,
-      handleRemoveVariantItem,
-      handleToggleVariantShipping,
+      updateVariantItem,
+      toggleVariantShipping,
       toggleAdditionalFields,
-      multiVariantShippingCondition,
+      isVariantShipping,
     ]
   );
 
