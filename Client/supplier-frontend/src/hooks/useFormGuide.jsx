@@ -11,8 +11,8 @@ const useFormGuide = () => {
   const [guideContent, setGuideContent] = useState(defaultContent);
 
   const updateGuideContent = (name, title = "Tips") => {
-    const content = ProductFormTips[name] || defaultContent.guide;
-    setGuideContent({ title, content });
+    const guide = ProductFormTips[name] || defaultContent.guide;
+    setGuideContent({ title, guide });
   };
 
   return { guideContent, updateGuideContent };

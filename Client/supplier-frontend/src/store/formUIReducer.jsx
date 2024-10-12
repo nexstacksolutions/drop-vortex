@@ -38,6 +38,7 @@ const uiControl = (state, action) =>
 
       case "SET_REQUIRED_FIELDS":
         draft.requiredFields = payload;
+        draft.emptyFields = payload;
         break;
 
       case "SET_FORM_ERRORS":

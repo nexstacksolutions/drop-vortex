@@ -32,7 +32,7 @@ export const productDetailsSchema = Yup.object({
           name: requiredString,
           variantImages: nullableArrayOfSchema(fileValidation),
           pricing: pricingSchema("uiState.variantPricing", null),
-          stock: nullableNumber,
+          stock: conditionalMeasurementField("uiState.variantPricing", null),
           availability: Yup.boolean().default(true),
           freeItems: nullableString,
           sku: nullableString,

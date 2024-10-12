@@ -32,10 +32,9 @@ const ProductFormProvider = ({ children }) => {
   );
 
   const updateFormData = useCallback(
-    async (name, value) => {
+    (name, value) => {
       dispatch({ type: "UPDATE_FIELD", payload: { name, value } });
-
-      await validateField(state, name, value);
+      validateField(state, name, value);
     },
     [dispatch, state, validateField]
   );
@@ -82,27 +81,23 @@ const ProductFormProvider = ({ children }) => {
       };
 
       const basePath = `productDetails.variations[${variationIndex}].values`;
+
       const updatedVariants = isAdding
         ? [...get(state, basePath), newVariant]
         : state.productDetails.variations[variationIndex].values.filter(
             (_, idx) => idx !== valueIndex
           );
 
-      const additionalFields = isAdding
-        ? {
-            [`${basePath}[${
-              updatedVariants.length - 1
-            }].pricing.original`]: true,
-            [`${basePath}[${updatedVariants.length - 1}].stock`]: true,
-            [`${basePath}[${updatedVariants.length - 1}].dimensions`]: true,
-            [`${basePath}[${updatedVariants.length - 1}].packageWeight`]: true,
-          }
-        : {
-            [`${basePath}[${valueIndex}].pricing.original`]: true,
-            [`${basePath}[${valueIndex}].stock`]: true,
-            [`${basePath}[${valueIndex}].dimensions`]: true,
-            [`${basePath}[${valueIndex}].packageWeight`]: true,
-          };
+      const updatedValueIndex = isAdding
+        ? updatedVariants.length - 1
+        : valueIndex;
+
+      const additionalFields = {
+        [`${basePath}[${updatedValueIndex}].pricing.original`]: true,
+        [`${basePath}[${updatedValueIndex}].stock`]: true,
+        [`${basePath}[${updatedValueIndex}].dimensions`]: true,
+        [`${basePath}[${updatedValueIndex}].packageWeight`]: true,
+      };
 
       await updateVariantData(
         basePath,
@@ -155,32 +150,28 @@ const ProductFormProvider = ({ children }) => {
     [state, validateForm, uiState.isSubmitting]
   );
 
-  const fetchFields = useCallback(
-    async (fieldType) => {
-      try {
-        await validateForm(state, true, fieldType);
-      } catch (error) {
-        console.error(`Error fetching ${fieldType}:`, error);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
   const isVariantShipping = useMemo(
     () => state.productDetails?.variations?.[0]?.values?.length > 1,
     [state.productDetails?.variations]
   );
 
-  // Fetch fields only on first render
   useEffect(() => {
-    fetchFields("SET_EMPTY_FIELDS");
+    // Fetching Require fields only on first render
+    const fetchFields = async (fieldType) => {
+      try {
+        await validateForm(state, true, fieldType);
+      } catch (error) {
+        console.error(`Error fetching ${fieldType}:`, error);
+      }
+    };
+
     fetchFields("SET_REQUIRED_FIELDS");
-  }, [fetchFields]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!isVariantShipping) uiDispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
-  }, [isVariantShipping, uiDispatch]);
+  }, [isVariantShipping]);
 
   const values = useMemo(
     () => ({

@@ -161,7 +161,7 @@ function TipsCard() {
       <h3 className={styles.tipsTitle}>{guideContent?.title}</h3>
       <TipsIcon />
       <div className={`${styles.tipsContent} flex flex-col`}>
-        <p className={styles.tipsText}>{guideContent?.content}</p>
+        <p className={styles.tipsText}>{guideContent?.guide}</p>
       </div>
     </div>
   );

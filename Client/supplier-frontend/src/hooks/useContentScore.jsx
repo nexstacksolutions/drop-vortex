@@ -87,7 +87,7 @@ const useContentScore = (formState, emptyFields, requiredFields) => {
     variantShipping,
   ]);
 
-  // console.log(emptyFields);
+  console.log(filteredEmptyFields);
 
   // Main score calculation
   const calculateScore = useMemo(() => {
