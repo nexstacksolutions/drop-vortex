@@ -103,7 +103,9 @@ const ProductFormProvider = ({ children }) => {
         basePath,
         updatedVariants,
         isAdding ? "SET_EMPTY_FIELDS" : "CLEAR_EMPTY_FIELDS",
-        additionalFields
+        isAdding
+          ? additionalFields
+          : { ...additionalFields, removedIndex: valueIndex }
       );
     },
     [state, updateVariantData]

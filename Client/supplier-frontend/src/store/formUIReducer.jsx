@@ -50,9 +50,30 @@ const uiControl = (state, action) =>
         break;
 
       case "CLEAR_EMPTY_FIELDS":
-        Object.keys(payload).forEach((key) => {
-          delete draft.emptyFields[key];
-        });
+        draft.emptyFields = Object.keys(draft.emptyFields).reduce(
+          (acc, key) => {
+            const matches = key.match(
+              /productDetails\.variations\[(\d+)\]\.values\[(\d+)\](.*)/
+            );
+
+            if (matches) {
+              const [fullKey, variationIndex, valueIndex] = matches;
+              const currentIndex = parseInt(valueIndex);
+
+              if (currentIndex > payload.removedIndex) {
+                const newKey = `productDetails.variations[${variationIndex}].values[${
+                  currentIndex - 1
+                }]${matches[3]}`;
+                acc[newKey] = draft.emptyFields[fullKey];
+              }
+            } else {
+              acc[key] = draft.emptyFields[key];
+            }
+
+            return acc;
+          },
+          {}
+        );
         break;
 
       case "CLEAR_FORM_ERRORS":
