@@ -158,7 +158,7 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
   );
 
   return (
-    <div className={`${styles.productPriceStockWrapper} flex flex-col`}>
+    <div className={`${styles.productPSWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
       {hasVariationRows && (
         <div className={`${styles.variationInputContainer} flex align-center`}>

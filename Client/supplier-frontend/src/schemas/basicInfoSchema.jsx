@@ -18,6 +18,6 @@ export const basicInfoSchema = Yup.object({
       "The field value is required, Image is missing. Please upload at least 1 image."
     ),
     buyerPromotionImage: nullableArrayOfSchema(fileValidation),
-    productVideo: nullableArrayOfSchema(fileOrUrlValidation),
+    productVideo: fileOrUrlValidation.nullable(),
   }),
 });

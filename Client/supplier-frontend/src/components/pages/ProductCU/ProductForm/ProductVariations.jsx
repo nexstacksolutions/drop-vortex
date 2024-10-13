@@ -2,7 +2,7 @@ import styles from "./ProductForm.module.css";
 import { useCallback, useState } from "react";
 import { RiDeleteBin5Line, RiMenuFill } from "react-icons/ri";
 import { useProductForm } from "../../../../context/ProductForm";
-import { FormInput, MediaInput, InputWrapper } from "./ProductInputs";
+import { FormInput, MediaInput, InputContainer } from "./ProductInputs";
 
 function VariantActionButtons({ handleRemove }) {
   return (
@@ -124,7 +124,7 @@ function ProductVariations({ variations, onChange }) {
         const name = `productDetails.variations[${variationIndex}].values`;
 
         return (
-          <InputWrapper
+          <InputContainer
             key={variationIndex}
             name={name}
             label={`Variant ${variationIndex + 1}`}
@@ -174,7 +174,7 @@ function ProductVariations({ variations, onChange }) {
                 {...{ updateVariantItem, variationIndex, showVariantImages }}
               />
             </div>
-          </InputWrapper>
+          </InputContainer>
         );
       })}
     </div>

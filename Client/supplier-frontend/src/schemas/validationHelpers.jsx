@@ -26,12 +26,13 @@ export const fileValidation = Yup.mixed().test(
   (value) => !value || value instanceof File
 );
 
+// Allow file array or a URL string
 export const fileOrUrlValidation = Yup.mixed().test(
   "file-or-url",
-  "Must be a valid file or URL.",
+  "Must be an array of files or a valid URL.",
   (value) =>
     !value ||
-    value instanceof File ||
+    (Array.isArray(value) && value.every((file) => file instanceof File)) ||
     Yup.string().url("Invalid URL format").isValidSync(value)
 );
 

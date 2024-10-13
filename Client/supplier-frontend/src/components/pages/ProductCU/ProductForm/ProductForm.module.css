@@ -25,9 +25,13 @@
     & .sectionContent .formInputContainer {
       position: relative;
 
-      & label > .requiredFieldIcon {
-        color: var(--danger-color);
-        font-size: 1rem;
+      & .inputHeader {
+        width: max-content;
+
+        & label > .requiredFieldIcon {
+          color: var(--danger-color);
+          font-size: 1rem;
+        }
       }
 
       & .formInputWrapper {
@@ -47,7 +51,7 @@
 
           & input {
             border: none;
-            flex: 1 1;
+            flex: 1;
           }
 
           & .suffixDisplay {
@@ -61,9 +65,6 @@
           &:focus-within,
           &:hover {
             border-color: var(--accent-color);
-          }
-
-          &:focus-within {
             box-shadow: var(--shadow-xs)
               rgba(var(--accent-Rgb), var(--opacity-md));
           }
@@ -78,30 +79,18 @@
         color: var(--danger-color);
       }
 
-      &.invalidInput {
-        /* width: 100%; */
+      &.invalidInput .formInputWrapper .inputWrapper {
+        border-color: var(--danger-color);
 
-        & .formInputWrapper .inputWrapper {
-          border-color: var(--danger-color);
-
-          &:focus-within {
-            box-shadow: var(--shadow-xs)
-              rgba(var(--danger-Rgb), var(--opacity-lg));
-          }
-        }
-
-        & .reactQuillInput > div {
-          border-color: var(--danger-color);
+        &:focus-within {
+          box-shadow: var(--shadow-xs)
+            rgba(var(--danger-Rgb), var(--opacity-lg));
         }
       }
     }
 
     & .showMoreBtn {
       transition: var(--transition-base);
-
-      & svg {
-        transition: var(--transition-base);
-      }
 
       &.showMoreBtnActive {
         color: var(--accent-color);
@@ -138,7 +127,7 @@
             object-fit: cover;
           }
 
-          & .mediaActionsContainer {
+          & .mediaPreviewActions {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -154,7 +143,7 @@
             }
           }
 
-          &:hover .mediaActionsContainer {
+          &:hover .mediaPreviewActions {
             opacity: 1;
             visibility: visible;
           }
@@ -165,40 +154,67 @@
           height: 6rem;
           border: var(--border-base-dashed);
 
-          & label {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+          & .inputHeader {
             width: 100%;
             height: 100%;
+            justify-content: center;
 
-            & svg {
-              font-size: var(--font-lg);
-              color: var(--secondary-text);
+            & label {
+              width: 100%;
+              height: 100%;
+              justify-content: center;
             }
           }
 
-          & > div {
-            display: none;
+          & .formInputWrapper {
+            position: absolute;
+            top: 80%;
+            opacity: 0;
+            visibility: collapse;
+            z-index: 10;
+            transition: var(--transition-base) 100ms;
+            padding: 0;
+
+            & .inputWrapper {
+              display: none;
+            }
+
+            & .addMediaActions {
+              position: relative;
+              gap: 0;
+              padding: var(--spacing-xs) 0;
+              border-radius: var(--radius-md);
+              background-color: var(--block-bg);
+              transition: var(--transition-base);
+
+              & button {
+                min-width: 100%;
+                justify-content: start;
+                padding: var(--spacing-sm) var(--spacing-md);
+
+                &:hover {
+                  background-color: var(--wrapper-bg);
+                }
+              }
+            }
+          }
+
+          &:hover .formInputWrapper {
+            opacity: 1;
+            visibility: visible;
+            top: 100%;
           }
         }
       }
     }
 
-    & .guideContainer {
-      max-width: max-content;
+    & .uploadVideoOptions {
+      /* padding: 2rem; */
 
-      & ul {
-        gap: var(--spacing-xs);
-
-        & li {
-          color: var(--secondary-text);
-        }
+      & .formInputWrapper {
+        padding: 0;
+        background-color: transparent;
       }
-    }
-
-    &.invalidInput .formInputWrapper {
-      border: var(--border-err-dashed);
     }
   }
 
@@ -208,7 +224,6 @@
     & .dropdownList {
       width: 100%;
       max-height: 25rem;
-      overflow-x: hidden;
       overflow-y: auto;
       position: absolute;
       border: var(--border-base);
@@ -220,22 +235,61 @@
       z-index: 10;
 
       & .dropdownOption {
-        flex: 1;
         padding: var(--spacing-sm) var(--spacing-md);
 
         &:hover {
           background-color: var(--wrapper-bg);
         }
       }
-
-      & .noOptions {
-        flex: 1;
-        padding: 0 var(--spacing-md);
-      }
     }
+  }
 
-    &.dropdownInputFocused > div > div > div:last-child svg {
-      transform: rotate(180deg);
+  & .multiInputGroup {
+    flex: 1;
+    gap: var(--spacing-md);
+
+    & > div {
+      gap: var(--spacing-md);
+
+      & .radioItem {
+        width: max-content;
+        cursor: pointer;
+
+        & .inputWrapper {
+          display: none;
+        }
+
+        & .customRadio {
+          position: relative;
+          width: 1.6rem;
+          height: 1.6rem;
+          border-radius: 50%;
+          border: var(--border-base);
+
+          &::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: white;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+          }
+
+          &.radioItemChecked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+
+            &::before {
+              opacity: 1;
+            }
+          }
+        }
+      }
     }
   }
 
@@ -343,52 +397,35 @@
     }
   }
 
-  & .productPriceStockWrapper {
-    width: 100%;
+  & .productPSWrapper .variantTableWrapper {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 
-    & .variantTableWrapper {
-      max-width: 100%;
-      overflow-x: auto;
-      overflow-y: hidden;
+    & table {
+      width: max-content;
+      border-collapse: collapse;
 
-      & .variationInputContainer {
-        flex: 1;
-
-        & .variationInputWrapper {
-          flex: 1 1;
-        }
-
-        & button {
-          min-width: max-content;
-        }
+      & th,
+      td {
+        padding: 10px;
+        border: var(--border-base);
+        text-align: center;
       }
 
-      & table {
-        width: 100%;
-        width: max-content;
-        border-collapse: collapse;
+      & th label > svg {
+        color: var(--danger-color);
+        font-size: 1rem;
+      }
 
-        & th,
-        td {
-          padding: 10px;
-          border: var(--border-base);
-          text-align: center;
-        }
+      & td:last-child > div > div > div {
+        justify-content: center;
+        border: none !important;
 
-        & th label > svg {
-          color: var(--danger-color);
-          font-size: 1rem;
-        }
-
-        & td:last-child > div > div > div {
-          justify-content: center;
+        &:focus-within,
+        &:hover {
           border: none !important;
-
-          &:focus-within,
-          &:hover {
-            border: none !important;
-            box-shadow: none !important;
-          }
+          box-shadow: none !important;
         }
       }
     }
@@ -447,7 +484,6 @@
   }
 
   & .formActions {
-    flex: 1;
     padding: var(--spacing-md) 2rem;
     border-radius: var(--radius-md);
     background-color: var(--canvas-color);
