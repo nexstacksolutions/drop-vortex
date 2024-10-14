@@ -1,7 +1,6 @@
 import formSchema from "../schemas/productForm";
 import useFormGuide from "../hooks/useFormGuide";
 import useContentScore from "../hooks/useContentScore";
-import useSectionScroll from "../hooks/useSectionScroll";
 import useFormValidation from "../hooks/useFormValidation";
 import { ProductFormUIContext, useProductForm } from "./ProductForm";
 import { createRef, useMemo, useEffect, useRef, useCallback } from "react";
@@ -10,7 +9,6 @@ export const ProductFormUIProvider = ({ children }) => {
   const { uiState, uiDispatch, formState } = useProductForm();
   const { guideContent, updateGuideContent } = useFormGuide();
   const sectionRefs = useRef(Array.from({ length: 5 }, () => createRef()));
-  const { activeSection, scrollToSection } = useSectionScroll(sectionRefs);
   const { contentScore } = useContentScore(
     formState,
     uiState.emptyFields,
@@ -24,6 +22,7 @@ export const ProductFormUIProvider = ({ children }) => {
     uiState,
     uiDispatch
   );
+
   const { formErrors, emptyFields, requiredFields } = uiState;
 
   const toggleVariantShipping = useCallback(
@@ -98,8 +97,6 @@ export const ProductFormUIProvider = ({ children }) => {
       uiDispatch,
       sectionRefs,
       contentScore,
-      activeSection,
-      scrollToSection,
       handleSubmit,
       validateField,
       guideContent,
@@ -116,8 +113,6 @@ export const ProductFormUIProvider = ({ children }) => {
       uiDispatch,
       sectionRefs,
       contentScore,
-      activeSection,
-      scrollToSection,
       handleSubmit,
       validateField,
       guideContent,

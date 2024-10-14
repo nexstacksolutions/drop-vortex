@@ -25,6 +25,10 @@
     max-height: 20rem;
     animation: slide-up var(--animation-base);
 
+    & .tipsTitle {
+      z-index: 20;
+    }
+
     & .tipsContent {
       width: 100%;
       z-index: 10;

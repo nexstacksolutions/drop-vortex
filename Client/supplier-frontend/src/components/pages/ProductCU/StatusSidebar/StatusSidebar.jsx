@@ -1,16 +1,17 @@
 import styles from "./StatusSidebar.module.css";
+import { get } from "lodash";
 import classNames from "classnames";
 import { RxReload } from "react-icons/rx";
 import { FaAngleDown } from "react-icons/fa6";
 import Divider from "../../../constant/Divider/Divider";
 import useMediaExport from "../../../../hooks/useMediaExport";
+import useSectionScroll from "../../../../hooks/useSectionScroll";
 import { useMemo, useCallback, memo, useState, useEffect } from "react";
 import {
   useProductFormUI,
   useProductFormState,
 } from "../../../../context/ProductForm";
 
-// Memoized Guide Component
 const ScoreImproverGuide = memo(({ title, guinness, onToggle, isActive }) => (
   <div
     className={classNames(styles.guideSection, "flex flex-col", {
@@ -34,10 +35,8 @@ const ScoreImproverGuide = memo(({ title, guinness, onToggle, isActive }) => (
     )}
   </div>
 ));
-
 ScoreImproverGuide.displayName = "ScoreImproverGuide";
 
-// Memoized Content Status Component
 const ContentStatus = memo(
   ({
     formState,
@@ -62,7 +61,10 @@ const ContentStatus = memo(
       const fieldsPath = Object.keys(requiredFields).filter((field) =>
         field.includes("specifications")
       );
-      const fieldStatus = fieldsPath.map((field) => formState[field] === "");
+      const fieldStatus = fieldsPath.map(
+        (field) => get(formState, field) === ""
+      );
+
       return fieldStatus.includes(true);
     }, [formState, requiredFields]);
 
@@ -149,11 +151,10 @@ const ContentStatus = memo(
     );
   }
 );
-
 ContentStatus.displayName = "ContentStatus";
 
-// Memoized Tips Card Component
-const TipsCard = memo(({ guideContent, TipsIcon }) => {
+const TipsCard = memo(({ guideContent }) => {
+  const { TipsIcon } = useMediaExport();
   const [contentKey, setContentKey] = useState(0);
 
   useEffect(() => {
@@ -170,21 +171,13 @@ const TipsCard = memo(({ guideContent, TipsIcon }) => {
     </div>
   );
 });
-
 TipsCard.displayName = "TipsCard";
 
-// Main Sidebar Component
 function StatusSidebar() {
   const { formState } = useProductFormState();
-  const {
-    requiredFields,
-    guideContent,
-    activeSection,
-    scrollToSection,
-    contentScore,
-  } = useProductFormUI();
-
-  const { TipsIcon } = useMediaExport();
+  const { requiredFields, guideContent, contentScore, sectionRefs } =
+    useProductFormUI();
+  const { activeSection, scrollToSection } = useSectionScroll(sectionRefs);
 
   return (
     <aside className={`${styles.statusSidebar} flex flex-col`}>
@@ -195,7 +188,7 @@ function StatusSidebar() {
         scrollToSection={scrollToSection}
         contentScore={contentScore}
       />
-      <TipsCard guideContent={guideContent} TipsIcon={TipsIcon} />
+      <TipsCard guideContent={guideContent} />
     </aside>
   );
 }

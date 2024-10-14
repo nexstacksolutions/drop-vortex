@@ -356,7 +356,9 @@ const MediaInput = memo(
             additionalJsxProps: {
               options: ["Upload Video", "Youtube Link"],
               type: "radio",
-              name: "upload-option",
+              name,
+              label,
+              hideLabel: true,
               value: uploadOption,
               onChange: (e) => setUploadOption(e.target.value),
               customClass: styles.uploadVideoOptions,
@@ -383,7 +385,7 @@ const DropdownInput = memo(
     const filteredOptions = useMemo(
       () =>
         options.filter((opt) =>
-          opt.toLowerCase().includes(rest.value.toLowerCase())
+          opt.toLowerCase().includes(rest.value.trim().toLowerCase())
         ),
       [options, rest.value]
     );
@@ -478,13 +480,13 @@ const MultiInputGroup = memo(
           : options?.map((option, index) => (
               <label
                 key={index}
-                htmlFor={`${name}${index}`}
+                htmlFor={`${name}-option-${index}`}
                 className={classNames(styles.radioItem, "flex flex-center")}
               >
                 <FormInput
                   type={type}
                   name={name}
-                  id={`${name}${index}`}
+                  id={`${name}-option-${index}`}
                   value={option}
                   wrapInput={false}
                   checked={value === option}

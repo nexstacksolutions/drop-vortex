@@ -88,18 +88,6 @@
         }
       }
     }
-
-    & .showMoreBtn {
-      transition: var(--transition-base);
-
-      &.showMoreBtnActive {
-        color: var(--accent-color);
-
-        & svg {
-          transform: rotate(180deg);
-        }
-      }
-    }
   }
 
   & .mediaInputContainer {
@@ -228,18 +216,22 @@
       position: absolute;
       border: var(--border-base);
       border-radius: var(--radius-sm);
-      padding: var(--spacing-sm) 0;
       background-color: var(--canvas-color);
+      gap: 0;
       top: 4.2rem;
       left: 0;
       z-index: 10;
 
       & .dropdownOption {
-        padding: var(--spacing-sm) var(--spacing-md);
+        padding: var(--spacing-base) var(--spacing-md);
 
         &:hover {
           background-color: var(--wrapper-bg);
         }
+      }
+
+      & .noOptions {
+        padding: var(--spacing-sm) var(--spacing-md);
       }
     }
   }
@@ -479,6 +471,22 @@
             box-shadow: none !important;
           }
         }
+      }
+    }
+  }
+
+  & .showMoreBtn {
+    transition: var(--transition-base);
+
+    &:hover {
+      color: var(--accent-color);
+    }
+
+    &.showMoreBtnActive {
+      color: var(--accent-color);
+
+      & svg {
+        transform: rotate(180deg);
       }
     }
   }
