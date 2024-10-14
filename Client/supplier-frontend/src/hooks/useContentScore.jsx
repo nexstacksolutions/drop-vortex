@@ -1,13 +1,14 @@
 import { get } from "lodash";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useProductForm } from "../context/ProductForm";
 
-const useContentScore = (formState, emptyFields, requiredFields) => {
+const useContentScore = (
+  formState,
+  emptyFields,
+  requiredFields,
+  variantShipping,
+  variantPricing
+) => {
   const [contentScore, setContentScore] = useState(0);
-
-  const {
-    uiState: { variantShipping, variantPricing },
-  } = useProductForm();
 
   // Memoize the field check function
   const fieldEndsWithSuffix = useCallback(

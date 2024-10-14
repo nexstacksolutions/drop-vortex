@@ -1,10 +1,13 @@
 import styles from "./ProductForm.module.css";
-import { useMemo } from "react";
-import { FormInput, MultiInputGroup } from "./ProductInputs";
 import { get } from "lodash";
-import { useProductForm } from "../../../../context/ProductForm";
+import { useMemo, memo } from "react";
 import { FaAsterisk } from "react-icons/fa6";
+import { FormInput, MultiInputGroup } from "./ProductInputs";
 import useAdditionalFields from "../../../../hooks/useAdditionalFields";
+import {
+  useProductFormState,
+  useProductFormUI,
+} from "../../../../context/ProductForm";
 
 const getFieldPath = (
   isVariationField,
@@ -19,12 +22,11 @@ const getFieldPath = (
     : `productDetails.${basePath}`;
 };
 
-// Utility to render table headers and inputs based on field configuration
 const renderField = (
   fields,
   isHeader,
   isVariationField,
-  { state, onChange, variantShipping, rowIndex, requiredFields }
+  { formState, onChange, variantShipping, rowIndex, requiredFields }
 ) => {
   return fields.map(
     ({ label, fieldPath, maxValue, type = "number", ...rest }, idx) => {
@@ -48,13 +50,13 @@ const renderField = (
             <MultiInputGroup
               {...{ type, label, name, onChange, ...rest }}
               groupType="input"
-              value={get(state, name)}
+              value={get(formState, name)}
             />
           ) : (
             <FormInput
               {...{ type, label, name, onChange, ...rest }}
               suffixDisplay={{ maxValue }}
-              value={get(state, name)}
+              value={get(formState, name)}
             />
           )}
         </td>
@@ -63,70 +65,75 @@ const renderField = (
   );
 };
 
-// Table headers component
-function TableHeaders({
-  requiredFields,
-  hasVariationRows,
-  variationColumnNames,
-  additionalFields,
-}) {
-  return (
-    <thead>
-      <tr>
-        {hasVariationRows &&
-          variationColumnNames.map((columnName, columnIndex) => (
-            <th key={columnIndex}>{columnName}</th>
-          ))}
-        {renderField(additionalFields, true, false, { requiredFields })}
-      </tr>
-    </thead>
-  );
-}
-
-// Table rows component
-function TableRows({
-  state,
-  onChange,
-  variationRows,
-  variantShipping,
-  hasVariationRows,
-  variationColumnNames,
-  additionalFields,
-}) {
-  return (
-    <tbody>
-      {hasVariationRows ? (
-        variationRows.map((rowValues, rowIndex) => (
-          <tr key={`variation-row-${rowIndex}`}>
-            {variationColumnNames.map((columnName, columnIndex) => (
-              <td key={`variation-col-${columnIndex}`}>
-                {rowValues[columnName]}
-              </td>
+const TableHeaders = memo(
+  ({
+    requiredFields,
+    hasVariationRows,
+    variationColumnNames,
+    additionalFields,
+  }) => {
+    return (
+      <thead>
+        <tr>
+          {hasVariationRows &&
+            variationColumnNames.map((columnName, columnIndex) => (
+              <th key={columnIndex}>{columnName}</th>
             ))}
-            {renderField(additionalFields, false, true, {
-              state,
+          {renderField(additionalFields, true, false, { requiredFields })}
+        </tr>
+      </thead>
+    );
+  }
+);
+TableHeaders.displayName = "TableHeaders";
+
+const TableRows = memo(
+  ({
+    formState,
+    onChange,
+    variationRows,
+    variantShipping,
+    hasVariationRows,
+    variationColumnNames,
+    additionalFields,
+  }) => {
+    return (
+      <tbody>
+        {hasVariationRows ? (
+          variationRows.map((rowValues, rowIndex) => (
+            <tr key={`variation-row-${rowIndex}`}>
+              {variationColumnNames.map((columnName, columnIndex) => (
+                <td key={`variation-col-${columnIndex}`}>
+                  {rowValues[columnName]}
+                </td>
+              ))}
+              {renderField(additionalFields, false, true, {
+                formState,
+                onChange,
+                variantShipping,
+                rowIndex,
+              })}
+            </tr>
+          ))
+        ) : (
+          <tr>
+            {renderField(additionalFields, false, false, {
+              formState,
               onChange,
               variantShipping,
-              rowIndex,
+              rowIndex: -1,
             })}
           </tr>
-        ))
-      ) : (
-        <tr>
-          {renderField(additionalFields, false, false, {
-            state,
-            onChange,
-            variantShipping,
-            rowIndex: -1,
-          })}
-        </tr>
-      )}
-    </tbody>
-  );
-}
+        )}
+      </tbody>
+    );
+  }
+);
+TableRows.displayName = "TableRows";
 
 function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
-  const { state, handleApplyToAll, requiredFields } = useProductForm();
+  const { requiredFields } = useProductFormUI();
+  const { formState, handleApplyToAll } = useProductFormState();
 
   const variationNames = variations.map((variation) =>
     variation.values.map((v) => v.name).join(",")
@@ -173,7 +180,7 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
                   <FormInput
                     key={`non-row-${fieldPath}-${index}`}
                     name={getFieldPath(false, fieldPath)}
-                    value={get(state, getFieldPath(false, fieldPath))}
+                    value={get(formState, getFieldPath(false, fieldPath))}
                     suffixDisplay={{ maxValue }}
                     {...{ type, onChange, ...rest }}
                   />
@@ -202,7 +209,7 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
           />
           <TableRows
             {...{
-              state,
+              formState,
               onChange,
               variationRows,
               variantShipping,
@@ -217,4 +224,4 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
   );
 }
 
-export default ProductPriceStockWrapper;
+export default memo(ProductPriceStockWrapper);

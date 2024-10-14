@@ -1,11 +1,14 @@
 import styles from "./ProductForm.module.css";
 import classNames from "classnames";
 import { get } from "lodash";
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import FormSection from "./FormSection";
 import ProductVariations from "./ProductVariations";
 import ProductPriceStockWrapper from "./ProductPriceStock";
-import { useProductForm } from "../../../../context/ProductForm";
+import {
+  useProductFormUI,
+  useProductFormState,
+} from "../../../../context/ProductForm";
 import {
   FormInput,
   MultiInputGroup,
@@ -16,12 +19,12 @@ import {
 const RenderInputField = (
   { name, formInputType, onChange, condition, ...rest },
   i,
-  state,
+  formState,
   uiState
 ) => {
-  const { handleInputChange } = useProductForm();
+  const { handleInputChange } = useProductFormState();
   const key = `${name}${i}`;
-  const value = get(state, name);
+  const value = get(formState, name);
   const handleChange = onChange || handleInputChange;
 
   if (condition && !condition(uiState)) return null;
@@ -46,15 +49,14 @@ const RenderInputField = (
 };
 
 function ProductForm({ customClass }) {
+  const { formState, handleInputChange } = useProductFormState();
   const {
-    state,
     uiState,
     sectionRefs,
     handleSubmit,
-    handleInputChange,
-    toggleVariantShipping,
     isVariantShipping,
-  } = useProductForm();
+    toggleVariantShipping,
+  } = useProductFormUI();
 
   const memoizedFormSections = useMemo(
     () => [
@@ -172,11 +174,11 @@ function ProductForm({ customClass }) {
         fields: [
           {
             formInputType: "productVariations",
-            variations: state.productDetails.variations,
+            variations: formState.productDetails.variations,
           },
           {
             formInputType: "productPriceStockWrapper",
-            variations: state.productDetails.variations,
+            variations: formState.productDetails.variations,
             variantShipping: uiState.variantShipping,
           },
         ],
@@ -283,14 +285,15 @@ function ProductForm({ customClass }) {
       },
     ],
     [
-      state,
-      uiState,
+      isVariantShipping,
+      formState.productDetails.variations,
+      uiState.additionalFields.warranty,
+      uiState.additionalFields.description,
+      uiState.variantShipping,
       handleInputChange,
       toggleVariantShipping,
-      isVariantShipping,
     ]
   );
-
   return (
     <form
       className={classNames(styles.productForm, customClass, "flex flex-col")}
@@ -308,7 +311,9 @@ function ProductForm({ customClass }) {
           {...rest}
           sectionRef={sectionRefs.current[index]}
         >
-          {fields.map((field, i) => RenderInputField(field, i, state, uiState))}
+          {fields.map((field, i) =>
+            RenderInputField(field, i, formState, uiState)
+          )}
         </FormSection>
       ))}
 
@@ -325,4 +330,4 @@ function ProductForm({ customClass }) {
   );
 }
 
-export default ProductForm;
+export default memo(ProductForm);

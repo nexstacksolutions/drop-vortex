@@ -1,10 +1,10 @@
 import styles from "./ProductForm.module.css";
-import { useCallback, useState } from "react";
+import { useCallback, useState, memo } from "react";
 import { RiDeleteBin5Line, RiMenuFill } from "react-icons/ri";
-import { useProductForm } from "../../../../context/ProductForm";
+import { useProductFormState } from "../../../../context/ProductForm";
 import { FormInput, MediaInput, InputContainer } from "./ProductInputs";
 
-function VariantActionButtons({ handleRemove }) {
+const VariantActionButtons = memo(({ handleRemove }) => {
   return (
     <div className={`${styles.variantActions} flex justify-end`}>
       <button
@@ -19,103 +19,113 @@ function VariantActionButtons({ handleRemove }) {
       </button>
     </div>
   );
-}
+});
+VariantActionButtons.displayName = "VariantActionButtons";
 
-function VariantItem({
-  variantData,
-  variationIndex,
-  valueIndex,
-  updateVariantItem,
-  showVariantImages,
-  onChange,
-}) {
-  const [inputState, setInputState] = useState({
-    inputValue: "",
-    variantImages: [],
-    resetTrigger: false,
-  });
-
-  const { inputValue, variantImages, resetTrigger } = inputState;
-
-  const resetInputValues = useCallback(() => {
-    setInputState({
+const VariantItem = memo(
+  ({
+    variantData,
+    variationIndex,
+    valueIndex,
+    updateVariantItem,
+    showVariantImages,
+    onChange,
+  }) => {
+    const [inputState, setInputState] = useState({
       inputValue: "",
       variantImages: [],
-      resetTrigger: !resetTrigger,
+      resetTrigger: false,
     });
-    setTimeout(
-      () =>
-        setInputState((prevState) => ({ ...prevState, resetTrigger: false })),
-      0
-    );
-  }, [resetTrigger]);
 
-  const handleKeyDown = useCallback(() => {
-    if (inputValue.trim()) {
-      updateVariantItem(inputValue, variantImages, variationIndex, null, true);
-      resetInputValues();
-    }
-  }, [
-    inputValue,
-    variantImages,
-    resetInputValues,
-    variationIndex,
-    updateVariantItem,
-  ]);
+    const { inputValue, variantImages, resetTrigger } = inputState;
 
-  const updatedValueIndex =
-    valueIndex === undefined ? "addVariantItem" : valueIndex;
+    const resetInputValues = useCallback(() => {
+      setInputState({
+        inputValue: "",
+        variantImages: [],
+        resetTrigger: !resetTrigger,
+      });
+      setTimeout(
+        () =>
+          setInputState((prevState) => ({ ...prevState, resetTrigger: false })),
+        0
+      );
+    }, [resetTrigger]);
 
-  const updatedInputName = `productDetails.variations[${variationIndex}].values[${updatedValueIndex}]`;
+    const handleKeyDown = useCallback(() => {
+      if (inputValue.trim()) {
+        updateVariantItem(
+          inputValue,
+          variantImages,
+          variationIndex,
+          null,
+          true
+        );
+        resetInputValues();
+      }
+    }, [
+      inputValue,
+      variantImages,
+      resetInputValues,
+      variationIndex,
+      updateVariantItem,
+    ]);
 
-  return (
-    <div className={`${styles.variantItem} flex align-center`}>
-      <FormInput
-        name={`${updatedInputName}.name`}
-        type="text"
-        placeholder="Please type or select"
-        value={(variantData && variantData.name) || inputValue}
-        onChange={
-          onChange
-            ? onChange
-            : (e) =>
-                setInputState({ ...inputState, inputValue: e.target.value })
-        }
-        onKeyDown={handleKeyDown}
-      />
+    const updatedValueIndex =
+      valueIndex === undefined ? "addVariantItem" : valueIndex;
 
-      {showVariantImages && (
-        <MediaInput
-          name={`${updatedInputName}.variantImages`}
-          fileType="image"
-          maxFiles={5}
-          value={variantData?.variantImages || variantImages}
-          resetTrigger={resetTrigger}
+    const updatedInputName = `productDetails.variations[${variationIndex}].values[${updatedValueIndex}]`;
+
+    return (
+      <div className={`${styles.variantItem} flex align-center`}>
+        <FormInput
+          name={`${updatedInputName}.name`}
+          type="text"
+          placeholder="Please type or select"
+          value={(variantData && variantData.name) || inputValue}
           onChange={
             onChange
               ? onChange
-              : (_, __, newMedia) =>
-                  setInputState((prevState) => ({
-                    ...prevState,
-                    variantImages: newMedia,
-                  }))
+              : (e) =>
+                  setInputState({ ...inputState, inputValue: e.target.value })
           }
+          onKeyDown={handleKeyDown}
         />
-      )}
 
-      {onChange && (
-        <VariantActionButtons
-          handleRemove={() =>
-            updateVariantItem(null, null, variationIndex, valueIndex, false)
-          }
-        />
-      )}
-    </div>
-  );
-}
+        {showVariantImages && (
+          <MediaInput
+            name={`${updatedInputName}.variantImages`}
+            fileType="image"
+            maxFiles={5}
+            value={variantData?.variantImages || variantImages}
+            resetTrigger={resetTrigger}
+            onChange={
+              onChange
+                ? onChange
+                : (_, __, newMedia) =>
+                    setInputState((prevState) => ({
+                      ...prevState,
+                      variantImages: newMedia,
+                    }))
+            }
+          />
+        )}
+
+        {onChange && (
+          <VariantActionButtons
+            handleRemove={() =>
+              updateVariantItem(null, null, variationIndex, valueIndex, false)
+            }
+          />
+        )}
+      </div>
+    );
+  }
+);
+VariantItem.displayName = "VariantItem";
 
 function ProductVariations({ variations, onChange }) {
-  const { updateVariantItem } = useProductForm();
+  const { updateVariantItem } = useProductFormState();
   const [showVariantImages, setShowVariantImages] = useState(false);
 
   return (
@@ -181,4 +191,4 @@ function ProductVariations({ variations, onChange }) {
   );
 }
 
-export default ProductVariations;
+export default memo(ProductVariations);
