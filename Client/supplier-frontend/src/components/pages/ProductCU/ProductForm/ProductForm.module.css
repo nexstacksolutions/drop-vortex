@@ -60,6 +60,12 @@
             right: var(--spacing-md);
             color: var(--secondary-text);
             font-size: var(--font-xs);
+
+            & .suffixIcon {
+              font-size: 1.6rem;
+              cursor: pointer;
+              opacity: 0;
+            }
           }
 
           &:focus-within,
@@ -67,6 +73,10 @@
             border-color: var(--accent-color);
             box-shadow: var(--shadow-xs)
               rgba(var(--accent-Rgb), var(--opacity-md));
+
+            & .suffixDisplay .suffixIcon {
+              opacity: 1;
+            }
           }
         }
       }
@@ -141,6 +151,10 @@
           width: 6rem;
           height: 6rem;
           border: var(--border-base-dashed);
+
+          & > div label {
+            cursor: pointer;
+          }
 
           & .inputHeader {
             width: 100%;

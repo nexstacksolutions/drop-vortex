@@ -14,6 +14,7 @@ const useFormGuide = () => {
     const newGuide = ProductFormTips[name] || defaultContent.guide;
 
     if (guideContent.guide !== newGuide || guideContent.title !== title) {
+      console.log(name, title);
       setGuideContent({ title, guide: newGuide });
     }
   };

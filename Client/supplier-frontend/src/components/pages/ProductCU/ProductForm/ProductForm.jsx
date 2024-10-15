@@ -5,6 +5,7 @@ import { useMemo, memo } from "react";
 import FormSection from "./FormSection";
 import ProductVariations from "./ProductVariations";
 import ProductPriceStockWrapper from "./ProductPriceStock";
+import Divider from "../../../constant/Divider/Divider";
 import {
   useProductFormUI,
   useProductFormState,
@@ -17,7 +18,7 @@ import {
 } from "./ProductInputs";
 
 const RenderInputField = (
-  { name, formInputType, onChange, condition, ...rest },
+  { name, formInputType, onChange, condition, useDivider, ...rest },
   i,
   formState,
   uiState
@@ -41,10 +42,14 @@ const RenderInputField = (
   const InputComponent = inputTypes[formInputType] || inputTypes.default;
 
   return (
-    <InputComponent
-      key={key}
-      {...{ name, value, onChange: handleChange, ...rest }}
-    />
+    <>
+      <InputComponent
+        key={key}
+        {...{ name, value, onChange: handleChange, ...rest }}
+      />
+
+      {useDivider && <Divider />}
+    </>
   );
 };
 
@@ -255,6 +260,7 @@ function ProductForm({ customClass }) {
             label: "Dangerous Goods",
             name: "shipping.dangerousGoods",
             type: "radio",
+            useDivider: true,
             groupType: "radio",
             formInputType: "inputGroup",
             options: ["None", "Contains battery / flammables / liquid"],
@@ -294,6 +300,7 @@ function ProductForm({ customClass }) {
       toggleVariantShipping,
     ]
   );
+
   return (
     <form
       className={classNames(styles.productForm, customClass, "flex flex-col")}

@@ -3,11 +3,12 @@ import styles from "./ProductForm.module.css";
 import { get } from "lodash";
 import classNames from "classnames";
 import ReactQuill from "react-quill";
+import { CgCloseO } from "react-icons/cg";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
-import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
 import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
-import { memo, useCallback, useState, useRef, useEffect, useMemo } from "react";
+import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
 import { useProductFormUI } from "../../../../context/ProductForm";
+import { memo, useCallback, useState, useRef, useEffect, useMemo } from "react";
 
 const useHandleInputKeyDown = (callback) =>
   useCallback(
@@ -114,6 +115,7 @@ const InputContainer = memo(
     label,
     children,
     hideLabel,
+    hideFormGuide,
     hideValidation,
     inputHeaderProps,
     inputWrapperProps,
@@ -125,7 +127,8 @@ const InputContainer = memo(
     const isRequired = get(requiredFields, name);
     const errorMessage = get(formErrors, name);
 
-    const handleClick = () => updateGuideContent(name, label);
+    const handleClick = () =>
+      hideFormGuide ? null : updateGuideContent(name, label);
 
     return (
       <div
@@ -167,7 +170,7 @@ const inputComponents = {
 
 const FormInput = memo(
   ({
-    type = "default",
+    type,
     name,
     value,
     label,
@@ -177,6 +180,7 @@ const FormInput = memo(
     hideLabel,
     customClass,
     suffixDisplay,
+    hideFormGuide,
     hideValidation,
     inputWrapperProps,
     ...rest
@@ -210,8 +214,8 @@ const FormInput = memo(
                 <span>{suffixDisplay.maxValue}</span>
               </>
             )}
-            {suffixDisplay.icon}
-            {suffixDisplay.AdditionalJsx}
+            {suffixDisplay.suffixIcon}
+            {suffixDisplay.additionalJsx}
           </div>
         )}
       </div>
@@ -225,8 +229,10 @@ const FormInput = memo(
           hideLabel,
           id: inputId,
           customClass,
+          hideFormGuide,
           hideValidation,
           inputWrapperProps,
+          ...rest,
         }}
       >
         {inputElement}
@@ -247,6 +253,7 @@ const MediaInput = memo(
     value = [],
     onChange,
     resetTrigger,
+    hideFormGuide,
     customClass,
     guidelinesProps,
   }) => {
@@ -313,7 +320,8 @@ const MediaInput = memo(
             name={name}
             wrapInput={false}
             type="text"
-            hideValidation
+            hideValidation={true}
+            hideFormGuide={true}
             customClass={classNames(
               styles.addMediaWrapper,
               styles.linkInputWrapper
@@ -334,7 +342,8 @@ const MediaInput = memo(
               type="file"
               inputRef={fileInputRef}
               multiple={maxFiles > 1}
-              hideValidation
+              hideValidation={true}
+              hideFormGuide={true}
               customClass={styles.addMediaWrapper}
               inputWrapperProps={{ AdditionalJsx: AddMediaActions }}
               onChange={handleFileChange}
@@ -347,8 +356,7 @@ const MediaInput = memo(
 
     return (
       <InputContainer
-        label={label}
-        name={name}
+        {...{ name, label, hideFormGuide }}
         customClass={classNames(styles.mediaInputContainer, customClass)}
         inputHeaderProps={
           fileType === "video" && {
@@ -359,6 +367,7 @@ const MediaInput = memo(
               name,
               label,
               hideLabel: true,
+              hideFormGuide: true,
               value: uploadOption,
               onChange: (e) => setUploadOption(e.target.value),
               customClass: styles.uploadVideoOptions,
@@ -374,7 +383,6 @@ const MediaInput = memo(
     );
   }
 );
-
 MediaInput.displayName = "MediaInput";
 
 const DropdownInput = memo(
@@ -397,6 +405,16 @@ const DropdownInput = memo(
       }
     };
 
+    const suffixIcon =
+      rest.value.length > 0 ? (
+        <CgCloseO
+          className={styles.suffixIcon}
+          onClick={() => onChange(null, name, "")}
+        />
+      ) : (
+        <FaAngleDown />
+      );
+
     return (
       <InputContainer
         {...{ id, name, ...rest }}
@@ -407,7 +425,7 @@ const DropdownInput = memo(
         <FormInput
           {...{ id, name, onChange, ...rest }}
           wrapInput={false}
-          suffixDisplay={{ icon: <FaAngleDown /> }}
+          suffixDisplay={{ suffixIcon }}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
@@ -451,11 +469,7 @@ const MultiInputGroup = memo(
 
     return (
       <InputContainer
-        label={label}
-        id={id}
-        name={name}
-        hideLabel={hideLabel}
-        hideValidation={hideValidation}
+        {...{ id, name, label, hideLabel, hideValidation }}
         customClass={classNames(styles.multiInputGroup, customClass)}
       >
         {groupType === "input"

@@ -24,12 +24,12 @@ VariantActionButtons.displayName = "VariantActionButtons";
 
 const VariantItem = memo(
   ({
+    onChange,
     variantData,
     variationIndex,
     valueIndex,
     updateVariantItem,
     showVariantImages,
-    onChange,
   }) => {
     const [inputState, setInputState] = useState({
       inputValue: "",
@@ -89,6 +89,7 @@ const VariantItem = memo(
               : (e) =>
                   setInputState({ ...inputState, inputValue: e.target.value })
           }
+          hideFormGuide={true}
           onKeyDown={handleKeyDown}
         />
 
@@ -99,6 +100,7 @@ const VariantItem = memo(
             maxFiles={5}
             value={variantData?.variantImages || variantImages}
             resetTrigger={resetTrigger}
+            hideFormGuide={true}
             onChange={
               onChange
                 ? onChange
@@ -157,6 +159,7 @@ function ProductVariations({ variations, onChange }) {
                   }
                   type="checkbox"
                   value={showVariantImages}
+                  hideFormGuide={true}
                   onChange={(e) => setShowVariantImages(e.target.checked)}
                   customClass={styles.showImageCheckbox}
                 />
@@ -181,7 +184,11 @@ function ProductVariations({ variations, onChange }) {
               </div>
 
               <VariantItem
-                {...{ updateVariantItem, variationIndex, showVariantImages }}
+                {...{
+                  updateVariantItem,
+                  variationIndex,
+                  showVariantImages,
+                }}
               />
             </div>
           </InputContainer>
