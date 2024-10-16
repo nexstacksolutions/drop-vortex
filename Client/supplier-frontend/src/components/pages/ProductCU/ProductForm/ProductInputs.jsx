@@ -3,7 +3,7 @@ import styles from "./ProductForm.module.css";
 import { get } from "lodash";
 import classNames from "classnames";
 import ReactQuill from "react-quill";
-import { CgCloseO } from "react-icons/cg";
+import { CgCloseO, CgInfo } from "react-icons/cg";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
 import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
@@ -21,17 +21,35 @@ const useHandleInputKeyDown = (callback) =>
     [callback]
   );
 
-const Guidelines = memo(({ content, customClass }) =>
-  content?.length ? (
+const GuidePopup = memo(({ guidance }) => {
+  if (!guidance?.length) return null;
+
+  return (
+    <div className={`${styles.guidePopup} flex flex-center`}>
+      <CgInfo />
+      <ul>
+        {guidance?.map((item, idx) => (
+          <li key={item}>{`${idx + 1}. ${item}`}</li>
+        ))}
+      </ul>
+    </div>
+  );
+});
+GuidePopup.displayName = "GuidePopup";
+
+const Guidelines = memo(({ guidance, customClass }) => {
+  if (!guidance?.length) return null;
+
+  return (
     <div className={classNames(styles.guideContainer, customClass)}>
       <ul>
-        {content.map((item, idx) => (
+        {guidance.map((item, idx) => (
           <li key={idx}>{item}</li>
         ))}
       </ul>
     </div>
-  ) : null
-);
+  );
+});
 Guidelines.displayName = "Guidelines";
 
 const MediaPreviewItem = memo(({ file, fileType, onRemove }) => {
@@ -45,10 +63,7 @@ const MediaPreviewItem = memo(({ file, fileType, onRemove }) => {
         className="object-cover"
       />
       <div
-        className={classNames(
-          styles.mediaPreviewActions,
-          "flex justify-between"
-        )}
+        className={classNames(styles.previewActions, "flex justify-between")}
       >
         <button type="button" className={styles.editMediaBtn}>
           <RiEdit2Line />
@@ -71,39 +86,44 @@ const InputHeader = memo(
     id,
     label,
     isRequired,
+    customClass,
     hideValidation,
-    AdditionalJsx,
-    additionalJsxProps,
+    filterTabsProps,
+    guidePopupProps,
   }) => (
-    <div className={classNames(styles.inputHeader, "flex flex-col")}>
+    <div
+      className={classNames(styles.inputHeader, "flex flex-col", customClass)}
+    >
       <label htmlFor={id} className="flex align-center">
         {!hideValidation && isRequired && (
           <FaAsterisk className={styles.requiredFieldIcon} />
         )}
         {typeof label === "string" ? <span>{label}</span> : label}
       </label>
-      {AdditionalJsx && <AdditionalJsx {...additionalJsxProps} />}
+      {guidePopupProps && <GuidePopup {...guidePopupProps} />}
+      {filterTabsProps && <MultiInputGroup {...filterTabsProps} />}
     </div>
   )
 );
 InputHeader.displayName = "InputHeader";
 
-const InputFooter = memo(
-  ({ errorMessage }) =>
-    errorMessage && <p className={styles.errorMsg}>{errorMessage}</p>
-);
+const InputFooter = memo(({ errorMessage }) => (
+  <div className={styles.validationWrapper}>
+    {<p className={styles.errorMsg}>{errorMessage}</p>}
+  </div>
+));
 InputFooter.displayName = "InputFooter";
 
-const InputWrapper = memo(({ children, AdditionalJsx, customClass }) => (
+const InputWrapper = memo(({ children, InputActions, customClass }) => (
   <div
     className={classNames(
-      styles.formInputWrapper,
+      styles.inputControl,
       "flex align-center",
       customClass
     )}
   >
     {children}
-    {AdditionalJsx && <AdditionalJsx />}
+    {InputActions}
   </div>
 ));
 InputWrapper.displayName = "InputWrapper";
@@ -120,20 +140,19 @@ const InputContainer = memo(
     inputHeaderProps,
     inputWrapperProps,
     customClass,
-    AdditionalJsx,
   }) => {
-    const { updateGuideContent, requiredFields, formErrors } =
+    const { updateInputGuidance, requiredFields, formErrors } =
       useProductFormUI();
     const isRequired = get(requiredFields, name);
     const errorMessage = get(formErrors, name);
 
     const handleClick = () =>
-      hideFormGuide ? null : updateGuideContent(name, label);
+      hideFormGuide ? null : updateInputGuidance(name, label);
 
     return (
       <div
         className={classNames(
-          styles.formInputContainer,
+          styles.inputContainer,
           "flex flex-col",
           customClass,
           { [styles.invalidInput]: errorMessage }
@@ -145,8 +164,8 @@ const InputContainer = memo(
             {...{ id, label, isRequired, hideValidation, ...inputHeaderProps }}
           />
         )}
-        {AdditionalJsx && <AdditionalJsx />}
         <InputWrapper {...inputWrapperProps}>{children}</InputWrapper>
+
         {!hideValidation && errorMessage && (
           <InputFooter errorMessage={errorMessage} />
         )}
@@ -256,6 +275,7 @@ const MediaInput = memo(
     hideFormGuide,
     customClass,
     guidelinesProps,
+    guidePopupProps,
   }) => {
     const [mediaFiles, setMediaFiles] = useState(value);
     const [uploadOption, setUploadOption] = useState("Upload Video");
@@ -322,10 +342,6 @@ const MediaInput = memo(
             type="text"
             hideValidation={true}
             hideFormGuide={true}
-            customClass={classNames(
-              styles.addMediaWrapper,
-              styles.linkInputWrapper
-            )}
             onChange={onChange}
             placeholder="Paste Youtube URL link here"
           />
@@ -345,7 +361,7 @@ const MediaInput = memo(
               hideValidation={true}
               hideFormGuide={true}
               customClass={styles.addMediaWrapper}
-              inputWrapperProps={{ AdditionalJsx: AddMediaActions }}
+              inputWrapperProps={{ InputActions: <AddMediaActions /> }}
               onChange={handleFileChange}
               accept={fileType === "image" ? "image/*" : "video/*"}
             />
@@ -358,22 +374,22 @@ const MediaInput = memo(
       <InputContainer
         {...{ name, label, hideFormGuide }}
         customClass={classNames(styles.mediaInputContainer, customClass)}
-        inputHeaderProps={
-          fileType === "video" && {
-            AdditionalJsx: MultiInputGroup,
-            additionalJsxProps: {
-              options: ["Upload Video", "Youtube Link"],
-              type: "radio",
+        inputHeaderProps={{
+          guidePopupProps,
+          ...(fileType === "video" && {
+            filterTabsProps: {
               name,
               label,
+              type: "radio",
               hideLabel: true,
               hideFormGuide: true,
               value: uploadOption,
+              customClass: styles.inputFilterTabs,
+              options: ["Upload Video", "Youtube Link"],
               onChange: (e) => setUploadOption(e.target.value),
-              customClass: styles.uploadVideoOptions,
             },
-          }
-        }
+          }),
+        }}
       >
         {renderInputField()}
         {uploadOption !== "Youtube Link" && guidelinesProps && (
@@ -388,6 +404,7 @@ MediaInput.displayName = "MediaInput";
 const DropdownInput = memo(
   ({ customClass, name, options, onChange, ...rest }) => {
     const [isFocused, setIsFocused] = useState(false);
+    const inputRef = useRef();
     const id = `${name}-dropdown-input`;
 
     const filteredOptions = useMemo(
@@ -405,12 +422,14 @@ const DropdownInput = memo(
       }
     };
 
+    const handleClearInput = () => {
+      onChange(null, name, "");
+      inputRef.current.focus();
+    };
+
     const suffixIcon =
       rest.value.length > 0 ? (
-        <CgCloseO
-          className={styles.suffixIcon}
-          onClick={() => onChange(null, name, "")}
-        />
+        <CgCloseO className={styles.suffixIcon} onClick={handleClearInput} />
       ) : (
         <FaAngleDown />
       );
@@ -423,7 +442,7 @@ const DropdownInput = memo(
         })}
       >
         <FormInput
-          {...{ id, name, onChange, ...rest }}
+          {...{ id, name, onChange, inputRef, ...rest }}
           wrapInput={false}
           suffixDisplay={{ suffixIcon }}
           onFocus={() => setIsFocused(true)}
@@ -462,8 +481,8 @@ const MultiInputGroup = memo(
     type,
     groupType,
     label,
-    hideLabel = false,
-    hideValidation = false,
+    hideLabel,
+    hideValidation,
   }) => {
     const id = `${name}-multi-input-group`;
 

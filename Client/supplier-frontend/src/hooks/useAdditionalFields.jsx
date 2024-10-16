@@ -19,7 +19,16 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
         label: "Special Price",
         placeholder: "Special Price",
       },
-      { fieldPath: "stock", label: "Stock", placeholder: "Stock" },
+      {
+        fieldPath: "stock",
+        label: "Stock",
+        placeholder: "Stock",
+        guidePopupProps: {
+          guidance: [
+            "Stock here refers to the total stock that seller has in the main warehouse only, including those reserved for campaigns.",
+          ],
+        },
+      },
       {
         fieldPath: "sku",
         label: "Seller SKU",

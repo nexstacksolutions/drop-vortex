@@ -7,7 +7,7 @@ import { createRef, useMemo, useEffect, useRef, useCallback } from "react";
 
 export const ProductFormUIProvider = ({ children }) => {
   const { uiState, uiDispatch, formState } = useProductForm();
-  const { guideContent, updateGuideContent } = useFormGuide();
+  const { inputGuidance, updateInputGuidance } = useFormGuide();
   const sectionRefs = useRef(Array.from({ length: 5 }, () => createRef()));
   const { contentScore } = useContentScore(
     formState,
@@ -99,8 +99,8 @@ export const ProductFormUIProvider = ({ children }) => {
       contentScore,
       handleSubmit,
       validateField,
-      guideContent,
-      updateGuideContent,
+      inputGuidance,
+      updateInputGuidance,
       toggleAdditionalFields,
       toggleVariantShipping,
       isVariantShipping,
@@ -115,8 +115,8 @@ export const ProductFormUIProvider = ({ children }) => {
       contentScore,
       handleSubmit,
       validateField,
-      guideContent,
-      updateGuideContent,
+      inputGuidance,
+      updateInputGuidance,
       toggleAdditionalFields,
       toggleVariantShipping,
       isVariantShipping,

@@ -1,4 +1,9 @@
 {
+  "defaultGuidance": {
+    "title": "Tips",
+    "content": "Please ensure to upload product images, fill in the product name, and select the correct category to publish your product."
+  },
+
   "basicInfo.productName": "The name of your product. Recommend to have 20-40 words with unique selling points, so that your products will appear in search result 6x higher.",
 
   "basicInfo.category": "Please make sure to upload product images(s), fill product name, and select the correct category to publish a product.",

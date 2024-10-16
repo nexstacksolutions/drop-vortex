@@ -97,7 +97,7 @@ const VariantItem = memo(
           <MediaInput
             name={`${updatedInputName}.variantImages`}
             fileType="image"
-            maxFiles={5}
+            maxFiles={8}
             value={variantData?.variantImages || variantImages}
             resetTrigger={resetTrigger}
             hideFormGuide={true}

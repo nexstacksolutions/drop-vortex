@@ -153,20 +153,20 @@ const ContentStatus = memo(
 );
 ContentStatus.displayName = "ContentStatus";
 
-const TipsCard = memo(({ guideContent }) => {
+const TipsCard = memo(({ inputGuidance }) => {
   const { TipsIcon } = useMediaExport();
   const [contentKey, setContentKey] = useState(0);
 
   useEffect(() => {
     setContentKey((prevKey) => prevKey + 1);
-  }, [guideContent]);
+  }, [inputGuidance]);
 
   return (
     <div key={contentKey} className={`${styles.tipsCard} flex flex-col`}>
-      <h3 className={styles.tipsTitle}>{guideContent?.title}</h3>
+      <h3 className={styles.tipsTitle}>{inputGuidance.title}</h3>
       <TipsIcon />
       <div className={`${styles.tipsContent} flex flex-col`}>
-        <p className={styles.tipsText}>{guideContent?.guide}</p>
+        <p className={styles.tipsText}>{inputGuidance.content}</p>
       </div>
     </div>
   );
@@ -175,7 +175,7 @@ TipsCard.displayName = "TipsCard";
 
 function StatusSidebar() {
   const { formState } = useProductFormState();
-  const { requiredFields, guideContent, contentScore, sectionRefs } =
+  const { requiredFields, inputGuidance, contentScore, sectionRefs } =
     useProductFormUI();
   const { activeSection, scrollToSection } = useSectionScroll(sectionRefs);
 
@@ -188,7 +188,7 @@ function StatusSidebar() {
         scrollToSection={scrollToSection}
         contentScore={contentScore}
       />
-      <TipsCard guideContent={guideContent} />
+      <TipsCard inputGuidance={inputGuidance} />
     </aside>
   );
 }

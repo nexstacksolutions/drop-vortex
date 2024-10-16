@@ -2,7 +2,7 @@ import styles from "./ProductForm.module.css";
 import { get } from "lodash";
 import { useMemo, memo } from "react";
 import { FaAsterisk } from "react-icons/fa6";
-import { FormInput, MultiInputGroup } from "./ProductInputs";
+import { FormInput, MultiInputGroup, InputHeader } from "./ProductInputs";
 import useAdditionalFields from "../../../../hooks/useAdditionalFields";
 import {
   useProductFormState,
@@ -36,10 +36,13 @@ const renderField = (
       if (isHeader) {
         return (
           <th key={idx}>
-            <label htmlFor={`${name}-form-input`} className="flex flex-center">
-              {isRequired && <FaAsterisk />}
-              <span>{label}</span>
-            </label>
+            <InputHeader
+              id={`${name}-form-input`}
+              label={label}
+              isRequired={isRequired}
+              customClass={styles.tableHeader}
+              guidePopupProps={rest.guidePopupProps}
+            />
           </th>
         );
       }

@@ -22,80 +22,87 @@
       color: var(--secondary-text);
     }
 
-    & .sectionContent .formInputContainer {
+    & .sectionContent .inputContainer {
       position: relative;
+    }
 
-      & .inputHeader {
-        width: max-content;
-
-        & label > .requiredFieldIcon {
-          color: var(--danger-color);
-          font-size: 1rem;
-        }
+    & .inputHeader {
+      &:has(.guidePopup) {
+        flex-direction: row;
+        align-items: center;
       }
 
-      & .formInputWrapper {
-        position: relative;
-        flex: 1;
-
-        & > div {
-          flex: 1;
-        }
-
-        & .inputWrapper {
-          flex: 1;
-          position: relative;
-          border: var(--border-base);
-          border-radius: var(--radius-sm);
-          transition: var(--transition-base);
-
-          & input {
-            border: none;
-            flex: 1;
-          }
-
-          & .suffixDisplay {
-            position: absolute;
-            gap: var(--spacing-xs);
-            right: var(--spacing-md);
-            color: var(--secondary-text);
-            font-size: var(--font-xs);
-
-            & .suffixIcon {
-              font-size: 1.6rem;
-              cursor: pointer;
-              opacity: 0;
-            }
-          }
-
-          &:focus-within,
-          &:hover {
-            border-color: var(--accent-color);
-            box-shadow: var(--shadow-xs)
-              rgba(var(--accent-Rgb), var(--opacity-md));
-
-            & .suffixDisplay .suffixIcon {
-              opacity: 1;
-            }
-          }
-        }
-      }
-
-      & .reactQuillInput {
-        flex: 1;
-      }
-
-      & .errorMsg {
+      & label > .requiredFieldIcon {
         color: var(--danger-color);
+        font-size: 1rem;
+      }
+    }
+
+    & .inputControl {
+      position: relative;
+      flex: 1;
+
+      & > div {
+        flex: 1;
       }
 
-      &.invalidInput .formInputWrapper .inputWrapper {
-        border-color: var(--danger-color);
+      & .inputWrapper {
+        flex: 1;
+        position: relative;
+        border: var(--border-base);
+        border-radius: var(--radius-sm);
+        transition: var(--transition-base);
 
-        &:focus-within {
-          box-shadow: var(--shadow-xs)
-            rgba(var(--danger-Rgb), var(--opacity-lg));
+        & input {
+          border: none;
+          flex: 1;
         }
+
+        & .suffixDisplay {
+          position: absolute;
+          gap: var(--spacing-xs);
+          right: var(--spacing-md);
+          color: var(--secondary-text);
+          font-size: var(--font-xs);
+
+          & .suffixIcon {
+            font-size: 1.6rem;
+            cursor: pointer;
+            opacity: 0;
+          }
+        }
+
+        &:focus-within,
+        &:hover {
+          border-color: var(--accent-color);
+          box-shadow: var(--shadow-xs)
+            rgba(var(--accent-Rgb), var(--opacity-md));
+
+          & .reactQuillInput > div:first-child {
+            border-color: var(--accent-color);
+          }
+
+          & .suffixDisplay .suffixIcon {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    & .validationWrapper .errorMsg {
+      color: var(--danger-color);
+    }
+
+    & .invalidInput .inputControl .inputWrapper {
+      border-color: var(--danger-color);
+
+      & .reactQuillInput > div:first-child {
+        border-color: var(--danger-color);
+      }
+
+      &:focus-within,
+      &:hover {
+        box-shadow: var(--shadow-xs) rgba(var(--danger-Rgb), var(--opacity-lg));
       }
     }
   }
@@ -103,11 +110,12 @@
   & .mediaInputContainer {
     flex: 1;
 
-    & .formInputWrapper {
+    & .inputControl {
       padding: var(--spacing-md);
       border-radius: var(--radius-sm);
       background-color: var(--wrapper-bg);
       justify-content: start;
+      gap: var(--spacing-md);
 
       & .mediaPreviewWrapper {
         max-width: max-content;
@@ -125,7 +133,7 @@
             object-fit: cover;
           }
 
-          & .mediaPreviewActions {
+          & .previewActions {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -141,38 +149,35 @@
             }
           }
 
-          &:hover .mediaPreviewActions {
+          &:hover .previewActions {
             opacity: 1;
             visibility: visible;
           }
         }
 
         & .addMediaWrapper {
-          width: 6rem;
-          height: 6rem;
-          border: var(--border-base-dashed);
-
-          & > div label {
-            cursor: pointer;
-          }
+          width: max-content;
 
           & .inputHeader {
-            width: 100%;
-            height: 100%;
+            width: 6rem;
+            height: 6rem;
             justify-content: center;
+            border: var(--border-base-dashed);
 
             & label {
               width: 100%;
               height: 100%;
               justify-content: center;
+              cursor: pointer;
             }
           }
 
-          & .formInputWrapper {
+          & .inputControl {
             position: absolute;
             top: 80%;
             opacity: 0;
-            visibility: collapse;
+            transform: scale(0);
+            transform-origin: top;
             z-index: 10;
             transition: var(--transition-base) 100ms;
             padding: 0;
@@ -201,21 +206,35 @@
             }
           }
 
-          &:hover .formInputWrapper {
+          &:hover .inputControl {
             opacity: 1;
-            visibility: visible;
+            transform: scale(1);
             top: 100%;
           }
         }
       }
+
+      &:not(:has(.mediaPreviewWrapper)) {
+        background-color: transparent;
+        padding: var(--spacing-sm) 0;
+      }
     }
 
-    & .uploadVideoOptions {
-      /* padding: 2rem; */
+    & .inputFilterTabs .inputControl {
+      padding: var(--spacing-xs) 0;
+      background-color: transparent;
+    }
+  }
 
-      & .formInputWrapper {
-        padding: 0;
-        background-color: transparent;
+  & .reactQuillInput {
+    flex: 1;
+
+    & > div {
+      border: none;
+      transition: var(--transition-base);
+
+      &:first-child {
+        border-bottom: var(--border-base);
       }
     }
   }
@@ -370,11 +389,11 @@
           padding: var(--spacing-sm) var(--spacing-md);
           border-radius: var(--radius-md);
 
-          & .formInputContainer {
+          & > div:first-child {
             width: 30%;
           }
 
-          & .mediaInputContainer {
+          & > div:not(:first-child) {
             padding: 0;
             background-color: transparent;
             max-width: max-content;
@@ -385,9 +404,52 @@
               background-color: transparent;
             }
 
-            & > div > div > div {
-              width: 4rem;
-              height: 4rem;
+            & > div > div {
+              & > div:not(:last-child) {
+                width: 4rem;
+                height: 4rem;
+              }
+
+              & > div:last-child {
+                flex-direction: row;
+                gap: var(--spacing-sm);
+
+                & > div:first-child {
+                  width: 4rem;
+                  height: 4rem;
+                }
+
+                & > div:last-child {
+                  position: static;
+                  opacity: 1;
+                  visibility: visible;
+
+                  & > div:last-child {
+                    flex-direction: row;
+                    gap: var(--spacing-md);
+                    justify-content: start;
+
+                    & button {
+                      min-width: auto;
+                      padding: 0;
+                      background-color: transparent;
+                      color: var(--accent-color);
+                      position: relative;
+                      font-size: var(--font-xs);
+
+                      &:first-child::before {
+                        cursor: default;
+                        position: absolute;
+                        content: "";
+                        right: -0.8rem;
+                        height: 100%;
+                        width: 1px;
+                        background-color: var(--border-color);
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
 
@@ -419,9 +481,9 @@
         text-align: center;
       }
 
-      & th label > svg {
-        color: var(--danger-color);
-        font-size: 1rem;
+      & th .tableHeader,
+      label {
+        justify-content: center;
       }
 
       & td:last-child > div > div > div {
@@ -457,35 +519,8 @@
       width: 30%;
     }
 
-    & .inputGroup input:focus {
-      border-color: var(--accent-color);
-    }
-
     & .radioGroup {
-      width: 100% !important;
       margin-top: var(--spacing-sm);
-
-      & > div {
-        justify-content: start;
-      }
-    }
-
-    & > div:nth-child(3) > div {
-      gap: var(--spacing-md);
-
-      & > label {
-        cursor: pointer;
-
-        & > div > div > div {
-          border: none !important;
-
-          &:focus-within,
-          &:hover {
-            border: none !important;
-            box-shadow: none !important;
-          }
-        }
-      }
     }
   }
 
@@ -502,6 +537,47 @@
       & svg {
         transform: rotate(180deg);
       }
+    }
+  }
+
+  & .guidePopup {
+    width: max-content;
+    position: relative;
+    z-index: 20;
+
+    & ul {
+      width: 27rem;
+      position: absolute;
+      bottom: 2rem;
+      background-color: var(--block-bg);
+      padding: var(--spacing-base);
+      border-radius: var(--radius-md);
+      opacity: 0;
+      transform: scale(0);
+      transition: var(--transition-base);
+      z-index: 20;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 48%;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid var(--block-bg);
+      }
+
+      & li {
+        cursor: default;
+      }
+    }
+
+    &:hover ul {
+      opacity: 1;
+      transform: scale(1);
+      transform-origin: bottom;
     }
   }
 

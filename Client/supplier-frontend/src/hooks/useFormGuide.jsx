@@ -1,25 +1,20 @@
 import { useState } from "react";
 import ProductFormTips from "../api/ProductFormTips.json";
 
-const defaultContent = {
-  title: "Tips",
-  guide:
-    "Please ensure to upload product images, fill in the product name, and select the correct category to publish your product.",
-};
+const defaultGuidance = ProductFormTips["defaultGuidance"];
 
 const useFormGuide = () => {
-  const [guideContent, setGuideContent] = useState(defaultContent);
+  const [inputGuidance, setInputGuidance] = useState(defaultGuidance);
 
-  const updateGuideContent = (name, title = "Tips") => {
-    const newGuide = ProductFormTips[name] || defaultContent.guide;
+  const updateInputGuidance = (name, title = "Tips") => {
+    const newGuidance = ProductFormTips[name] || defaultGuidance.content;
 
-    if (guideContent.guide !== newGuide || guideContent.title !== title) {
-      console.log(name, title);
-      setGuideContent({ title, guide: newGuide });
+    if (inputGuidance.content !== newGuidance) {
+      setInputGuidance({ title, content: newGuidance });
     }
   };
 
-  return { guideContent, updateGuideContent };
+  return { inputGuidance, updateInputGuidance };
 };
 
 export default useFormGuide;

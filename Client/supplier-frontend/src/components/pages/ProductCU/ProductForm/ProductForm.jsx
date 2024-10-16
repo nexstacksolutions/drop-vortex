@@ -1,7 +1,7 @@
 import styles from "./ProductForm.module.css";
 import classNames from "classnames";
 import { get } from "lodash";
-import { useMemo, memo } from "react";
+import React, { useMemo, memo } from "react";
 import FormSection from "./FormSection";
 import ProductVariations from "./ProductVariations";
 import ProductPriceStockWrapper from "./ProductPriceStock";
@@ -42,14 +42,10 @@ const RenderInputField = (
   const InputComponent = inputTypes[formInputType] || inputTypes.default;
 
   return (
-    <>
-      <InputComponent
-        key={key}
-        {...{ name, value, onChange: handleChange, ...rest }}
-      />
-
+    <React.Fragment key={`fragment-${key}`}>
+      <InputComponent {...{ name, value, onChange: handleChange, ...rest }} />
       {useDivider && <Divider />}
-    </>
+    </React.Fragment>
   );
 };
 
@@ -108,6 +104,13 @@ function ProductForm({ customClass }) {
             formInputType: "media",
             fileType: "image",
             maxFiles: 5,
+            guidePopupProps: {
+              guidance: [
+                "This is the main image of your product page. Maximum 8 images can be uploaded",
+                "Image size between 330x330 and 5000x5000 px. Max file size: 3 MB.",
+                "Obscene image is strictly prohibited.",
+              ],
+            },
           },
           {
             label: "Buyer Promotion Image",
@@ -117,7 +120,13 @@ function ProductForm({ customClass }) {
             fileType: "image",
             maxFiles: 1,
             guidelinesProps: {
-              content: ["White Background Image", "See Example"],
+              guidance: ["White Background Image", "See Example"],
+            },
+            guidePopupProps: {
+              guidance: [
+                "A buyer promotion image represents your product in various places, such as search result page, product recommendation page, etc.",
+                "Having a buyer promotion image will inspire buyers to click on your product.",
+              ],
             },
           },
           {
@@ -128,7 +137,7 @@ function ProductForm({ customClass }) {
             fileType: "video",
             maxFiles: 1,
             guidelinesProps: {
-              content: [
+              guidance: [
                 "Min size: 480x480 px, max video length: 60 seconds, max file size: 100MB.",
                 "Supported Format: mp4",
                 "New Video might take up to 36 hrs to be approved",
