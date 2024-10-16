@@ -1,7 +1,6 @@
 import styles from "./ProductForm.module.css";
 import { get } from "lodash";
 import { useMemo, memo } from "react";
-import { FaAsterisk } from "react-icons/fa6";
 import { FormInput, MultiInputGroup, InputHeader } from "./ProductInputs";
 import useAdditionalFields from "../../../../hooks/useAdditionalFields";
 import {
@@ -41,7 +40,7 @@ const renderField = (
               label={label}
               isRequired={isRequired}
               customClass={styles.tableHeader}
-              guidePopupProps={rest.guidePopupProps}
+              guidelinesProps={rest.guidelinesProps}
             />
           </th>
         );

@@ -27,6 +27,8 @@
     }
 
     & .inputHeader {
+      flex-wrap: wrap;
+
       &:has(.guidePopup) {
         flex-direction: row;
         align-items: center;
@@ -110,6 +112,20 @@
   & .mediaInputContainer {
     flex: 1;
 
+    & .inputHeader {
+      & > span {
+        order: 3;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-xs);
+        background-color: var(--block-bg);
+      }
+
+      & .filterTabs {
+        flex-basis: 100%;
+      }
+    }
+
     & .inputControl {
       padding: var(--spacing-md);
       border-radius: var(--radius-sm);
@@ -133,23 +149,31 @@
             object-fit: cover;
           }
 
-          & .previewActions {
+          & .actionWrapper {
             position: absolute;
             width: 100%;
             height: 100%;
-            padding: 0 var(--spacing-xs);
             background-color: rgba(0, 0, 0, 0.7);
             opacity: 0;
             visibility: hidden;
             transition: var(--transition-base);
 
-            & button svg {
-              font-size: var(--font-lg);
-              color: var(--white-color);
+            & .mediaPreview {
+              width: 100%;
+              object-fit: cover;
+            }
+
+            & .mediaAction {
+              padding: 0 var(--spacing-xs);
+
+              & button svg {
+                font-size: var(--font-lg);
+                color: var(--white-color);
+              }
             }
           }
 
-          &:hover .previewActions {
+          &:hover .actionWrapper {
             opacity: 1;
             visibility: visible;
           }
@@ -177,6 +201,7 @@
             top: 80%;
             opacity: 0;
             transform: scale(0);
+            visibility: hidden;
             transform-origin: top;
             z-index: 10;
             transition: var(--transition-base) 100ms;
@@ -209,8 +234,21 @@
           &:hover .inputControl {
             opacity: 1;
             transform: scale(1);
+            visibility: visible;
             top: 100%;
           }
+        }
+      }
+
+      & .guidanceWrapper {
+        & .guidanceHeader {
+          flex-direction: column;
+          align-items: start;
+        }
+
+        & .popupWrapper {
+          padding: var(--spacing-md);
+          gap: var(--spacing-xl);
         }
       }
 
@@ -220,7 +258,7 @@
       }
     }
 
-    & .inputFilterTabs .inputControl {
+    & .filterTabs .inputControl {
       padding: var(--spacing-xs) 0;
       background-color: transparent;
     }
@@ -275,6 +313,34 @@
 
     & > div {
       gap: var(--spacing-md);
+
+      &:first-child {
+        gap: var(--spacing-sm);
+
+        & > div:last-child {
+          flex-basis: 100%;
+
+          & > div:last-child {
+            flex-direction: column-reverse;
+            padding: var(--spacing-lg) var(--spacing-base);
+            left: 40%;
+            bottom: -9rem;
+
+            & img {
+              width: 20rem;
+              height: 20rem;
+              object-fit: contain;
+            }
+
+            & > ul {
+              max-width: 90%;
+              padding: var(--spacing-md);
+              border-radius: var(--radius-md);
+              background-color: var(--canvas-color);
+            }
+          }
+        }
+      }
 
       & .radioItem {
         width: max-content;
@@ -400,17 +466,70 @@
 
             & > div:first-child {
               padding: 0;
-              border-radius: none;
               background-color: transparent;
             }
 
             & > div > div {
-              & > div:not(:last-child) {
+              & > .mediaPreviewItem {
                 width: 4rem;
                 height: 4rem;
+                position: relative;
+
+                & > div:last-child {
+                  transform: scale(0);
+                  transform-origin: bottom;
+                  opacity: 0;
+                  width: max-content;
+                  top: -9rem;
+                  gap: 0;
+                  z-index: 20;
+
+                  & img {
+                    height: 10rem;
+                    aspect-ratio: 16/9;
+                  }
+
+                  & > div:last-child {
+                    padding: var(--spacing-sm);
+                    background-color: var(--canvas-color);
+                    position: relative;
+                    border-radius: var(--radius-sm);
+
+                    & button {
+                      flex: 1;
+                    }
+
+                    &::before {
+                      position: absolute;
+                      content: "";
+                      height: 50%;
+                      width: 1px;
+                      background-color: var(--border-color);
+                      left: 50%;
+                    }
+                  }
+
+                  &::before {
+                    content: "";
+                    position: absolute;
+                    bottom: -5.3rem;
+                    left: 45%;
+                    width: 0;
+                    height: 0;
+                    border-left: 10px solid transparent;
+                    border-right: 10px solid transparent;
+                    border-top: 10px solid var(--canvas-color);
+                    z-index: 21;
+                  }
+                }
+
+                &:hover > div:last-child {
+                  opacity: 1;
+                  transform: scale(1);
+                }
               }
 
-              & > div:last-child {
+              & > .inputContainer {
                 flex-direction: row;
                 gap: var(--spacing-sm);
 
@@ -421,8 +540,9 @@
 
                 & > div:last-child {
                   position: static;
-                  opacity: 1;
                   visibility: visible;
+                  opacity: 1;
+                  transform: scale(1);
 
                   & > div:last-child {
                     flex-direction: row;
@@ -540,44 +660,78 @@
     }
   }
 
-  & .guidePopup {
-    width: max-content;
+  & .guidanceWrapper {
     position: relative;
-    z-index: 20;
 
-    & ul {
-      width: 27rem;
+    & .guidanceHeader button {
+      color: var(--accent-color);
+
+      & svg {
+        font-size: var(--font-lg);
+      }
+    }
+
+    & .popupWrapper {
+      min-width: 27rem;
+      max-width: 50rem;
       position: absolute;
-      bottom: 2rem;
+      bottom: 2.8rem;
+      left: -10.5rem;
       background-color: var(--block-bg);
       padding: var(--spacing-base);
       border-radius: var(--radius-md);
       opacity: 0;
       transform: scale(0);
+      transform-origin: bottom;
+      visibility: hidden;
       transition: var(--transition-base);
       z-index: 20;
+
+      &:has(img) {
+        left: 12%;
+        bottom: -5rem;
+
+        &::before {
+          top: 65%;
+          left: -1rem;
+          transform: rotate(90deg);
+        }
+      }
+
+      & img {
+        height: 10rem;
+        aspect-ratio: 1;
+        object-fit: cover;
+      }
+
+      & .guidanceList {
+        max-width: 100%;
+
+        li {
+          cursor: default;
+          font-size: var(--font-sm);
+          font-weight: var(--weight-thin);
+          text-align: start;
+        }
+      }
 
       &::before {
         content: "";
         position: absolute;
-        top: 100%;
-        left: 48%;
+        top: 97%;
+        left: 40%;
         width: 0;
         height: 0;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 5px solid var(--block-bg);
-      }
-
-      & li {
-        cursor: default;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid var(--block-bg);
       }
     }
 
-    &:hover ul {
+    &.guidanceActive .popupWrapper {
       opacity: 1;
       transform: scale(1);
-      transform-origin: bottom;
+      visibility: visible;
     }
   }
 

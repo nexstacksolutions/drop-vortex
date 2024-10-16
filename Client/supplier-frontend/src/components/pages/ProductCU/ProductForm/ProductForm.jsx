@@ -104,12 +104,14 @@ function ProductForm({ customClass }) {
             formInputType: "media",
             fileType: "image",
             maxFiles: 5,
-            guidePopupProps: {
-              guidance: [
-                "This is the main image of your product page. Maximum 8 images can be uploaded",
-                "Image size between 330x330 and 5000x5000 px. Max file size: 3 MB.",
-                "Obscene image is strictly prohibited.",
-              ],
+            inputHeaderProps: {
+              guidelinesProps: {
+                instructions: [
+                  "This is the main image of your product page. Maximum 8 images can be uploaded",
+                  "Image size between 330x330 and 5000x5000 px. Max file size: 3 MB.",
+                  "Obscene image is strictly prohibited.",
+                ],
+              },
             },
           },
           {
@@ -120,13 +122,26 @@ function ProductForm({ customClass }) {
             fileType: "image",
             maxFiles: 1,
             guidelinesProps: {
-              guidance: ["White Background Image", "See Example"],
-            },
-            guidePopupProps: {
-              guidance: [
-                "A buyer promotion image represents your product in various places, such as search result page, product recommendation page, etc.",
-                "Having a buyer promotion image will inspire buyers to click on your product.",
+              title: "White Background Image",
+              popupBtn: "See Example",
+              imgSrc: "/images/productForm/image-upload-ex.webp",
+              instructions: [
+                "Size: Less than 3MB",
+                "Supported formats: JPG, JPEG or PNG",
+                "The aspect ratio (W x H) must be 1:1",
+                "The minimum resolution is 330 x 330 pixels (Recommended: 1000 x 1000 pixels)",
+                "The background should be plain white (preferred) or show the real environment",
+                "Do not include watermarks, any forms of borders, or marketing copy in the picture",
               ],
+            },
+            inputHeaderProps: {
+              featureLabel: <span>More Exposure</span>,
+              guidelinesProps: {
+                instructions: [
+                  "A buyer promotion image represents your product in various places, such as search result page, product recommendation page, etc.",
+                  "Having a buyer promotion image will inspire buyers to click on your product.",
+                ],
+              },
             },
           },
           {
@@ -137,7 +152,8 @@ function ProductForm({ customClass }) {
             fileType: "video",
             maxFiles: 1,
             guidelinesProps: {
-              guidance: [
+              enablePopup: false,
+              instructions: [
                 "Min size: 480x480 px, max video length: 60 seconds, max file size: 100MB.",
                 "Supported Format: mp4",
                 "New Video might take up to 36 hrs to be approved",
@@ -264,6 +280,16 @@ function ProductForm({ customClass }) {
             groupType: "input",
             placeholder: "0.01 - 300",
             condition: (formData) => !uiState.variantShipping,
+            inputHeaderProps: {
+              guidelinesProps: {
+                title: "How to measure my package dimensions?",
+                popupBtn: "View Example",
+                imgSrc: "/images/productForm/package-length-ex.png",
+                instructions: [
+                  "Please include the packaging materials to be used for shipment while entering the package weight and dimensions. Do note that inaccurate package dimensions may result in additional shipping charges or failed delivery.",
+                ],
+              },
+            },
           },
           {
             label: "Dangerous Goods",

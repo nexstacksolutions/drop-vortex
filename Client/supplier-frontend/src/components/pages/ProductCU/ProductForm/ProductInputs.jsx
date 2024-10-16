@@ -21,64 +21,97 @@ const useHandleInputKeyDown = (callback) =>
     [callback]
   );
 
-const GuidePopup = memo(({ guidance }) => {
-  if (!guidance?.length) return null;
+const GuidanceTooltip = memo(
+  ({
+    title,
+    imgSrc,
+    customClass,
+    enablePopup = true,
+    instructions = [],
+    popupBtn = <CgInfo />,
+  }) => {
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  return (
-    <div className={`${styles.guidePopup} flex flex-center`}>
-      <CgInfo />
-      <ul>
-        {guidance?.map((item, idx) => (
-          <li key={item}>{`${idx + 1}. ${item}`}</li>
-        ))}
-      </ul>
-    </div>
-  );
-});
-GuidePopup.displayName = "GuidePopup";
+    if (!instructions.length && !imgSrc) return null;
 
-const Guidelines = memo(({ guidance, customClass }) => {
-  if (!guidance?.length) return null;
-
-  return (
-    <div className={classNames(styles.guideContainer, customClass)}>
-      <ul>
-        {guidance.map((item, idx) => (
-          <li key={idx}>{item}</li>
-        ))}
-      </ul>
-    </div>
-  );
-});
-Guidelines.displayName = "Guidelines";
-
-const MediaPreviewItem = memo(({ file, fileType, onRemove }) => {
-  const src = URL.createObjectURL(file);
-  const MediaTag = fileType === "image" ? "img" : "video";
-  return (
-    <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
-      <MediaTag
-        src={src}
-        controls={fileType !== "image"}
-        className="object-cover"
-      />
+    return (
       <div
-        className={classNames(styles.previewActions, "flex justify-between")}
+        className={classNames(
+          styles.guidanceWrapper,
+          "flex justify-start align-center",
+          { customClass, [styles.guidanceActive]: isPopupOpen }
+        )}
+        onMouseLeave={() => setIsPopupOpen(false)}
       >
-        <button type="button" className={styles.editMediaBtn}>
-          <RiEdit2Line />
-        </button>
-        <button
-          type="button"
-          onClick={onRemove}
-          className={styles.removeMediaBtn}
+        {(title || popupBtn) && enablePopup && (
+          <div className={`${styles.guidanceHeader} flex flex-center`}>
+            {title && <span>{title}</span>}
+            <button onMouseOver={() => setIsPopupOpen(true)}>{popupBtn}</button>
+          </div>
+        )}
+
+        <div
+          className={classNames("flex align-center", {
+            [styles.popupWrapper]: enablePopup,
+            [styles.contentWrapper]: !enablePopup,
+          })}
         >
-          <RiDeleteBin5Line />
-        </button>
+          {imgSrc && <img src={imgSrc} alt="Guidance Visual" />}
+
+          {instructions.length > 0 && (
+            <ul className={styles.guidanceList}>
+              {instructions.map((item, idx) => (
+                <li key={idx}>
+                  {instructions.length > 1 && enablePopup && `${idx + 1}.`}{" "}
+                  {item}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
+GuidanceTooltip.displayName = "GuidanceTooltip";
+
+const MediaPreviewItem = memo(
+  ({ file, fileType, onRemove, showMediaPreview }) => {
+    const src = URL.createObjectURL(file);
+    const MediaTag = fileType === "image" ? "img" : "video";
+    return (
+      <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
+        <MediaTag
+          src={src}
+          controls={fileType !== "image"}
+          className="object-cover"
+        />
+        <div
+          className={classNames(
+            styles.actionWrapper,
+            "flex flex-col justify-center"
+          )}
+        >
+          {showMediaPreview && (
+            <img src={src} alt="" className={styles.mediaPreview} />
+          )}
+          <div className={`${styles.mediaAction} flex justify-between`}>
+            <button type="button" className={styles.editBtn}>
+              <RiEdit2Line />
+            </button>
+            <button
+              type="button"
+              onClick={onRemove}
+              className={styles.removeBtn}
+            >
+              <RiDeleteBin5Line />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
 MediaPreviewItem.displayName = "MediaPreviewItem";
 
 const InputHeader = memo(
@@ -87,20 +120,20 @@ const InputHeader = memo(
     label,
     isRequired,
     customClass,
+    featureLabel,
     hideValidation,
     filterTabsProps,
-    guidePopupProps,
+    guidelinesProps,
   }) => (
-    <div
-      className={classNames(styles.inputHeader, "flex flex-col", customClass)}
-    >
+    <div className={classNames(styles.inputHeader, "flex ", customClass)}>
       <label htmlFor={id} className="flex align-center">
         {!hideValidation && isRequired && (
           <FaAsterisk className={styles.requiredFieldIcon} />
         )}
         {typeof label === "string" ? <span>{label}</span> : label}
       </label>
-      {guidePopupProps && <GuidePopup {...guidePopupProps} />}
+      {featureLabel}
+      {guidelinesProps && <GuidanceTooltip {...guidelinesProps} />}
       {filterTabsProps && <MultiInputGroup {...filterTabsProps} />}
     </div>
   )
@@ -201,6 +234,7 @@ const FormInput = memo(
     suffixDisplay,
     hideFormGuide,
     hideValidation,
+    guidelinesProps,
     inputWrapperProps,
     ...rest
   }) => {
@@ -250,6 +284,7 @@ const FormInput = memo(
           customClass,
           hideFormGuide,
           hideValidation,
+          guidelinesProps,
           inputWrapperProps,
           ...rest,
         }}
@@ -274,8 +309,9 @@ const MediaInput = memo(
     resetTrigger,
     hideFormGuide,
     customClass,
+    inputHeaderProps,
     guidelinesProps,
-    guidePopupProps,
+    mediaPreviewProps,
   }) => {
     const [mediaFiles, setMediaFiles] = useState(value);
     const [uploadOption, setUploadOption] = useState("Upload Video");
@@ -318,10 +354,11 @@ const MediaInput = memo(
             key={index}
             file={file}
             fileType={fileType}
+            {...mediaPreviewProps}
             onRemove={() => handleRemoveFile(index)}
           />
         )),
-      [fileType, handleRemoveFile]
+      [fileType, handleRemoveFile, mediaPreviewProps]
     );
 
     const AddMediaActions = () => (
@@ -375,7 +412,7 @@ const MediaInput = memo(
         {...{ name, label, hideFormGuide }}
         customClass={classNames(styles.mediaInputContainer, customClass)}
         inputHeaderProps={{
-          guidePopupProps,
+          ...inputHeaderProps,
           ...(fileType === "video" && {
             filterTabsProps: {
               name,
@@ -384,7 +421,7 @@ const MediaInput = memo(
               hideLabel: true,
               hideFormGuide: true,
               value: uploadOption,
-              customClass: styles.inputFilterTabs,
+              customClass: styles.filterTabs,
               options: ["Upload Video", "Youtube Link"],
               onChange: (e) => setUploadOption(e.target.value),
             },
@@ -393,7 +430,7 @@ const MediaInput = memo(
       >
         {renderInputField()}
         {uploadOption !== "Youtube Link" && guidelinesProps && (
-          <Guidelines {...guidelinesProps} />
+          <GuidanceTooltip {...guidelinesProps} />
         )}
       </InputContainer>
     );
@@ -480,15 +517,13 @@ const MultiInputGroup = memo(
     onChange,
     type,
     groupType,
-    label,
-    hideLabel,
-    hideValidation,
+    ...rest
   }) => {
     const id = `${name}-multi-input-group`;
 
     return (
       <InputContainer
-        {...{ id, name, label, hideLabel, hideValidation }}
+        {...{ id, name, ...rest }}
         customClass={classNames(styles.multiInputGroup, customClass)}
       >
         {groupType === "input"
@@ -548,4 +583,5 @@ export {
   MediaInput,
   DropdownInput,
   MultiInputGroup,
+  GuidanceTooltip,
 };

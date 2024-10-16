@@ -43,6 +43,7 @@ body {
   --font-md: 1.6rem; /* 16px */
   --font-lg: 1.8rem; /* 18px */
   --font-xl: 2.4rem; /* 24px */
+  --weight-thin: 300;
   --weight-normal: 400;
   --weight-base: 500;
   --weight-semibold: 600;

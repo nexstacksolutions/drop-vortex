@@ -23,8 +23,8 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
         fieldPath: "stock",
         label: "Stock",
         placeholder: "Stock",
-        guidePopupProps: {
-          guidance: [
+        guidelinesProps: {
+          instructions: [
             "Stock here refers to the total stock that seller has in the main warehouse only, including those reserved for campaigns.",
           ],
         },
