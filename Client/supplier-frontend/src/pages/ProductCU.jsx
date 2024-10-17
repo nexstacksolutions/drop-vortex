@@ -1,4 +1,4 @@
-import styles from "../styles/ProductCU.module.css";
+import styles from "../styles/pages/ProductCU.module.css";
 import ShowcaseGrid from "../components/common/ShowcaseV2/ShowcaseGrid/ShowcaseGrid";
 import StatusSidebar from "../components/pages/ProductCU/StatusSidebar/StatusSidebar";
 import ProductForm from "../components/pages/ProductCU/ProductForm/ProductForm";

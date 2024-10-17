@@ -1,14 +1,13 @@
 import styles from "./Sidebar.module.css";
 import navigation from "../../../constant/navigation";
 import classNames from "classnames";
-import { useTheme } from "../../../context/ThemeContext";
-import useMediaExport from "../../../hooks/useMediaExport";
+import { useTheme } from "../../../context/Theme";
+import useMediaExport from "../../../hooks/global/useMediaExport";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
 import { NavLink, useLocation, Link } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import Divider from "../Divider/Divider";
-import { debounce } from "lodash";
 
 function NavSubLinks({ subLinks, isActive }) {
   if (!subLinks?.length) return null;

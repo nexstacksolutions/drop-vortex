@@ -1,5 +1,5 @@
 import styles from "./ToggleTheme.module.css";
-import { useTheme } from "../../../context/ThemeContext";
+import { useTheme } from "../../../context/Theme";
 import { CiLight, CiDark } from "react-icons/ci";
 import classNames from "classnames";
 

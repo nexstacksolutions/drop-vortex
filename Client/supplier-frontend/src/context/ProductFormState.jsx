@@ -2,7 +2,7 @@ import { get } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import formSchema from "../schemas/productForm";
 import { useMemo, useCallback } from "react";
-import useFormValidation from "../hooks/useFormValidation";
+import useFormValidation from "../hooks/pages/ProductForm/useFormValidation";
 import { ProductFormStateContext, useProductForm } from "./ProductForm";
 
 export const ProductFormStateProvider = ({ children }) => {

@@ -2,7 +2,7 @@ import styles from "./ProductForm.module.css";
 import { get } from "lodash";
 import { useMemo, memo } from "react";
 import { FormInput, MultiInputGroup, InputHeader } from "./ProductInputs";
-import useAdditionalFields from "../../../../hooks/useAdditionalFields";
+import useAdditionalFields from "../../../../hooks/pages/ProductForm/useAdditionalFields";
 import {
   useProductFormState,
   useProductFormUI,

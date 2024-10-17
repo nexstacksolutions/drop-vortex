@@ -1,7 +1,7 @@
 import formSchema from "../schemas/productForm";
-import useFormGuide from "../hooks/useFormGuide";
-import useContentScore from "../hooks/useContentScore";
-import useFormValidation from "../hooks/useFormValidation";
+import useFormGuide from "../hooks/pages/ProductForm/useFormGuide";
+import useContentScore from "../hooks/pages/ProductForm/useContentScore";
+import useFormValidation from "../hooks/pages/ProductForm/useFormValidation";
 import { ProductFormUIContext, useProductForm } from "./ProductForm";
 import { createRef, useMemo, useEffect, useRef, useCallback } from "react";
 

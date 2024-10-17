@@ -1,4 +1,4 @@
-import styles from "../styles/Home.module.css";
+import styles from "../styles/pages/Home.module.css";
 import FeatureMsg from "../components/common/FeatureMsg/FeatureMsg";
 import HeroSection from "../components/pages/Home/HeroSection/HeroSection";
 import OrdersSection from "../components/pages/Home/OrdersSection/OrdersSection";

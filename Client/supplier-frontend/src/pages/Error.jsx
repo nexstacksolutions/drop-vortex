@@ -1,4 +1,4 @@
-import styles from "../styles/Error.module.css";
+import styles from "../styles/pages/Error.module.css";
 import { Link, useNavigate, useRouteError } from "react-router-dom";
 
 function ErrorBoundary() {

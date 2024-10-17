@@ -1,6 +1,8 @@
 import { formState, formControl } from "../store/formStateReducer";
 import { formUI, uiControl } from "../store/formUIReducer";
 import { createContext, useContext, useReducer, useMemo } from "react";
+import { ProductFormStateProvider } from "./ProductFormState";
+import { ProductFormUIProvider } from "./ProductFormUI";
 
 export const ProductFormContext = createContext();
 export const ProductFormUIContext = createContext();
@@ -22,7 +24,9 @@ const ProductFormProvider = ({ children }) => {
 
   return (
     <ProductFormContext.Provider value={values}>
-      {children}
+      <ProductFormStateProvider>
+        <ProductFormUIProvider>{children}</ProductFormUIProvider>
+      </ProductFormStateProvider>
     </ProductFormContext.Provider>
   );
 };

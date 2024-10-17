@@ -1,7 +1,7 @@
 import styles from "./FeatureSection.module.css";
 import ShowcaseGrid from "../../../common/Showcase/ShowcaseGrid/ShowcaseGrid";
 import FeatureCard from "../../../common/Showcase/ShowcaseCard/FeatureCard/FeatureCard";
-import useMediaExport from "../../../../hooks/useMediaExport";
+import useMediaExport from "../../../../hooks/global/useMediaExport";
 
 function FeatureSection() {
   const { FeatureIcon1, FeatureIcon2, FeatureIcon3, FeatureIcon4 } =
