@@ -187,6 +187,7 @@
             height: 6rem;
             justify-content: center;
             border: var(--border-base-dashed);
+            transition: var(--transition-base);
 
             & label {
               width: 100%;
@@ -231,25 +232,27 @@
             }
           }
 
-          &:hover .inputControl {
-            opacity: 1;
-            transform: scale(1);
-            visibility: visible;
-            top: 100%;
+          &:hover {
+            & .inputHeader {
+              border-color: var(--accent-color);
+
+              & label svg {
+                color: var(--accent-color);
+              }
+            }
+
+            & .inputControl {
+              opacity: 1;
+              transform: scale(1);
+              visibility: visible;
+              top: 100%;
+            }
           }
         }
       }
 
-      & .guidanceWrapper {
-        & .guidanceHeader {
-          flex-direction: column;
-          align-items: start;
-        }
-
-        & .popupWrapper {
-          padding: var(--spacing-md);
-          gap: var(--spacing-xl);
-        }
+      & .guidanceHeader {
+        flex-direction: column;
       }
 
       &:not(:has(.mediaPreviewWrapper)) {
@@ -319,26 +322,6 @@
 
         & > div:last-child {
           flex-basis: 100%;
-
-          & > div:last-child {
-            flex-direction: column-reverse;
-            padding: var(--spacing-lg) var(--spacing-base);
-            left: 40%;
-            bottom: -9rem;
-
-            & img {
-              width: 25rem;
-              height: 25rem;
-              object-fit: contain;
-            }
-
-            & > ul {
-              max-width: 90%;
-              padding: var(--spacing-md);
-              border-radius: var(--radius-md);
-              background-color: var(--block-bg);
-            }
-          }
         }
       }
 
@@ -660,78 +643,15 @@
     }
   }
 
-  & .guidanceWrapper {
-    position: relative;
+  & .guidanceHeader {
+    width: max-content;
 
-    & .guidanceHeader button {
+    & button {
       color: var(--accent-color);
-
-      & svg {
-        font-size: var(--font-lg);
-      }
     }
 
-    & .popupWrapper {
-      min-width: 27rem;
-      max-width: 50rem;
-      position: absolute;
-      bottom: 2.8rem;
-      left: -10.5rem;
-      border: var(--border-base);
-      background-color: var(--canvas-color);
-      padding: var(--spacing-base);
-      border-radius: var(--radius-md);
-      opacity: 0;
-      transform: scale(0);
-      transform-origin: bottom;
-      visibility: hidden;
-      transition: var(--transition-base);
-      z-index: 20;
-
-      &:has(img) {
-        left: 12%;
-        bottom: -5rem;
-
-        &::before {
-          top: 0;
-          right: 100%;
-          width: 10px;
-          height: 100%;
-        }
-      }
-
-      & img {
-        height: 10rem;
-        aspect-ratio: 1;
-        object-fit: cover;
-      }
-
-      & .guidanceList {
-        max-width: 100%;
-
-        li {
-          cursor: default;
-          font-size: var(--font-sm);
-          font-weight: var(--weight-thin);
-          text-align: start;
-        }
-      }
-
-      &::before {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        height: 10px;
-        background-color: transparent;
-      }
-    }
-
-    &.guidanceActive .popupWrapper {
-      opacity: 1;
-      transform: scale(1);
-      visibility: visible;
+    & svg {
+      font-size: var(--font-lg);
     }
   }
 
@@ -744,4 +664,37 @@
       color: var(--white-color);
     }
   }
+}
+
+.guidanceWrapper {
+  max-width: 30rem;
+
+  &:has(img) {
+    max-width: 50rem;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-md);
+
+    & img {
+      width: 10rem;
+    }
+
+    &:not(:has(ul > li:nth-child(2))) {
+      max-width: 42.6rem;
+      flex-direction: column-reverse;
+
+      & img {
+        width: 25rem;
+      }
+
+      & ul {
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+        background-color: var(--canvas-color);
+      }
+    }
+  }
+}
+
+& .guidanceTooltip {
+  border-radius: var(--radius-sm) !important;
 }

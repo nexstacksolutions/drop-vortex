@@ -4,6 +4,7 @@ import { get } from "lodash";
 import classNames from "classnames";
 import ReactQuill from "react-quill";
 import { CgCloseO, CgInfo } from "react-icons/cg";
+import ReactDOMServer from "react-dom/server";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
 import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
@@ -25,51 +26,41 @@ const GuidanceTooltip = memo(
   ({
     title,
     imgSrc,
-    customClass,
-    enablePopup = true,
-    instructions = [],
+    instructions,
     popupBtn = <CgInfo />,
+    enablePopup = true,
+    direction = "top",
   }) => {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const content = (
+      <div className={classNames("flex align-center", styles.guidanceWrapper)}>
+        {imgSrc && <img src={imgSrc} alt="Guidance Visual" />}
+        {instructions.length > 0 && (
+          <ul className={styles.guidanceList}>
+            {instructions.map((item, idx) => (
+              <li key={idx}>
+                {instructions.length > 1 && `${idx + 1}.`} {item}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
 
-    if (!instructions.length && !imgSrc) return null;
+    if (!enablePopup) return content;
 
     return (
-      <div
-        className={classNames(
-          styles.guidanceWrapper,
-          "flex justify-start align-center",
-          { customClass, [styles.guidanceActive]: isPopupOpen }
-        )}
-        onMouseLeave={() => setIsPopupOpen(false)}
-      >
-        {(title || popupBtn) && enablePopup && (
-          <div className={`${styles.guidanceHeader} flex flex-center`}>
-            {title && <span>{title}</span>}
-            <button onMouseOver={() => setIsPopupOpen(true)}>{popupBtn}</button>
-          </div>
-        )}
-
-        <div
-          className={classNames("flex align-center", {
-            [styles.popupWrapper]: enablePopup,
-            [styles.contentWrapper]: !enablePopup,
-          })}
-        >
-          {imgSrc && <img src={imgSrc} alt="Guidance Visual" />}
-
-          {instructions.length > 0 && (
-            <ul className={styles.guidanceList}>
-              {instructions.map((item, idx) => (
-                <li key={idx}>
-                  {instructions.length > 1 && enablePopup && `${idx + 1}.`}{" "}
-                  {item}
-                </li>
-              ))}
-            </ul>
-          )}
+      (title || popupBtn) && (
+        <div className={`${styles.guidanceHeader} flex`}>
+          {title && <span>{title}</span>}
+          <button
+            data-tooltip-id="guidance-tooltip"
+            data-tooltip-html={ReactDOMServer.renderToStaticMarkup(content)}
+            data-tooltip-place={direction}
+          >
+            {popupBtn}
+          </button>
         </div>
-      </div>
+      )
     );
   }
 );
@@ -510,13 +501,13 @@ DropdownInput.displayName = "DropdownInput";
 
 const MultiInputGroup = memo(
   ({
-    customClass,
     value,
     options,
     name,
     onChange,
     type,
     groupType,
+    customClass,
     ...rest
   }) => {
     const id = `${name}-multi-input-group`;

@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { get } from "lodash";
 import React, { useMemo, memo } from "react";
 import FormSection from "./FormSection";
+import { Tooltip } from "react-tooltip";
 import ProductVariations from "./ProductVariations";
 import ProductPriceStockWrapper from "./ProductPriceStock";
 import Divider from "../../../constant/Divider/Divider";
@@ -125,6 +126,7 @@ function ProductForm({ customClass }) {
               title: "White Background Image",
               popupBtn: "See Example",
               imgSrc: "/images/productForm/image-upload-ex.webp",
+              direction: "right",
               instructions: [
                 "Size: Less than 3MB",
                 "Supported formats: JPG, JPEG or PNG",
@@ -285,6 +287,7 @@ function ProductForm({ customClass }) {
                 title: "How to measure my package dimensions?",
                 popupBtn: "View Example",
                 imgSrc: "/images/productForm/package-length-ex.png",
+                direction: "right",
                 instructions: [
                   "Please include the packaging materials to be used for shipment while entering the package weight and dimensions. Do note that inaccurate package dimensions may result in additional shipping charges or failed delivery.",
                 ],
@@ -358,6 +361,12 @@ function ProductForm({ customClass }) {
           )}
         </FormSection>
       ))}
+
+      <Tooltip
+        id="guidance-tooltip"
+        className={styles.guidanceTooltip}
+        // clickable
+      />
 
       <div className={`${styles.formActions} flex justify-end`}>
         <button
