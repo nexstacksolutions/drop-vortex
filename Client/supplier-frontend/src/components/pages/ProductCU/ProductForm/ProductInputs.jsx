@@ -26,51 +26,45 @@ const GuidanceTooltip = memo(
   ({
     title,
     imgSrc,
-    instructions,
+    instructions = [],
     popupBtn = <CgInfo />,
     enablePopup = true,
-    id = "guidance-tooltip",
     place = "top",
   }) => {
-    const { handleTooltipTrigger, handleMouseLeave } = useTooltip();
+    const { handleTooltipTrigger } = useTooltip();
 
-    const content = (
-      <div className={classNames("flex align-center", styles.guidanceWrapper)}>
-        {imgSrc && <img src={imgSrc} alt="Guidance Visual" />}
-        {instructions?.length > 0 && (
-          <ul className={styles.guidanceList}>
-            {instructions.map((item, idx) => (
-              <li key={idx}>
-                {instructions.length > 1 && `${idx + 1}.`} {item}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+    const content = useMemo(
+      () => (
+        <div
+          className={classNames("flex align-center", styles.guidanceWrapper)}
+        >
+          {imgSrc && <img src={imgSrc} alt="Guidance Visual" />}
+          {instructions.length > 0 && (
+            <ul className={styles.guidanceList}>
+              {instructions.map((item, idx) => (
+                <li key={idx}>
+                  {instructions.length > 1 && `${idx + 1}.`} {item}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ),
+      [imgSrc, instructions]
     );
-
-    const tooltipProps = {
-      id,
-      content,
-      place,
-      clickable: true,
-    };
 
     if (!enablePopup) return content;
 
     return (
-      (title || popupBtn) && (
-        <div className={`${styles.guidanceHeader} flex`}>
-          {title && <span>{title}</span>}
-          <button
-            id={id}
-            onMouseOver={() => handleTooltipTrigger(tooltipProps)}
-            onMouseLeave={handleMouseLeave}
-          >
-            {popupBtn}
-          </button>
-        </div>
-      )
+      <div className={classNames(styles.guidanceHeader, "flex")}>
+        {title && <span>{title}</span>}
+        <button
+          id="global-tooltip"
+          onMouseOver={() => handleTooltipTrigger({ content, place })}
+        >
+          {popupBtn}
+        </button>
+      </div>
     );
   }
 );
@@ -78,15 +72,12 @@ GuidanceTooltip.displayName = "GuidanceTooltip";
 
 const MediaPreviewItem = memo(
   ({ file, fileType, onRemove, showMediaPreview }) => {
-    const src = URL.createObjectURL(file);
+    const { handleTooltipTrigger } = useTooltip();
+    const src = useMemo(() => URL.createObjectURL(file), [file]);
     const MediaTag = fileType === "image" ? "img" : "video";
-    return (
-      <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
-        <MediaTag
-          src={src}
-          controls={fileType !== "image"}
-          className="object-cover"
-        />
+
+    const content = useMemo(
+      () => (
         <div
           className={classNames(
             styles.actionWrapper,
@@ -96,7 +87,9 @@ const MediaPreviewItem = memo(
           {showMediaPreview && (
             <img src={src} alt="" className={styles.mediaPreview} />
           )}
-          <div className={`${styles.mediaAction} flex justify-between`}>
+          <div
+            className={classNames(styles.mediaAction, "flex justify-between")}
+          >
             <button type="button" className={styles.editBtn}>
               <RiEdit2Line />
             </button>
@@ -109,6 +102,19 @@ const MediaPreviewItem = memo(
             </button>
           </div>
         </div>
+      ),
+      [src, showMediaPreview, onRemove]
+    );
+
+    return (
+      <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
+        <MediaTag
+          src={src}
+          controls={fileType !== "image"}
+          className="object-cover"
+          id="global-tooltip"
+          onMouseOver={() => handleTooltipTrigger({ content })}
+        />
       </div>
     );
   }

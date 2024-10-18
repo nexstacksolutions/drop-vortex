@@ -1,52 +1,48 @@
 import { isEqual } from "lodash";
-import {
+import React, {
   createContext,
-  useMemo,
   useContext,
   useState,
   useCallback,
+  useMemo,
 } from "react";
 
 const TooltipContext = createContext();
 
 const TooltipProvider = ({ children }) => {
-  const [toolTipProps, setToolTipProps] = useState({});
-  const [hasDisplayedTooltip, setHasDisplayedTooltip] = useState(false);
+  const [tooltipProps, setTooltipProps] = useState({});
 
   const displayTooltip = useCallback(
-    ({ content, delayShow = 100, delayHide = 100, ...rest }) => {
-      if (!isEqual(content, toolTipProps.content)) {
-        setToolTipProps({ content, delayShow, delayHide, ...rest });
-      }
+    ({
+      delayShow = 100,
+      delayHide = 100,
+      clickable = true,
+      place = "top",
+      ...rest
+    }) => {
+      setTooltipProps({ delayShow, delayHide, clickable, place, ...rest });
     },
-    [toolTipProps]
+    []
   );
 
   const handleTooltipTrigger = useCallback(
     (props) => {
-      if (!hasDisplayedTooltip) {
+      if (!isEqual(props.content, tooltipProps.content)) {
         displayTooltip(props);
-        setHasDisplayedTooltip(true);
       }
     },
-    [displayTooltip, hasDisplayedTooltip]
+    [tooltipProps.content, displayTooltip]
   );
 
-  const handleMouseLeave = () => {
-    setHasDisplayedTooltip(false);
-  };
-
-  const values = useMemo(
-    () => ({
-      toolTipProps,
-      handleTooltipTrigger,
-      handleMouseLeave,
-    }),
-    [toolTipProps, handleTooltipTrigger]
+  const contextValue = useMemo(
+    () => ({ tooltipProps, handleTooltipTrigger }),
+    [tooltipProps, handleTooltipTrigger]
   );
 
   return (
-    <TooltipContext.Provider value={values}>{children}</TooltipContext.Provider>
+    <TooltipContext.Provider value={contextValue}>
+      {children}
+    </TooltipContext.Provider>
   );
 };
 

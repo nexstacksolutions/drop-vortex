@@ -10,14 +10,14 @@ import TooltipManager from "./components/constant/ToolTip/TooltipManager";
 import { useTooltip } from "./context/Tooltip";
 
 function App() {
-  const { toolTipProps } = useTooltip();
+  const { tooltipProps } = useTooltip();
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Sidebar />
       <MainLayout />
       <ToggleTheme />
-      <TooltipManager {...toolTipProps} />
+      <TooltipManager {...tooltipProps} />
     </Suspense>
   );
 }
