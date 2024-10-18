@@ -49,7 +49,12 @@ const GuidanceTooltip = memo(
       </div>
     );
 
-    const tooltipProps = { id, content, place, clickable: true };
+    const tooltipProps = {
+      id,
+      content,
+      place,
+      clickable: true,
+    };
 
     if (!enablePopup) return content;
 

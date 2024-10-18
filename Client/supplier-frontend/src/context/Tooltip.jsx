@@ -14,9 +14,9 @@ const TooltipProvider = ({ children }) => {
   const [hasDisplayedTooltip, setHasDisplayedTooltip] = useState(false);
 
   const displayTooltip = useCallback(
-    ({ content, ...rest }) => {
+    ({ content, delayShow = 100, delayHide = 100, ...rest }) => {
       if (!isEqual(content, toolTipProps.content)) {
-        setToolTipProps({ content, ...rest });
+        setToolTipProps({ content, delayShow, delayHide, ...rest });
       }
     },
     [toolTipProps]
