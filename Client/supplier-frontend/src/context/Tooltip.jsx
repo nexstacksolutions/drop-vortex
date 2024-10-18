@@ -32,9 +32,9 @@ const TooltipProvider = ({ children }) => {
     [displayTooltip, hasDisplayedTooltip]
   );
 
-  const handleMouseLeave = useCallback(() => {
+  const handleMouseLeave = () => {
     setHasDisplayedTooltip(false);
-  }, []);
+  };
 
   const values = useMemo(
     () => ({
@@ -42,7 +42,7 @@ const TooltipProvider = ({ children }) => {
       handleTooltipTrigger,
       handleMouseLeave,
     }),
-    [toolTipProps, handleTooltipTrigger, handleMouseLeave]
+    [toolTipProps, handleTooltipTrigger]
   );
 
   return (

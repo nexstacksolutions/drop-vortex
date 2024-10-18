@@ -9,9 +9,14 @@ import React, {
 const ThemeContext = createContext();
 
 function ThemeProvider({ children }) {
-  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+  const systemTheme = useMemo(
+    () =>
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light",
+    []
+  );
+
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || systemTheme
   );
