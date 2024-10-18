@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import styles from "./ShowcaseWrapper.module.css";
+import { memo } from "react";
 
 function ShowcaseWrapper({
   wrapContent,
@@ -23,4 +24,4 @@ function ShowcaseWrapper({
   );
 }
 
-export default ShowcaseWrapper;
+export default memo(ShowcaseWrapper);

@@ -1,11 +1,14 @@
 // Providers.js
 import ThemeProvider from "./context/Theme";
+import TooltipProvider from "./context/Tooltip";
 import ProductFormProvider from "./context/ProductForm";
 
 const Providers = ({ children }) => {
   return (
     <ThemeProvider>
-      <ProductFormProvider>{children}</ProductFormProvider>
+      <TooltipProvider>
+        <ProductFormProvider>{children}</ProductFormProvider>
+      </TooltipProvider>
     </ThemeProvider>
   );
 };

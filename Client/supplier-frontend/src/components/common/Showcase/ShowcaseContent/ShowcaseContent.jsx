@@ -1,6 +1,7 @@
 import styles from "./ShowcaseContent.module.css";
 import ShowcaseWrapper from "../ShowcaseWrapper/ShowcaseWrapper";
 import classNames from "classnames";
+import { memo } from "react";
 
 function ShowcaseContent({
   customClass,
@@ -29,4 +30,4 @@ function ShowcaseContent({
   );
 }
 
-export default ShowcaseContent;
+export default memo(ShowcaseContent);

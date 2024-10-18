@@ -4,12 +4,12 @@ import { get } from "lodash";
 import classNames from "classnames";
 import ReactQuill from "react-quill";
 import { CgCloseO, CgInfo } from "react-icons/cg";
-import ReactDOMServer from "react-dom/server";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
 import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
 import { useProductFormUI } from "../../../../context/ProductForm";
 import { memo, useCallback, useState, useRef, useEffect, useMemo } from "react";
+import { useTooltip } from "../../../../context/Tooltip";
 
 const useHandleInputKeyDown = (callback) =>
   useCallback(
@@ -29,12 +29,15 @@ const GuidanceTooltip = memo(
     instructions,
     popupBtn = <CgInfo />,
     enablePopup = true,
-    direction = "top",
+    id = "guidance-tooltip",
+    place = "top",
   }) => {
+    const { handleTooltipTrigger, handleMouseLeave } = useTooltip();
+
     const content = (
       <div className={classNames("flex align-center", styles.guidanceWrapper)}>
         {imgSrc && <img src={imgSrc} alt="Guidance Visual" />}
-        {instructions.length > 0 && (
+        {instructions?.length > 0 && (
           <ul className={styles.guidanceList}>
             {instructions.map((item, idx) => (
               <li key={idx}>
@@ -46,6 +49,8 @@ const GuidanceTooltip = memo(
       </div>
     );
 
+    const tooltipProps = { id, content, place, clickable: true };
+
     if (!enablePopup) return content;
 
     return (
@@ -53,9 +58,9 @@ const GuidanceTooltip = memo(
         <div className={`${styles.guidanceHeader} flex`}>
           {title && <span>{title}</span>}
           <button
-            data-tooltip-id="guidance-tooltip"
-            data-tooltip-html={ReactDOMServer.renderToStaticMarkup(content)}
-            data-tooltip-place={direction}
+            id={id}
+            onMouseOver={() => handleTooltipTrigger(tooltipProps)}
+            onMouseLeave={handleMouseLeave}
           >
             {popupBtn}
           </button>

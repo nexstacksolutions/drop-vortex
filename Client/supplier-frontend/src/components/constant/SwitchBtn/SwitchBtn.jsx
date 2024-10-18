@@ -1,5 +1,5 @@
 import styles from "./SwitchBtn.module.css";
-import { useState } from "react";
+import { useState, memo } from "react";
 import classNames from "classnames";
 
 function SwitchBtn({
@@ -41,4 +41,4 @@ function SwitchBtn({
   );
 }
 
-export default SwitchBtn;
+export default memo(SwitchBtn);

@@ -2,6 +2,7 @@ import styles from "./ShowcaseGrid.module.css";
 import ShowcaseHeader from "../ShowcaseHeader/ShowcaseHeader";
 import ShowcaseContent from "../ShowcaseContent/ShowcaseContent";
 import classNames from "classnames";
+import { memo } from "react";
 
 function ShowcaseGrid({
   customClass,
@@ -21,4 +22,4 @@ function ShowcaseGrid({
   );
 }
 
-export default ShowcaseGrid;
+export default memo(ShowcaseGrid);

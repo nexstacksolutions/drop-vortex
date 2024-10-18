@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import { memo } from "react";
 
 function FeatureMsg({ customClass, messages, msgType = "warning" }) {
   return (
@@ -24,4 +25,4 @@ function FeatureMsg({ customClass, messages, msgType = "warning" }) {
   );
 }
 
-export default FeatureMsg;
+export default memo(FeatureMsg);

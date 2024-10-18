@@ -3,6 +3,7 @@ import styles from "./ShowcaseHeader.module.css";
 import { Link } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { TbReload } from "react-icons/tb";
+import { memo } from "react";
 
 function OptBtn({ customClass, path, icon, btnText }) {
   return (
@@ -46,4 +47,4 @@ function ShowcaseHeader({
   );
 }
 
-export default ShowcaseHeader;
+export default memo(ShowcaseHeader);

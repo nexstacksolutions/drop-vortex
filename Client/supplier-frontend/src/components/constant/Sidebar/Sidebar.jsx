@@ -1,15 +1,15 @@
 import styles from "./Sidebar.module.css";
-import navigation from "../../../constant/navigation";
 import classNames from "classnames";
+import Divider from "../Divider/Divider";
 import { useTheme } from "../../../context/Theme";
+import navigation from "../../../constant/navigation";
+import { CSSTransition } from "react-transition-group";
 import useMediaExport from "../../../hooks/global/useMediaExport";
-import { useState, useCallback, useEffect, useMemo } from "react";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
 import { NavLink, useLocation, Link } from "react-router-dom";
-import { CSSTransition } from "react-transition-group";
-import Divider from "../Divider/Divider";
+import { useState, useCallback, useEffect, useMemo, memo } from "react";
 
-function NavSubLinks({ subLinks, isActive }) {
+const NavSubLinks = memo(({ subLinks, isActive }) => {
   if (!subLinks?.length) return null;
 
   return (
@@ -35,95 +35,106 @@ function NavSubLinks({ subLinks, isActive }) {
       </ul>
     </CSSTransition>
   );
-}
+});
+NavSubLinks.displayName = "NavSubLinks";
 
-function NavItems({
-  activeSubLinks,
-  expandSideBar,
-  handleMouseEnter,
-  toggleSubLinks,
-}) {
-  const location = useLocation();
+const NavItems = memo(
+  ({ activeSubLinks, expandSideBar, handleMouseEnter, toggleSubLinks }) => {
+    const location = useLocation();
 
-  useEffect(() => {
-    navigation.sidebar.forEach(({ subLinks }, index) => {
-      if (subLinks.some((link) => link.to === location.pathname)) {
-        toggleSubLinks(index, true);
-      }
-    });
-  }, [location.pathname, toggleSubLinks]);
+    useEffect(() => {
+      navigation.sidebar.forEach(({ subLinks }, index) => {
+        if (subLinks.some((link) => link.to === location.pathname)) {
+          toggleSubLinks(index, true);
+        }
+      });
+    }, [location.pathname, toggleSubLinks]);
 
-  return (
-    <nav className={styles.nav} aria-label="Main navigation">
-      <ul className={styles.navWrapper}>
-        {navigation.sidebar.map(({ icon, label, subLinks }, index) => {
-          const isExpanded = activeSubLinks.toggleIndex === index;
-          const isActive = activeSubLinks.routeIndex === index;
-          const keepExpanded = isActive && activeSubLinks.keepActive;
+    return (
+      <nav className={styles.nav} aria-label="Main navigation">
+        <ul className={styles.navWrapper}>
+          {navigation.sidebar.map(({ icon, label, subLinks }, index) => {
+            const isExpanded = activeSubLinks.toggleIndex === index;
+            const isActive = activeSubLinks.routeIndex === index;
+            const keepExpanded = isActive && activeSubLinks.keepActive;
 
-          return (
-            <li
-              key={index}
-              className={classNames(styles.navItemWrapper, "flex-col", {
-                [styles.activeNavItemWrapper]: isExpanded || keepExpanded,
-              })}
-            >
-              <div
-                className={classNames(styles.navItem, "flex flex-center", {
-                  [styles.navItemActive]: isActive,
+            return (
+              <li
+                key={index}
+                className={classNames(styles.navItemWrapper, "flex-col", {
+                  [styles.activeNavItemWrapper]: isExpanded || keepExpanded,
                 })}
-                onClick={() => toggleSubLinks(index)}
-                onMouseEnter={() => handleMouseEnter(index)}
-                aria-expanded={isExpanded || isActive}
               >
-                {icon}
-                {expandSideBar && <span>{label}</span>}
-                {expandSideBar && <FaAngleDown />}
-              </div>
+                <div
+                  className={classNames(styles.navItem, "flex flex-center", {
+                    [styles.navItemActive]: isActive,
+                  })}
+                  onClick={() => toggleSubLinks(index)}
+                  onMouseEnter={() => handleMouseEnter(index)}
+                  aria-expanded={isExpanded || isActive}
+                >
+                  {icon}
+                  {expandSideBar && <span>{label}</span>}
+                  {expandSideBar && <FaAngleDown />}
+                </div>
 
-              <NavSubLinks
-                subLinks={subLinks}
-                isActive={isExpanded || keepExpanded}
-              />
-            </li>
-          );
+                <NavSubLinks
+                  subLinks={subLinks}
+                  isActive={isExpanded || keepExpanded}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    );
+  }
+);
+NavItems.displayName = "NavItems";
+
+const RenderLogo = memo(
+  ({ expandSideBar, showDivider = false, customClass }) => {
+    const { theme } = useTheme();
+    const { LogoLight, LogoDark, MiniLogoLight, MiniLogoDark } =
+      useMediaExport();
+
+    const Logo = useMemo(() => {
+      const logos = {
+        light: expandSideBar ? LogoLight : MiniLogoLight,
+        dark: expandSideBar ? LogoDark : MiniLogoDark,
+      };
+      return logos[theme];
+    }, [
+      expandSideBar,
+      theme,
+      LogoLight,
+      LogoDark,
+      MiniLogoLight,
+      MiniLogoDark,
+    ]);
+
+    return (
+      <Link
+        className={classNames("flex", customClass, {
+          "flex-center": !expandSideBar,
         })}
-      </ul>
-    </nav>
-  );
-}
+      >
+        {showDivider && <Divider />}
+        <Logo />
+      </Link>
+    );
+  }
+);
+RenderLogo.displayName = "RenderLogo";
 
-function RenderLogo({ expandSideBar, showDivider = false, customClass }) {
-  const { theme } = useTheme();
-  const { LogoLight, LogoDark, MiniLogoLight, MiniLogoDark } = useMediaExport();
-
-  const Logo = useMemo(() => {
-    const logos = {
-      light: expandSideBar ? LogoLight : MiniLogoLight,
-      dark: expandSideBar ? LogoDark : MiniLogoDark,
-    };
-    return logos[theme];
-  }, [expandSideBar, theme, LogoLight, LogoDark, MiniLogoLight, MiniLogoDark]);
-
-  return (
-    <Link
-      className={classNames("flex", customClass, {
-        "flex-center": !expandSideBar,
-      })}
-    >
-      {showDivider && <Divider />}
-      <Logo />
-    </Link>
-  );
-}
-
-function ToggleSidebarBtn({ toggleSideBar }) {
+const ToggleSidebarBtn = memo(({ toggleSideBar }) => {
   return (
     <button className={styles.toggleSidebarBtn} onClick={toggleSideBar}>
       <FaAngleRight />
     </button>
   );
-}
+});
+ToggleSidebarBtn.displayName = "ToggleSidebarBtn";
 
 function Sidebar() {
   const [expandSideBar, setExpandSideBar] = useState(false);

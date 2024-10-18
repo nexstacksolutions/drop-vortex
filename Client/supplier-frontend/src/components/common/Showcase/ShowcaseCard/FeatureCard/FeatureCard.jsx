@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import styles from "./FeatureCard.module.css";
 import { Link } from "react-router-dom";
+import { memo } from "react";
 
 function FeatureCard({ customClass, cardData }) {
   const { Icon, title } = cardData;
@@ -17,4 +18,4 @@ function FeatureCard({ customClass, cardData }) {
   );
 }
 
-export default FeatureCard;
+export default memo(FeatureCard);

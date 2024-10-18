@@ -2,6 +2,7 @@ import classNames from "classnames";
 import styles from "./EduCard.module.css";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { memo } from "react";
 
 function EduCard({ customClass, cardData }) {
   const { cardImage, category, cardTitle, cardViews } = cardData || {};
@@ -29,4 +30,4 @@ function EduCard({ customClass, cardData }) {
   );
 }
 
-export default EduCard;
+export default memo(EduCard);

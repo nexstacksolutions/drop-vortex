@@ -1,5 +1,6 @@
-import classNames from "classnames";
 import styles from "./ShowcaseHeader.module.css";
+import classNames from "classnames";
+import { memo } from "react";
 import Breadcrumbs from "../../Navigation/Breadcrumbs/Breadcrumbs";
 import FilterButtons from "../../Navigation/FilterButtons/FilterButtons";
 import FilterTabs from "../../Navigation/FilterTabs/FilterTabs";
@@ -44,4 +45,4 @@ function ShowcaseHeader({
   );
 }
 
-export default ShowcaseHeader;
+export default memo(ShowcaseHeader);

@@ -1,4 +1,5 @@
 import styles from "./ShowcaseGrid.module.css";
+import { memo } from "react";
 import ShowcaseHeader from "../ShowcaseHeader/ShowcaseHeader";
 import ShowcaseContent from "../ShowcaseContent/ShowcaseContent";
 import classNames from "classnames";
@@ -22,4 +23,4 @@ function ShowcaseGrid({
   );
 }
 
-export default ShowcaseGrid;
+export default memo(ShowcaseGrid);

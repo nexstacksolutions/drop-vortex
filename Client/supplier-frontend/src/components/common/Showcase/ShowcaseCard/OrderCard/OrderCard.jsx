@@ -2,6 +2,7 @@ import classNames from "classnames";
 import styles from "./OrderCard.module.css";
 import { Link } from "react-router-dom";
 import { FaAngleRight } from "react-icons/fa6";
+import { memo } from "react";
 
 function OrderCard({ customClass, cardData }) {
   const { cardValue = 0, cardTitle } = cardData || {};
@@ -20,4 +21,4 @@ function OrderCard({ customClass, cardData }) {
   );
 }
 
-export default OrderCard;
+export default memo(OrderCard);

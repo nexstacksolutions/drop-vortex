@@ -1,7 +1,7 @@
-import styles from "./LoadingSpinner.module.css";
+import styles from "./Spinner.module.css";
 import classNames from "classnames";
 
-function LoadingSpinner({ customClass }) {
+function Spinner({ customClass }) {
   return (
     <div
       className={classNames(`${styles.loadingSpinner} flex flex-center`, {
@@ -13,4 +13,4 @@ function LoadingSpinner({ customClass }) {
   );
 }
 
-export default LoadingSpinner;
+export default Spinner;
