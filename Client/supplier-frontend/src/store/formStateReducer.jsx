@@ -12,7 +12,17 @@ const formState = {
     },
   },
   productDetails: {
-    pricing: { current: "", original: "" },
+    pricing: {
+      original: {
+        amount: "",
+        currency: "PKR",
+      },
+      special: { amount: "", start: "", end: "", discount: "", status: "" },
+      priceFormat: {
+        decimals: 2,
+        separator: ",",
+      },
+    },
     stock: "",
     availability: true,
     freeItems: "",
@@ -32,7 +42,7 @@ const formState = {
     whatsInBox: "",
   },
   shipping: {
-    packageWeight: "",
+    packageWeight: { value: "", unit: "kg" },
     dimensions: { length: "", width: "", height: "" },
     dangerousGoods: "None",
     warranty: { type: "", period: "", policy: "" },

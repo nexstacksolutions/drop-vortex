@@ -19,9 +19,7 @@ export const ProductFormStateProvider = ({ children }) => {
 
   const handleInputChange = useCallback(
     (e, name, value, customizer) => {
-      if (e) {
-        ({ name, value } = e.target);
-      }
+      if (e) ({ name, value } = e.target);
       updateFormData(name, customizer ? customizer(value) : value);
     },
     [updateFormData]

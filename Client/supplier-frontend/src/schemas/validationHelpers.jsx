@@ -48,19 +48,40 @@ export const nullableArrayOfSchema = (schema) =>
 
 // Helper function for price comparison
 export const isCurrentLessThanOriginal = function (value) {
+  console.log(this.options.context.parent || this.parent);
+
   const { original } = this.options.context.parent || this.parent;
-  return original == null || value == null || value < original;
+  return original.amount == null || value == null || value < original.amount;
 };
 
 // Reusable pricing schema
 export const pricingSchema = (condition, customizer = false) =>
   Yup.object({
-    current: nullableNumber.test(
-      "is-current-greater-than-original",
-      "Current price must be less than the original price.",
-      isCurrentLessThanOriginal
-    ),
-    original: conditionalMeasurementField(condition, customizer),
+    original: Yup.object({
+      amount: conditionalMeasurementField(condition, customizer),
+      currency: Yup.string().default("PKR"),
+    }),
+    special: Yup.object({
+      amount: nullableNumber.test(
+        "is-current-greater-than-original",
+        "Current price must be less than the original price.",
+        isCurrentLessThanOriginal
+      ),
+      start: nullableString,
+      end: nullableString,
+      discount: nullableString,
+      status: Yup.boolean().default(false),
+    }),
+    priceFormat: Yup.object({
+      decimals: Yup.number().default(2),
+      separator: Yup.string().default(","),
+    }),
+  });
+
+export const packageWeightSchema = (condition, customizer = false) =>
+  Yup.object({
+    value: conditionalMeasurementField(condition, customizer),
+    unit: Yup.string().oneOf(["kg", "g"]).required("Unit is required."),
   });
 
 // Helper for handling measurement fields

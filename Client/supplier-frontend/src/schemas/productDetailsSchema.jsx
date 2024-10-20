@@ -11,6 +11,7 @@ import {
   nullableArrayOfSchema,
   fileValidation,
   requiredNumber,
+  packageWeightSchema,
 } from "./validationHelpers";
 
 export const productDetailsSchema = Yup.object({
@@ -36,10 +37,7 @@ export const productDetailsSchema = Yup.object({
           availability: Yup.boolean().default(true),
           freeItems: nullableString,
           sku: nullableString,
-          packageWeight: conditionalMeasurementField(
-            "uiState.variantShipping",
-            null
-          ),
+          packageWeight: packageWeightSchema("uiState.variantShipping", null),
           dimensions: dimensionSchema("uiState.variantShipping", null),
         })
       ),

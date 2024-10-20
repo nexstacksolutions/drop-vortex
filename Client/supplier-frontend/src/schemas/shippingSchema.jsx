@@ -1,13 +1,13 @@
 // shippingSchema.js
 import * as Yup from "yup";
 import {
-  conditionalMeasurementField,
   dimensionSchema,
   nullableString,
+  packageWeightSchema,
 } from "./validationHelpers";
 
 export const shippingSchema = Yup.object({
-  packageWeight: conditionalMeasurementField(
+  packageWeight: packageWeightSchema(
     "uiState.variantShipping",
     (value) => !value
   ),

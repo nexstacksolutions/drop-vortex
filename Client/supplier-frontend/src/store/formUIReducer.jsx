@@ -5,6 +5,7 @@ const formUI = {
     warranty: false,
     additionalSpecs: false,
     description: false,
+    productDetails: false,
   },
   variantShipping: false,
   variantPricing: false,

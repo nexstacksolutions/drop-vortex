@@ -25,7 +25,7 @@ const renderField = (
   fields,
   isHeader,
   isVariationField,
-  { formState, onChange, variantShipping, rowIndex, requiredFields }
+  { formState, onChange, rowIndex, requiredFields }
 ) => {
   return fields.map(
     ({ label, fieldPath, maxValue, type = "number", ...rest }, idx) => {
@@ -48,7 +48,7 @@ const renderField = (
 
       return (
         <td key={idx}>
-          {variantShipping && idx === 4 ? (
+          {name.includes("packageWeight") ? (
             <MultiInputGroup
               {...{ type, label, name, onChange, ...rest }}
               groupType="input"
@@ -68,12 +68,7 @@ const renderField = (
 };
 
 const TableHeaders = memo(
-  ({
-    requiredFields,
-    hasVariationRows,
-    variationColumnNames,
-    additionalFields,
-  }) => {
+  ({ hasVariationRows, variationColumnNames, additionalFields }) => {
     return (
       <thead>
         <tr>
@@ -81,7 +76,7 @@ const TableHeaders = memo(
             variationColumnNames.map((columnName, columnIndex) => (
               <th key={columnIndex}>{columnName}</th>
             ))}
-          {renderField(additionalFields, true, false, { requiredFields })}
+          {renderField(additionalFields, true, false, {})}
         </tr>
       </thead>
     );
@@ -94,7 +89,6 @@ const TableRows = memo(
     formState,
     onChange,
     variationRows,
-    variantShipping,
     hasVariationRows,
     variationColumnNames,
     additionalFields,
@@ -112,7 +106,6 @@ const TableRows = memo(
               {renderField(additionalFields, false, true, {
                 formState,
                 onChange,
-                variantShipping,
                 rowIndex,
               })}
             </tr>
@@ -122,7 +115,6 @@ const TableRows = memo(
             {renderField(additionalFields, false, false, {
               formState,
               onChange,
-              variantShipping,
               rowIndex: -1,
             })}
           </tr>

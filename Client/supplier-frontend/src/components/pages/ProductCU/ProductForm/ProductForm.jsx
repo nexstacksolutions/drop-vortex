@@ -268,7 +268,7 @@ function ProductForm({ customClass }) {
         fields: [
           {
             label: "Package Weight",
-            name: "shipping.packageWeight",
+            name: "shipping.packageWeight.value",
             type: "number",
             placeholder: "0.01 - 300",
             condition: (formData) => !uiState.variantShipping,

@@ -13,9 +13,13 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
   // Memoize common fields
   const commonFields = useMemo(
     () => [
-      { fieldPath: "pricing.original", label: "Price", placeholder: "Price" },
       {
-        fieldPath: "pricing.current",
+        fieldPath: "pricing.original.amount",
+        label: "Price",
+        placeholder: "Price",
+      },
+      {
+        fieldPath: "pricing.special.amount",
         label: "Special Price",
         placeholder: "Special Price",
       },
@@ -56,7 +60,7 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
     if (variantShipping && hasVariationRows) {
       return [
         {
-          fieldPath: "packageWeight",
+          fieldPath: "packageWeight.value",
           label: "Package Weight",
           placeholder: "0.001 - 300",
         },
