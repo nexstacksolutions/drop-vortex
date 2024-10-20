@@ -1,6 +1,6 @@
 import { produce } from "immer";
 
-const formUI = {
+const initialFormUI = {
   additionalFields: {
     warranty: false,
     additionalSpecs: false,
@@ -48,6 +48,7 @@ const uiControl = (state, action) =>
 
       case "SET_EMPTY_FIELDS":
         draft.emptyFields = { ...draft.emptyFields, ...payload };
+
         break;
 
       case "CLEAR_EMPTY_FIELDS":
@@ -103,4 +104,4 @@ const uiControl = (state, action) =>
     }
   });
 
-export { formUI, uiControl };
+export { initialFormUI, uiControl };

@@ -48,7 +48,7 @@ const renderField = (
 
       return (
         <td key={idx}>
-          {name.includes("packageWeight") ? (
+          {name.includes("dimensions") ? (
             <MultiInputGroup
               {...{ type, label, name, onChange, ...rest }}
               groupType="input"

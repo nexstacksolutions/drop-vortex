@@ -1,9 +1,9 @@
 import { get } from "lodash";
-import { v4 as uuidv4 } from "uuid";
-import formSchema from "../schemas/productForm";
 import { useMemo, useCallback } from "react";
-import useFormValidation from "../hooks/pages/ProductForm/useFormValidation";
+import formSchema from "../schemas/productForm";
+import { createNewVariant } from "../store/formStateReducer";
 import { ProductFormStateContext, useProductForm } from "./ProductForm";
+import useFormValidation from "../hooks/pages/ProductForm/useFormValidation";
 
 export const ProductFormStateProvider = ({ children }) => {
   const { formState, formDispatch, uiState, uiDispatch } = useProductForm();
@@ -45,19 +45,7 @@ export const ProductFormStateProvider = ({ children }) => {
       valueIndex,
       isAdding
     ) => {
-      const newVariant = {
-        id: uuidv4(),
-        name: inputValue,
-        variantImages,
-        pricing: { current: "", original: "" },
-        stock: "",
-        availability: true,
-        freeItems: "",
-        sku: "",
-        packageWeight: "",
-        dimensions: { length: "", width: "", height: "" },
-      };
-
+      const newVariant = createNewVariant(inputValue, variantImages);
       const basePath = `productDetails.variations[${variationIndex}].values`;
 
       const updatedVariants = isAdding
@@ -71,10 +59,10 @@ export const ProductFormStateProvider = ({ children }) => {
         : valueIndex;
 
       const additionalFields = {
-        [`${basePath}[${updatedValueIndex}].pricing.original`]: true,
+        [`${basePath}[${updatedValueIndex}].pricing.original.amount`]: true,
         [`${basePath}[${updatedValueIndex}].stock`]: true,
         [`${basePath}[${updatedValueIndex}].dimensions`]: true,
-        [`${basePath}[${updatedValueIndex}].packageWeight`]: true,
+        [`${basePath}[${updatedValueIndex}].packageWeight.value`]: true,
       };
 
       await updateVariantData(

@@ -1,7 +1,8 @@
-import { produce } from "immer";
 import { set } from "lodash";
+import { produce } from "immer";
+import { v4 as uuidv4 } from "uuid";
 
-const formState = {
+const initialFormState = {
   basicInfo: {
     productName: "",
     category: "",
@@ -17,7 +18,7 @@ const formState = {
         amount: "",
         currency: "PKR",
       },
-      special: { amount: "", start: "", end: "", discount: "", status: "" },
+      special: { amount: "", start: "", end: "", discount: "", status: false },
       priceFormat: {
         decimals: 2,
         separator: ",",
@@ -49,6 +50,19 @@ const formState = {
   },
 };
 
+const createNewVariant = (inputValue, variantImages = []) => ({
+  id: uuidv4(),
+  name: inputValue,
+  variantImages,
+  pricing: initialFormState.productDetails.pricing,
+  stock: initialFormState.productDetails.stock,
+  availability: true,
+  freeItems: "",
+  sku: "",
+  packageWeight: initialFormState.shipping.packageWeight,
+  dimensions: initialFormState.shipping.dimensions,
+});
+
 const formControl = (state, action) =>
   produce(state, (draft) => {
     const { type, payload } = action;
@@ -75,4 +89,4 @@ const formControl = (state, action) =>
     }
   });
 
-export { formState, formControl };
+export { initialFormState, createNewVariant, formControl };

@@ -10,13 +10,11 @@ const useContentScore = (
 ) => {
   const [contentScore, setContentScore] = useState(0);
 
-  // Memoize the field check function
   const fieldEndsWithSuffix = useCallback(
     (field, suffixes) => suffixes.some((suffix) => field.endsWith(suffix)),
     []
   );
 
-  // Memoize additional empty field suffixes based on variantShipping and variantPricing
   const additionalEmptyFieldSuffixes = useMemo(() => {
     const baseSuffixes = [
       "].stock",
@@ -33,24 +31,20 @@ const useContentScore = (
 
     if (variantPricing) {
       baseSuffixes.push(
-        "productDetails.pricing",
         "productDetails.stock",
-        "productDetails.pricing.original.amount",
-        "productDetails.pricing.special.amount"
+        "productDetails.pricing.original.amount"
       );
     }
 
     return baseSuffixes;
   }, [variantShipping, variantPricing]);
 
-  // Calculate the base score
   const calculateBaseScore = useCallback(
     (totalFields, filledFields) =>
       Math.round((filledFields / totalFields) * 75),
     []
   );
 
-  // Calculate the additional score
   const calculateAdditionalScore = useCallback((formState) => {
     let additionalScore = 0;
 
@@ -64,7 +58,6 @@ const useContentScore = (
     return additionalScore;
   }, []);
 
-  // Filter out unnecessary empty fields
   const filteredEmptyFields = useMemo(() => {
     return Object.keys(emptyFields).reduce((filtered, field) => {
       const isRequired = requiredFields[field] !== undefined;
@@ -88,7 +81,6 @@ const useContentScore = (
     variantShipping,
   ]);
 
-  // Main score calculation
   const calculateScore = useMemo(() => {
     const totalFields = Object.keys(filteredEmptyFields).length;
     const filledFields = Object.values(filteredEmptyFields).filter(
@@ -106,7 +98,6 @@ const useContentScore = (
     formState,
   ]);
 
-  // Update content score on relevant changes
   useEffect(() => {
     setContentScore(calculateScore);
   }, [calculateScore]);
