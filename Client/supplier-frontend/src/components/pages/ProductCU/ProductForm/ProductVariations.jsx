@@ -101,7 +101,7 @@ const VariantItem = memo(
             value={variantData?.variantImages || variantImages}
             resetTrigger={resetTrigger}
             hideFormGuide={true}
-            mediaPreviewProps={{ showMediaPreview: true }}
+            mediaPreviewProps={{ showMediaPreview: true, enablePopup: true }}
             onChange={
               onChange
                 ? onChange

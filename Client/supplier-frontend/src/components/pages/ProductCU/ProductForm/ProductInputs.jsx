@@ -71,7 +71,7 @@ const GuidanceTooltip = memo(
 GuidanceTooltip.displayName = "GuidanceTooltip";
 
 const MediaPreviewItem = memo(
-  ({ file, fileType, onRemove, showMediaPreview }) => {
+  ({ file, fileType, onRemove, showMediaPreview, enablePopup }) => {
     const { handleTooltipTrigger } = useTooltip();
     const src = useMemo(() => URL.createObjectURL(file), [file]);
     const MediaTag = fileType === "image" ? "img" : "video";
@@ -106,15 +106,30 @@ const MediaPreviewItem = memo(
       [src, showMediaPreview, onRemove]
     );
 
+    const tooltipProps = useMemo(
+      () => ({
+        content,
+        customClass: styles.mediaPreviewActions,
+      }),
+      [content]
+    );
+
+    const renderMediaTag = () => (
+      <MediaTag
+        src={src}
+        controls={fileType !== "image"}
+        className="object-cover"
+        {...(enablePopup && {
+          id: "global-tooltip",
+          onMouseOver: () => handleTooltipTrigger(tooltipProps),
+        })}
+      />
+    );
+
     return (
       <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
-        <MediaTag
-          src={src}
-          controls={fileType !== "image"}
-          className="object-cover"
-          id="global-tooltip"
-          onMouseOver={() => handleTooltipTrigger({ content })}
-        />
+        {renderMediaTag()}
+        {!enablePopup && content}
       </div>
     );
   }

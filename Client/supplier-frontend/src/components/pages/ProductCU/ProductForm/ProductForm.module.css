@@ -2,659 +2,6 @@
   width: 100%;
   gap: var(--spacing-lg);
 
-  & .formSection {
-    flex: 1;
-    background-color: var(--canvas-color);
-    padding: 1.2rem var(--spacing-md) 2rem;
-    border-radius: var(--radius-md);
-    gap: var(--spacing-md);
-
-    & > div {
-      flex: 1;
-      gap: var(--spacing-md);
-
-      & > div {
-        flex: 1 1 100%;
-      }
-    }
-
-    & .sectionHeader p {
-      color: var(--secondary-text);
-    }
-
-    & .sectionContent .inputContainer {
-      position: relative;
-    }
-
-    & .inputHeader {
-      flex-wrap: wrap;
-
-      &:has(.guidePopup) {
-        flex-direction: row;
-        align-items: center;
-      }
-
-      & label > .requiredFieldIcon {
-        color: var(--danger-color);
-        font-size: 1rem;
-      }
-    }
-
-    & .inputControl {
-      position: relative;
-      flex: 1;
-
-      & > div {
-        flex: 1;
-      }
-
-      & .inputWrapper {
-        flex: 1;
-        position: relative;
-        border: var(--border-base);
-        border-radius: var(--radius-sm);
-        transition: var(--transition-base);
-
-        & input {
-          border: none;
-          flex: 1;
-        }
-
-        & .suffixDisplay {
-          position: absolute;
-          gap: var(--spacing-xs);
-          right: var(--spacing-md);
-          color: var(--secondary-text);
-          font-size: var(--font-xs);
-
-          & .suffixIcon {
-            font-size: 1.6rem;
-            cursor: pointer;
-            opacity: 0;
-          }
-        }
-
-        &:focus-within,
-        &:hover {
-          border-color: var(--accent-color);
-          box-shadow: var(--shadow-xs)
-            rgba(var(--accent-Rgb), var(--opacity-md));
-
-          & .reactQuillInput > div:first-child {
-            border-color: var(--accent-color);
-          }
-
-          & .suffixDisplay .suffixIcon {
-            opacity: 1;
-          }
-        }
-      }
-    }
-
-    & .validationWrapper .errorMsg {
-      color: var(--danger-color);
-    }
-
-    & .invalidInput .inputControl .inputWrapper {
-      border-color: var(--danger-color);
-
-      & .reactQuillInput > div:first-child {
-        border-color: var(--danger-color);
-      }
-
-      &:focus-within,
-      &:hover {
-        box-shadow: var(--shadow-xs) rgba(var(--danger-Rgb), var(--opacity-lg));
-      }
-    }
-  }
-
-  & .mediaInputContainer {
-    flex: 1;
-
-    & .inputHeader {
-      & > span {
-        order: 3;
-        padding: var(--spacing-xs) var(--spacing-sm);
-        border-radius: var(--radius-sm);
-        font-size: var(--font-xs);
-        background-color: var(--block-bg);
-      }
-
-      & .filterTabs {
-        flex-basis: 100%;
-      }
-    }
-
-    & .inputControl {
-      padding: var(--spacing-md);
-      border-radius: var(--radius-sm);
-      background-color: var(--wrapper-bg);
-      justify-content: start;
-      gap: var(--spacing-md);
-
-      & .mediaPreviewWrapper {
-        max-width: max-content;
-
-        & .mediaPreviewItem {
-          position: relative;
-          width: 6rem;
-          height: 6rem;
-          border: var(--border-base-dashed);
-
-          & img,
-          video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-          }
-
-          & .actionWrapper {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
-
-            & .mediaPreview {
-              width: 100%;
-              object-fit: cover;
-            }
-
-            & .mediaAction {
-              padding: 0 var(--spacing-xs);
-
-              & button svg {
-                font-size: var(--font-lg);
-                color: var(--white-color);
-              }
-            }
-          }
-
-          &:hover .actionWrapper {
-            opacity: 1;
-            visibility: visible;
-          }
-        }
-
-        & .addMediaWrapper {
-          width: max-content;
-
-          & .inputHeader {
-            width: 6rem;
-            height: 6rem;
-            justify-content: center;
-            border: var(--border-base-dashed);
-            transition: var(--transition-base);
-
-            & label {
-              width: 100%;
-              height: 100%;
-              justify-content: center;
-              cursor: pointer;
-            }
-          }
-
-          & .inputControl {
-            position: absolute;
-            top: 80%;
-            opacity: 0;
-            transform: scale(0);
-            visibility: hidden;
-            transform-origin: top;
-            z-index: 10;
-            transition: var(--transition-base) 100ms;
-            padding: 0;
-
-            & .inputWrapper {
-              display: none;
-            }
-
-            & .addMediaActions {
-              position: relative;
-              gap: 0;
-              padding: var(--spacing-xs) 0;
-              border-radius: var(--radius-md);
-              background-color: var(--block-bg);
-              transition: var(--transition-base);
-
-              & button {
-                min-width: 100%;
-                justify-content: start;
-                padding: var(--spacing-sm) var(--spacing-md);
-
-                &:hover {
-                  background-color: var(--wrapper-bg);
-                }
-              }
-            }
-          }
-
-          &:hover {
-            & .inputHeader {
-              border-color: var(--accent-color);
-
-              & label svg {
-                color: var(--accent-color);
-              }
-            }
-
-            & .inputControl {
-              opacity: 1;
-              transform: scale(1);
-              visibility: visible;
-              top: 100%;
-            }
-          }
-        }
-      }
-
-      & .guidanceHeader {
-        flex-direction: column;
-      }
-
-      &:not(:has(.mediaPreviewWrapper)) {
-        background-color: transparent;
-        padding: var(--spacing-sm) 0;
-      }
-    }
-
-    & .filterTabs .inputControl {
-      padding: var(--spacing-xs) 0;
-      background-color: transparent;
-    }
-  }
-
-  & .reactQuillInput {
-    flex: 1;
-
-    & > div {
-      border: none;
-      transition: var(--transition-base);
-
-      &:first-child {
-        border-bottom: var(--border-base);
-      }
-    }
-  }
-
-  & .dropdownWrapper {
-    flex: 1;
-
-    & .dropdownList {
-      width: 100%;
-      max-height: 25rem;
-      overflow-y: auto;
-      position: absolute;
-      border: var(--border-base);
-      border-radius: var(--radius-sm);
-      background-color: var(--canvas-color);
-      gap: 0;
-      top: 4.2rem;
-      left: 0;
-      z-index: 50;
-
-      & .dropdownOption {
-        padding: var(--spacing-base) var(--spacing-md);
-
-        &:hover {
-          background-color: var(--wrapper-bg);
-        }
-      }
-
-      & .noOptions {
-        padding: var(--spacing-sm) var(--spacing-md);
-      }
-    }
-  }
-
-  & .multiInputGroup {
-    flex: 1;
-    gap: var(--spacing-md);
-
-    & > div {
-      gap: var(--spacing-md);
-
-      &:first-child {
-        gap: var(--spacing-sm);
-
-        & > div:last-child {
-          flex-basis: 100%;
-        }
-      }
-
-      & .radioItem {
-        width: max-content;
-        cursor: pointer;
-
-        & .inputWrapper {
-          display: none;
-        }
-
-        & .customRadio {
-          position: relative;
-          width: 1.6rem;
-          height: 1.6rem;
-          border-radius: 50%;
-          border: var(--border-base);
-
-          &::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: white;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-          }
-
-          &.radioItemChecked {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-
-            &::before {
-              opacity: 1;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  & .productVariationsWrapper {
-    width: 100%;
-
-    & .variationItem {
-      flex: 1;
-      gap: var(--spacing-md);
-      background-color: var(--wrapper-bg);
-      padding: 2rem;
-      border-radius: var(--radius-sm);
-
-      & > div {
-        flex-direction: column;
-      }
-
-      & .variationHeader {
-        width: 100%;
-        gap: var(--spacing-md);
-
-        & .variationTitle {
-          font-weight: var(--weight-semibold);
-        }
-
-        & .variationInfo span:last-child {
-          color: var(--secondary-text);
-        }
-
-        & .variationDetails .showImageCheckbox {
-          flex-direction: row-reverse;
-          justify-content: start;
-          row-gap: var(--spacing-md);
-
-          & label {
-            font-weight: var(--weight-base);
-            cursor: pointer;
-
-            & span:last-child {
-              color: var(--secondary-text);
-            }
-          }
-
-          & > div {
-            border: none;
-            max-width: max-content;
-
-            & > div {
-              border: none !important;
-
-              &:focus-within,
-              &:hover {
-                border: none !important;
-                box-shadow: none !important;
-              }
-            }
-          }
-        }
-      }
-
-      & .variationBody {
-        width: 100%;
-
-        & .variantWrapper {
-          width: 100%;
-        }
-
-        & .variantItem {
-          width: 100%;
-          gap: var(--spacing-md);
-          background-color: var(--block-bg);
-          padding: var(--spacing-sm) var(--spacing-md);
-          border-radius: var(--radius-md);
-
-          & > div:first-child {
-            width: 30%;
-          }
-
-          & > div:not(:first-child) {
-            padding: 0;
-            background-color: transparent;
-            max-width: max-content;
-
-            & > div:first-child {
-              padding: 0;
-              background-color: transparent;
-            }
-
-            & > div > div {
-              & > .mediaPreviewItem {
-                width: 4rem;
-                height: 4rem;
-                position: relative;
-
-                & > div:last-child {
-                  transform: scale(0);
-                  transform-origin: bottom;
-                  opacity: 0;
-                  width: max-content;
-                  top: -9rem;
-                  gap: 0;
-                  z-index: 20;
-
-                  & img {
-                    height: 10rem;
-                    aspect-ratio: 16/9;
-                  }
-
-                  & > div:last-child {
-                    padding: var(--spacing-sm);
-                    background-color: var(--canvas-color);
-                    position: relative;
-                    border-radius: var(--radius-sm);
-
-                    & button {
-                      flex: 1;
-                    }
-
-                    &::before {
-                      position: absolute;
-                      content: "";
-                      height: 50%;
-                      width: 1px;
-                      background-color: var(--border-color);
-                      left: 50%;
-                    }
-                  }
-
-                  &::before {
-                    content: "";
-                    position: absolute;
-                    bottom: -5.3rem;
-                    left: 45%;
-                    width: 0;
-                    height: 0;
-                    border-left: 10px solid transparent;
-                    border-right: 10px solid transparent;
-                    border-top: 10px solid var(--canvas-color);
-                    z-index: 21;
-                  }
-                }
-
-                &:hover > div:last-child {
-                  opacity: 1;
-                  transform: scale(1);
-                }
-              }
-
-              & > .inputContainer {
-                flex-direction: row;
-                gap: var(--spacing-sm);
-
-                & > div:first-child {
-                  width: 4rem;
-                  height: 4rem;
-                }
-
-                & > div:last-child {
-                  position: static;
-                  visibility: visible;
-                  opacity: 1;
-                  transform: scale(1);
-
-                  & > div:last-child {
-                    flex-direction: row;
-                    gap: var(--spacing-md);
-                    justify-content: start;
-
-                    & button {
-                      min-width: auto;
-                      padding: 0;
-                      background-color: transparent;
-                      color: var(--accent-color);
-                      position: relative;
-                      font-size: var(--font-xs);
-
-                      &:first-child::before {
-                        cursor: default;
-                        position: absolute;
-                        content: "";
-                        right: -0.8rem;
-                        height: 100%;
-                        width: 1px;
-                        background-color: var(--border-color);
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          & .variantActions {
-            margin-left: auto;
-          }
-        }
-      }
-    }
-
-    & .invalidInput.variationItem {
-      border: var(--border-err-dashed);
-    }
-  }
-
-  & .productPSWrapper .variantTableWrapper {
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    & table {
-      width: max-content;
-      border-collapse: collapse;
-
-      & th,
-      td {
-        padding: 10px;
-        border: var(--border-base);
-        text-align: center;
-      }
-
-      & th .tableHeader,
-      label {
-        justify-content: center;
-      }
-
-      & td:last-child > div > div > div {
-        justify-content: center;
-        border: none !important;
-
-        &:focus-within,
-        &:hover {
-          border: none !important;
-          box-shadow: none !important;
-        }
-      }
-    }
-  }
-
-  & .productSpec > div {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-
-    & > div {
-      flex: 0 0 48%;
-    }
-  }
-
-  & .productSW > div {
-    & .additionalJsx {
-      margin-top: var(--spacing-sm);
-    }
-
-    & > div:first-child {
-      flex: 0 0 30%;
-      width: 30%;
-    }
-
-    & .radioGroup {
-      margin-top: var(--spacing-sm);
-    }
-  }
-
-  & .showMoreBtn {
-    transition: var(--transition-base);
-
-    &:hover {
-      color: var(--accent-color);
-    }
-
-    &.showMoreBtnActive {
-      color: var(--accent-color);
-
-      & svg {
-        transform: rotate(180deg);
-      }
-    }
-  }
-
-  & .guidanceHeader {
-    width: max-content;
-
-    & button {
-      color: var(--accent-color);
-    }
-
-    & svg {
-      font-size: var(--font-lg);
-    }
-  }
-
   & .formActions {
     padding: var(--spacing-md) 2rem;
     border-radius: var(--radius-md);
@@ -665,6 +12,611 @@
     }
   }
 }
+
+.formSection {
+  flex: 1;
+  background-color: var(--canvas-color);
+  padding: 1.2rem var(--spacing-md) 2rem;
+  border-radius: var(--radius-md);
+  gap: var(--spacing-md);
+
+  & > div {
+    flex: 1;
+    gap: var(--spacing-md);
+
+    & > div {
+      flex: 1 1 100%;
+    }
+  }
+
+  & .sectionHeader p {
+    color: var(--secondary-text);
+  }
+
+  & .sectionContent .inputContainer {
+    position: relative;
+  }
+
+  & .inputHeader {
+    flex-wrap: wrap;
+
+    &:has(.guidePopup) {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    & label > .requiredFieldIcon {
+      color: var(--danger-color);
+      font-size: 1rem;
+    }
+  }
+
+  & .inputControl {
+    position: relative;
+    flex: 1;
+
+    & > div {
+      flex: 1;
+    }
+
+    & .inputWrapper {
+      flex: 1;
+      position: relative;
+      border: var(--border-base);
+      border-radius: var(--radius-sm);
+      transition: var(--transition-base);
+
+      & input {
+        border: none;
+        flex: 1;
+      }
+
+      & .suffixDisplay {
+        position: absolute;
+        gap: var(--spacing-xs);
+        right: var(--spacing-md);
+        color: var(--secondary-text);
+        font-size: var(--font-xs);
+
+        & .suffixIcon {
+          font-size: 1.6rem;
+          cursor: pointer;
+          opacity: 0;
+        }
+      }
+
+      &:focus-within,
+      &:hover {
+        border-color: var(--accent-color);
+        box-shadow: var(--shadow-xs) rgba(var(--accent-Rgb), var(--opacity-md));
+
+        & .reactQuillInput > div:first-child {
+          border-color: var(--accent-color);
+        }
+
+        & .suffixDisplay .suffixIcon {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  & .validationWrapper .errorMsg {
+    color: var(--danger-color);
+  }
+
+  & .invalidInput .inputControl .inputWrapper {
+    border-color: var(--danger-color);
+
+    & .reactQuillInput > div:first-child {
+      border-color: var(--danger-color);
+    }
+
+    &:focus-within,
+    &:hover {
+      box-shadow: var(--shadow-xs) rgba(var(--danger-Rgb), var(--opacity-lg));
+    }
+  }
+}
+
+.mediaInputContainer {
+  flex: 1;
+
+  & .inputHeader {
+    & > span {
+      order: 3;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-xs);
+      background-color: var(--block-bg);
+    }
+
+    & .filterTabs {
+      flex-basis: 100%;
+    }
+  }
+
+  & .inputControl {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    background-color: var(--wrapper-bg);
+    justify-content: start;
+    gap: var(--spacing-md);
+
+    & .mediaPreviewWrapper {
+      max-width: max-content;
+
+      & .mediaPreviewItem {
+        position: relative;
+        width: 6rem;
+        height: 6rem;
+        border: var(--border-base-dashed);
+
+        & img,
+        video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        & .actionWrapper {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          opacity: 0;
+          visibility: hidden;
+          transition: var(--transition-base);
+
+          & .mediaPreview {
+            width: 100%;
+            object-fit: cover;
+          }
+
+          & .mediaAction {
+            padding: 0 var(--spacing-xs);
+
+            & button svg {
+              font-size: var(--font-lg);
+              color: var(--white-color);
+            }
+          }
+        }
+
+        &:hover .actionWrapper {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+
+      & .addMediaWrapper {
+        width: max-content;
+
+        & .inputHeader {
+          width: 6rem;
+          height: 6rem;
+          justify-content: center;
+          border: var(--border-base-dashed);
+          transition: var(--transition-base);
+
+          & label {
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            cursor: pointer;
+          }
+        }
+
+        & .inputControl {
+          position: absolute;
+          top: 80%;
+          opacity: 0;
+          transform: scale(0);
+          visibility: hidden;
+          transform-origin: top;
+          z-index: 3;
+          transition: var(--transition-base) 100ms;
+          padding: 0;
+
+          & .inputWrapper {
+            display: none;
+          }
+
+          & .addMediaActions {
+            position: relative;
+            gap: 0;
+            padding: var(--spacing-xs) 0;
+            border-radius: var(--radius-md);
+            background-color: var(--block-bg);
+            transition: var(--transition-base);
+
+            & button {
+              min-width: 100%;
+              justify-content: start;
+              padding: var(--spacing-sm) var(--spacing-md);
+
+              &:hover {
+                background-color: var(--wrapper-bg);
+              }
+            }
+          }
+        }
+
+        &:hover {
+          & .inputHeader {
+            border-color: var(--accent-color);
+
+            & label svg {
+              color: var(--accent-color);
+            }
+          }
+
+          & .inputControl {
+            opacity: 1;
+            transform: scale(1);
+            visibility: visible;
+            top: 100%;
+          }
+        }
+      }
+    }
+
+    & .guidanceHeader {
+      flex-direction: column;
+    }
+
+    & .guidanceWrapper {
+      max-width: max-content;
+    }
+
+    &:not(:has(.mediaPreviewWrapper)) {
+      background-color: transparent;
+      padding: var(--spacing-sm) 0;
+    }
+  }
+
+  & .filterTabs .inputControl {
+    padding: var(--spacing-xs) 0;
+    background-color: transparent;
+  }
+}
+
+.reactQuillInput {
+  flex: 1;
+
+  & > div {
+    border: none;
+    transition: var(--transition-base);
+
+    &:first-child {
+      border-bottom: var(--border-base);
+    }
+  }
+}
+
+.dropdownWrapper {
+  flex: 1;
+
+  & .dropdownList {
+    width: 100%;
+    max-height: 25rem;
+    overflow-y: auto;
+    position: absolute;
+    border: var(--border-base);
+    border-radius: var(--radius-sm);
+    background-color: var(--canvas-color);
+    gap: 0;
+    top: 4.2rem;
+    left: 0;
+    z-index: 20;
+
+    & .dropdownOption {
+      padding: var(--spacing-base) var(--spacing-md);
+
+      &:hover {
+        background-color: var(--wrapper-bg);
+      }
+    }
+
+    & .noOptions {
+      padding: var(--spacing-sm) var(--spacing-md);
+    }
+  }
+}
+
+.multiInputGroup {
+  flex: 1;
+  gap: var(--spacing-md);
+
+  & > div {
+    gap: var(--spacing-md);
+
+    &:first-child {
+      gap: var(--spacing-sm);
+
+      & > div:last-child {
+        flex-basis: 100%;
+      }
+    }
+
+    & .radioItem {
+      width: max-content;
+      cursor: pointer;
+
+      & .inputWrapper {
+        display: none;
+      }
+
+      & .customRadio {
+        position: relative;
+        width: 1.6rem;
+        height: 1.6rem;
+        border-radius: 50%;
+        border: var(--border-base);
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: white;
+          transform: translate(-50%, -50%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        &.radioItemChecked {
+          background-color: var(--accent-color);
+          border-color: var(--accent-color);
+
+          &::before {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}
+
+.productVariationsWrapper {
+  width: 100%;
+
+  & .variationItem {
+    flex: 1;
+    gap: var(--spacing-md);
+    background-color: var(--wrapper-bg);
+    padding: 2rem;
+    border-radius: var(--radius-sm);
+
+    & > div {
+      flex-direction: column;
+    }
+
+    & .variationHeader {
+      width: 100%;
+      gap: var(--spacing-md);
+
+      & .variationTitle {
+        font-weight: var(--weight-semibold);
+      }
+
+      & .variationInfo span:last-child {
+        color: var(--secondary-text);
+      }
+
+      & .variationDetails .showImageCheckbox {
+        flex-direction: row-reverse;
+        justify-content: start;
+        row-gap: var(--spacing-md);
+
+        & label {
+          font-weight: var(--weight-base);
+          cursor: pointer;
+
+          & span:last-child {
+            color: var(--secondary-text);
+          }
+        }
+
+        & > div {
+          border: none;
+          max-width: max-content;
+
+          & > div {
+            border: none !important;
+
+            &:focus-within,
+            &:hover {
+              border: none !important;
+              box-shadow: none !important;
+            }
+          }
+        }
+      }
+    }
+
+    & .variationBody {
+      width: 100%;
+
+      & .variantWrapper {
+        width: 100%;
+      }
+
+      & .variantItem {
+        width: 100%;
+        gap: var(--spacing-md);
+        background-color: var(--block-bg);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-md);
+
+        & > div:first-child {
+          width: 30%;
+        }
+
+        & > div:not(:first-child) {
+          padding: 0;
+          background-color: transparent;
+          max-width: max-content;
+
+          & > div:first-child {
+            padding: 0;
+            background-color: transparent;
+          }
+
+          & > div > div {
+            & > .mediaPreviewItem {
+              width: 4rem;
+              height: 4rem;
+              position: relative;
+            }
+
+            & > .inputContainer {
+              flex-direction: row;
+              gap: var(--spacing-sm);
+
+              & > div:first-child {
+                width: 4rem;
+                height: 4rem;
+              }
+
+              & > div:last-child {
+                position: static;
+                visibility: visible;
+                opacity: 1;
+                transform: scale(1);
+
+                & > div:last-child {
+                  flex-direction: row;
+                  gap: var(--spacing-md);
+                  justify-content: start;
+
+                  & button {
+                    min-width: auto;
+                    padding: 0;
+                    background-color: transparent;
+                    color: var(--accent-color);
+                    position: relative;
+                    font-size: var(--font-xs);
+
+                    &:first-child::before {
+                      cursor: default;
+                      position: absolute;
+                      content: "";
+                      right: -0.8rem;
+                      height: 100%;
+                      width: 1px;
+                      background-color: var(--border-color);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        & .variantActions {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+
+  & .invalidInput.variationItem {
+    border: var(--border-err-dashed);
+  }
+}
+
+.productPSWrapper .variantTableWrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  & table {
+    width: max-content;
+    border-collapse: collapse;
+
+    & th,
+    td {
+      padding: 10px;
+      border: var(--border-base);
+      text-align: center;
+    }
+
+    & th .tableHeader,
+    label {
+      justify-content: center;
+    }
+
+    & td:last-child > div > div > div {
+      justify-content: center;
+      border: none !important;
+
+      &:focus-within,
+      &:hover {
+        border: none !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+}
+
+.productSpec > div {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+
+  & > div {
+    flex: 0 0 48%;
+  }
+}
+
+.productSW > div {
+  & .additionalJsx {
+    margin-top: var(--spacing-sm);
+  }
+
+  & > div:first-child {
+    flex: 0 0 30%;
+    width: 30%;
+  }
+
+  & .radioGroup {
+    margin-top: var(--spacing-sm);
+  }
+}
+
+.showMoreBtn {
+  transition: var(--transition-base);
+
+  &:hover {
+    color: var(--accent-color);
+  }
+
+  &.showMoreBtnActive {
+    color: var(--accent-color);
+
+    & svg {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.guidanceHeader {
+  width: max-content;
+
+  & button {
+    color: var(--accent-color);
+  }
+
+  & svg {
+    font-size: var(--font-lg);
+  }
+}
+
+/* Tooltips stylings */
 
 .guidanceWrapper {
   max-width: 30rem;
@@ -695,6 +647,42 @@
   }
 }
 
-& .guidanceTooltip {
-  border-radius: var(--radius-sm) !important;
+.mediaPreviewActions {
+  padding: 0 !important;
+  border: none !important;
+
+  & > div:first-child {
+    gap: 0;
+    max-width: 17rem;
+
+    & img {
+      height: 10rem;
+      aspect-ratio: 16/9;
+    }
+
+    & > div:last-child {
+      padding: var(--spacing-sm);
+      background-color: var(--canvas-color);
+      border-radius: var(--radius-sm);
+
+      & button {
+        flex: 1;
+        position: relative;
+
+        & svg {
+          font-size: var(--font-md);
+        }
+
+        &:first-child::before {
+          cursor: default;
+          position: absolute;
+          content: "";
+          right: -0.4rem;
+          height: 100%;
+          width: 1px;
+          background-color: var(--border-color);
+        }
+      }
+    }
+  }
 }

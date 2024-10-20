@@ -1,6 +1,7 @@
 import styles from "./ProductForm.module.css";
 import { get } from "lodash";
 import { useMemo, memo } from "react";
+import { useTooltip } from "../../../../context/Tooltip";
 import { FormInput, MultiInputGroup, InputHeader } from "./ProductInputs";
 import useAdditionalFields from "../../../../hooks/pages/ProductForm/useAdditionalFields";
 import {
@@ -20,6 +21,30 @@ const getFieldPath = (
     ? `${dynamicPath}.${basePath}`
     : `productDetails.${basePath}`;
 };
+
+const SpecialPriceWrapper = memo(() => {
+  const { handleTooltipTrigger } = useTooltip();
+  const content = useMemo(() => <div>Hello</div>, []);
+
+  const tooltipProps = useMemo(
+    () => ({
+      content,
+    }),
+    [content]
+  );
+
+  return (
+    <div className={styles.specialPriceWrapper}>
+      <button
+        id="global-tooltip"
+        onMouseOver={() => handleTooltipTrigger(tooltipProps)}
+      >
+        Add
+      </button>
+    </div>
+  );
+});
+SpecialPriceWrapper.displayName = "SpecialPriceWrapper";
 
 const renderField = (
   fields,
@@ -54,6 +79,8 @@ const renderField = (
               groupType="input"
               value={get(formState, name)}
             />
+          ) : name.includes("pricing.special") ? (
+            <SpecialPriceWrapper />
           ) : (
             <FormInput
               {...{ type, label, name, onChange, ...rest }}

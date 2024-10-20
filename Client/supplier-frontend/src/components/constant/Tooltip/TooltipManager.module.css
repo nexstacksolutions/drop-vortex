@@ -1,0 +1,14 @@
+.globalTooltip {
+  z-index: 999;
+  border: var(--border-base);
+  border-radius: var(--radius-base) !important;
+  backdrop-filter: blur(50px) !important;
+  background-color: var(--canvas-color) !important;
+
+  & > div:last-child {
+    border: inherit;
+    background-color: inherit;
+    border-left-color: transparent;
+    border-top-color: transparent;
+  }
+}
