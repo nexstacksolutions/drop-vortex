@@ -20,23 +20,23 @@ const useContentScore = (
   const additionalEmptyFieldSuffixes = useMemo(() => {
     const baseSuffixes = [
       "].stock",
-      "].pricing.original",
-      ...(variantShipping ? ["].dimensions", "].packageWeight"] : []),
+      "].pricing.original.amount",
+      ...(variantShipping ? ["].dimensions", "].packageWeight.value"] : []),
       "shipping.dimensions.width",
       "shipping.dimensions.length",
       "shipping.dimensions.height",
     ];
 
     if (variantShipping) {
-      baseSuffixes.push("shipping.packageWeight", "shipping.dimensions");
+      baseSuffixes.push("shipping.packageWeight.value", "shipping.dimensions");
     }
 
     if (variantPricing) {
       baseSuffixes.push(
         "productDetails.pricing",
         "productDetails.stock",
-        "productDetails.pricing.current",
-        "productDetails.pricing.original"
+        "productDetails.pricing.original.amount",
+        "productDetails.pricing.special.amount"
       );
     }
 
@@ -111,7 +111,7 @@ const useContentScore = (
     setContentScore(calculateScore);
   }, [calculateScore]);
 
-  return { contentScore };
+  return { contentScore: contentScore || 0 };
 };
 
 export default useContentScore;

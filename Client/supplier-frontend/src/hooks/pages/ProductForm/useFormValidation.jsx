@@ -19,7 +19,7 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
   const validateField = async (formState, fieldPath, fieldValue) => {
     try {
       const fieldSchema = Yup.reach(formSchema, fieldPath);
-      const sliceDepth = fieldPath.includes("productDetails.pricing") ? -2 : -1;
+      const sliceDepth = fieldPath.includes(".pricing") ? -2 : -1;
       const parentPath = fieldPath.split(".").slice(0, sliceDepth).join(".");
       const parent = get(formState, parentPath);
       const updatedValue =

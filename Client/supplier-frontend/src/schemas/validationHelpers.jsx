@@ -48,10 +48,8 @@ export const nullableArrayOfSchema = (schema) =>
 
 // Helper function for price comparison
 export const isCurrentLessThanOriginal = function (value) {
-  console.log(this.options.context.parent || this.parent);
-
   const { original } = this.options.context.parent || this.parent;
-  return original.amount == null || value == null || value < original.amount;
+  return original?.amount == null || value == null || value < original?.amount;
 };
 
 // Reusable pricing schema
