@@ -617,8 +617,7 @@
 }
 
 /* Tooltips stylings */
-
-.guidanceWrapper {
+.guidanceTooltip > div:first-child {
   max-width: 30rem;
 
   &:has(img) {
@@ -647,7 +646,7 @@
   }
 }
 
-.mediaPreviewActions {
+.mediaPreviewTooltip {
   padding: 0 !important;
   border: none !important;
 
@@ -686,3 +685,8 @@
     }
   }
 }
+
+/* .specialPriceTooltip{
+  padding: 0;
+  border: none;
+} */

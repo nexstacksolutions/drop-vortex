@@ -2,8 +2,13 @@ import styles from "./ProductForm.module.css";
 import { get } from "lodash";
 import { useMemo, memo } from "react";
 import { useTooltip } from "../../../../context/Tooltip";
-import { FormInput, MultiInputGroup, InputHeader } from "./ProductInputs";
 import useAdditionalFields from "../../../../hooks/pages/ProductForm/useAdditionalFields";
+import {
+  FormInput,
+  MultiInputGroup,
+  InputHeader,
+  DropdownInput,
+} from "./ProductInputs";
 import {
   useProductFormState,
   useProductFormUI,
@@ -22,28 +27,63 @@ const getFieldPath = (
     : `productDetails.${basePath}`;
 };
 
-const SpecialPriceWrapper = memo(() => {
-  const { handleTooltipTrigger } = useTooltip();
-  const content = useMemo(() => <div>Hello</div>, []);
+const SpecialPriceWrapper = memo(
+  ({ name, value, promotionDateProps, ...rest }) => {
+    const { handleTooltipTrigger } = useTooltip();
+    const modifiedProps = useMemo(
+      () => ({ ...rest, hideLabel: false }),
+      [rest]
+    );
 
-  const tooltipProps = useMemo(
-    () => ({
-      content,
-    }),
-    [content]
-  );
+    const formInputProps = useMemo(
+      () => ({
+        name: `${name}.amount`,
+        value: value.amount,
+        ...modifiedProps,
+      }),
+      [name, value.amount, modifiedProps]
+    );
 
-  return (
-    <div className={styles.specialPriceWrapper}>
-      <button
-        id="global-tooltip"
-        onMouseOver={() => handleTooltipTrigger(tooltipProps)}
-      >
-        Add
-      </button>
-    </div>
-  );
-});
+    const dropDownInputProps = useMemo(
+      () => ({
+        name: `${name}.status`,
+        value: value.status,
+        ...modifiedProps,
+        ...promotionDateProps,
+      }),
+      [name, value.status, modifiedProps, promotionDateProps]
+    );
+
+    const content = useMemo(
+      () => (
+        <div className="flex flex-col">
+          <FormInput {...formInputProps} />
+          <DropdownInput {...dropDownInputProps} />
+        </div>
+      ),
+      [formInputProps, dropDownInputProps]
+    );
+
+    const tooltipProps = useMemo(
+      () => ({
+        content,
+        customClass: styles.specialPriceTooltip,
+      }),
+      [content]
+    );
+
+    return (
+      <div className={styles.specialPriceWrapper}>
+        <button
+          id="global-tooltip"
+          onMouseOver={() => handleTooltipTrigger(tooltipProps)}
+        >
+          Add
+        </button>
+      </div>
+    );
+  }
+);
 SpecialPriceWrapper.displayName = "SpecialPriceWrapper";
 
 const renderField = (
@@ -55,7 +95,9 @@ const renderField = (
   return fields.map(
     ({ label, fieldPath, maxValue, type = "number", ...rest }, idx) => {
       const name = getFieldPath(isVariationField, fieldPath, rowIndex);
+      const value = get(formState, name);
       const isRequired = get(requiredFields, name);
+      const tdProps = { type, label, name, value, onChange, ...rest };
 
       if (isHeader) {
         return (
@@ -74,19 +116,11 @@ const renderField = (
       return (
         <td key={idx}>
           {name.includes("dimensions") ? (
-            <MultiInputGroup
-              {...{ type, label, name, onChange, ...rest }}
-              groupType="input"
-              value={get(formState, name)}
-            />
+            <MultiInputGroup {...tdProps} groupType="input" />
           ) : name.includes("pricing.special") ? (
-            <SpecialPriceWrapper />
+            <SpecialPriceWrapper {...tdProps} />
           ) : (
-            <FormInput
-              {...{ type, label, name, onChange, ...rest }}
-              suffixDisplay={{ maxValue }}
-              value={get(formState, name)}
-            />
+            <FormInput {...tdProps} suffixDisplay={{ maxValue }} />
           )}
         </td>
       );
@@ -180,7 +214,7 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
 
   const hasVariationRows = variationRows.length > 0;
 
-  const additionalFields = useAdditionalFields(
+  const { commonFields, additionalFields } = useAdditionalFields(
     variantShipping,
     hasVariationRows
   );
@@ -191,11 +225,8 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
       {hasVariationRows && (
         <div className={`${styles.variationInputContainer} flex align-center`}>
           <div className={`${styles.variationInputWrapper} flex `}>
-            {additionalFields
-              .slice(0, variantShipping ? 6 : 4)
-              .filter(
-                (_, index) => !(variantShipping && (index === 3 || index === 4))
-              )
+            {commonFields
+              .slice(0, 4)
               .map(
                 ({ fieldPath, maxValue, type = "number", ...rest }, index) => (
                   <FormInput
@@ -233,7 +264,6 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
               formState,
               onChange,
               variationRows,
-              variantShipping,
               hasVariationRows,
               variationColumnNames,
               additionalFields,

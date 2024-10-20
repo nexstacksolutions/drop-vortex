@@ -18,7 +18,7 @@ const initialFormState = {
         amount: "",
         currency: "PKR",
       },
-      special: { amount: "", start: "", end: "", discount: "", status: false },
+      special: { amount: "", start: "", end: "", discount: "", status: "" },
       priceFormat: {
         decimals: 2,
         separator: ",",

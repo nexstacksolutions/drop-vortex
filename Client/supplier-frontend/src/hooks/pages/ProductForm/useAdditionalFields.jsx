@@ -19,9 +19,16 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
         placeholder: "Price",
       },
       {
-        fieldPath: "pricing.special.amount",
+        fieldPath: "pricing.special",
         label: "Special Price",
         placeholder: "Special Price",
+        promotionDateProps: {
+          label: "Promotion Date",
+          type: "text",
+          placeholder: "Set Promotion Date",
+          disableInput: true,
+          options: ["Set Date"],
+        },
       },
       {
         fieldPath: "stock",
@@ -89,7 +96,7 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
     }));
   }, [variantFields, commonFields, commonAttributes]);
 
-  return additionalFields;
+  return { commonFields, additionalFields };
 };
 
 export default useAdditionalFields;

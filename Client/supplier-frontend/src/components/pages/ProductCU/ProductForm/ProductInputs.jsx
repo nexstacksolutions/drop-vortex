@@ -53,6 +53,11 @@ const GuidanceTooltip = memo(
       [imgSrc, instructions]
     );
 
+    const tooltipProps = useMemo(
+      () => ({ content, place, customClass: styles.guidanceTooltip }),
+      [content, place]
+    );
+
     if (!enablePopup) return content;
 
     return (
@@ -60,7 +65,7 @@ const GuidanceTooltip = memo(
         {title && <span>{title}</span>}
         <button
           id="global-tooltip"
-          onMouseOver={() => handleTooltipTrigger({ content, place })}
+          onMouseOver={() => handleTooltipTrigger(tooltipProps)}
         >
           {popupBtn}
         </button>
@@ -84,20 +89,15 @@ const MediaPreviewItem = memo(
             "flex flex-col justify-center"
           )}
         >
-          {showMediaPreview && (
-            <img src={src} alt="" className={styles.mediaPreview} />
-          )}
+          {showMediaPreview && <img src={src} alt="" />}
+
           <div
             className={classNames(styles.mediaAction, "flex justify-between")}
           >
-            <button type="button" className={styles.editBtn}>
+            <button type="button">
               <RiEdit2Line />
             </button>
-            <button
-              type="button"
-              onClick={onRemove}
-              className={styles.removeBtn}
-            >
+            <button type="button" onClick={onRemove}>
               <RiDeleteBin5Line />
             </button>
           </div>
@@ -109,7 +109,7 @@ const MediaPreviewItem = memo(
     const tooltipProps = useMemo(
       () => ({
         content,
-        customClass: styles.mediaPreviewActions,
+        customClass: styles.mediaPreviewTooltip,
       }),
       [content]
     );
@@ -118,7 +118,6 @@ const MediaPreviewItem = memo(
       <MediaTag
         src={src}
         controls={fileType !== "image"}
-        className="object-cover"
         {...(enablePopup && {
           id: "global-tooltip",
           onMouseOver: () => handleTooltipTrigger(tooltipProps),
@@ -461,7 +460,7 @@ const MediaInput = memo(
 MediaInput.displayName = "MediaInput";
 
 const DropdownInput = memo(
-  ({ customClass, name, options, onChange, ...rest }) => {
+  ({ customClass, name, options, onChange, disableInput, ...rest }) => {
     const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef();
     const id = `${name}-dropdown-input`;
@@ -500,6 +499,7 @@ const DropdownInput = memo(
           [styles.dropdownInputFocused]: isFocused,
         })}
       >
+        {/* {!disableInput && ( */}
         <FormInput
           {...{ id, name, onChange, inputRef, ...rest }}
           wrapInput={false}
@@ -507,6 +507,7 @@ const DropdownInput = memo(
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
+        {/* // )} */}
         {isFocused && (
           <ul className={classNames(styles.dropdownList, customClass)}>
             {filteredOptions.length ? (
