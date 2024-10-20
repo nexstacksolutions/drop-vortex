@@ -1,34 +1,8 @@
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import styles from "./ProductForm.module.css";
 import classNames from "classnames";
-import { FaAngleDown } from "react-icons/fa6";
 import SwitchBtn from "../../../constant/SwitchBtn/SwitchBtn";
-import { useProductFormUI } from "../../../../context/ProductForm";
-import { get } from "lodash";
-
-// Memoize ShowMoreBtn component
-const ShowMoreBtn = memo(
-  ({
-    section,
-    additionalFields,
-    btnText = "Show More",
-    toggleAdditionalFields,
-  }) => {
-    return (
-      <button
-        type="button"
-        onClick={() => toggleAdditionalFields(section)}
-        className={classNames(styles.showMoreBtn, {
-          [styles.showMoreBtnActive]: additionalFields[section],
-        })}
-      >
-        <span> {!additionalFields[section] ? btnText : "Show Less"}</span>
-        <FaAngleDown />
-      </button>
-    );
-  }
-);
-ShowMoreBtn.displayName = "ShowMoreBtn";
+import { ShowMoreBtn } from "./FormUi";
 
 // Memoize AdditionalJsx component
 const AdditionalJsx = memo((props) => {
@@ -54,17 +28,6 @@ function FormSection({
   showMoreBtnProps,
   additionalJsxProps,
 }) {
-  const { uiState, toggleAdditionalFields } = useProductFormUI();
-  const additionalFields = get(uiState, "additionalFields");
-
-  // Memoize additional JSX rendering
-  const additionalJsx = useMemo(() => {
-    if (additionalJsxProps) {
-      return <AdditionalJsx {...additionalJsxProps} />;
-    }
-    return null;
-  }, [additionalJsxProps]);
-
   return (
     <section
       className={classNames(styles.formSection, customClass, "flex flex-col")}
@@ -73,18 +36,12 @@ function FormSection({
       <div className={styles.sectionHeader}>
         <h2>{title}</h2>
         {message && <p>{message}</p>}
-        {additionalJsx}
+        {additionalJsxProps && <AdditionalJsx {...additionalJsxProps} />}
       </div>
       <div className={classNames(styles.sectionContent, "flex flex-col")}>
         {children}
       </div>
-      {showMoreBtnProps && (
-        <ShowMoreBtn
-          {...showMoreBtnProps}
-          additionalFields={additionalFields}
-          toggleAdditionalFields={toggleAdditionalFields}
-        />
-      )}
+      {showMoreBtnProps && <ShowMoreBtn {...showMoreBtnProps} />}
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import styles from "./ProductForm.module.css";
 import { get } from "lodash";
-import { useMemo, memo } from "react";
+import { ShowMoreBtn } from "./FormUi";
+import { useMemo, memo, useEffect } from "react";
 import { useTooltip } from "../../../../context/Tooltip";
 import useAdditionalFields from "../../../../hooks/pages/ProductForm/useAdditionalFields";
 import {
@@ -14,69 +15,118 @@ import {
   useProductFormUI,
 } from "../../../../context/ProductForm";
 
+// Constants for repeated strings
+const AMOUNT = "amount";
+const STATUS = "status";
+const PRODUCT_DETAILS = "productDetails";
+
 const getFieldPath = (
   isVariationField,
   basePath,
   valueIndex,
   variationIndex = 0
 ) => {
-  const dynamicPath = `productDetails.variations[${variationIndex}].values[${valueIndex}]`;
-
   return isVariationField
-    ? `${dynamicPath}.${basePath}`
-    : `productDetails.${basePath}`;
+    ? `${PRODUCT_DETAILS}.variations[${variationIndex}].values[${valueIndex}].${basePath}`
+    : `${PRODUCT_DETAILS}.${basePath}`;
+};
+
+const getComponentByFieldName = (name) => {
+  return name.includes("dimensions")
+    ? MultiInputGroup
+    : name.includes("pricing.special")
+    ? SpecialPriceWrapper
+    : FormInput;
+};
+
+const renderTableContent = (
+  isHeader,
+  fields,
+  isVariationField,
+  { rowIndex }
+) => {
+  return fields.map(
+    ({ maxValue, type = "number", fieldPath, ...rest }, idx) => {
+      const { formState, handleInputChange: onChange } = useProductFormState();
+      const { requiredFields } = useProductFormUI();
+      const name = getFieldPath(isVariationField, fieldPath, rowIndex);
+      const value = get(formState, name);
+      const isRequired = get(requiredFields, name);
+      const inputProps = { type, name, value, onChange, ...rest };
+      const Component = getComponentByFieldName(name);
+
+      return isHeader ? (
+        <th key={idx}>
+          <InputHeader
+            {...inputProps}
+            id={`${name}-form-input`}
+            isRequired={isRequired}
+            customClass={styles.tableHeader}
+          />
+        </th>
+      ) : (
+        <td key={idx}>
+          <Component {...inputProps} suffixDisplay={{ maxValue }} />
+        </td>
+      );
+    }
+  );
 };
 
 const SpecialPriceWrapper = memo(
-  ({ name, value, promotionDateProps, ...rest }) => {
+  ({ name, value, showMoreBtnProps, promotionDateProps, ...rest }) => {
     const { handleTooltipTrigger } = useTooltip();
-    const modifiedProps = useMemo(
-      () => ({ ...rest, hideLabel: false }),
-      [rest]
-    );
+    const { additionalFields } = useProductFormUI();
 
-    const formInputProps = useMemo(
+    const inputProps = useMemo(
       () => ({
-        name: `${name}.amount`,
-        value: value.amount,
-        ...modifiedProps,
+        formInput: {
+          name: `${name}.${AMOUNT}`,
+          value: value.amount,
+          ...rest,
+        },
+        dropDownInput: {
+          name: `${name}.${STATUS}`,
+          value: value.status,
+          ...rest,
+          ...promotionDateProps,
+        },
       }),
-      [name, value.amount, modifiedProps]
-    );
-
-    const dropDownInputProps = useMemo(
-      () => ({
-        name: `${name}.status`,
-        value: value.status,
-        ...modifiedProps,
-        ...promotionDateProps,
-      }),
-      [name, value.status, modifiedProps, promotionDateProps]
+      [name, value, rest, promotionDateProps]
     );
 
     const content = useMemo(
       () => (
         <div className="flex flex-col">
-          <FormInput {...formInputProps} />
-          <DropdownInput {...dropDownInputProps} />
+          <FormInput {...inputProps.formInput} />
+          {additionalFields.productDetails ? (
+            <DropdownInput {...inputProps.dropDownInput} />
+          ) : (
+            <ShowMoreBtn {...showMoreBtnProps} />
+          )}
         </div>
       ),
-      [formInputProps, dropDownInputProps]
+      [inputProps, additionalFields, showMoreBtnProps]
     );
 
-    const tooltipProps = useMemo(
-      () => ({
+    useEffect(() => {
+      handleTooltipTrigger({
         content,
         customClass: styles.specialPriceTooltip,
-      }),
-      [content]
-    );
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value, additionalFields.productDetails]);
 
     return (
       <div className={styles.specialPriceWrapper}>
         <button
           id="global-tooltip"
-          onMouseOver={() => handleTooltipTrigger(tooltipProps)}
+          onMouseOver={() =>
+            handleTooltipTrigger({
+              content,
+              customClass: styles.specialPriceTooltip,
+            })
+          }
         >
           Add
         </button>
@@ -86,158 +136,89 @@ const SpecialPriceWrapper = memo(
 );
 SpecialPriceWrapper.displayName = "SpecialPriceWrapper";
 
-const renderField = (
-  fields,
-  isHeader,
-  isVariationField,
-  { formState, onChange, rowIndex, requiredFields }
-) => {
-  return fields.map(
-    ({ label, fieldPath, maxValue, type = "number", ...rest }, idx) => {
-      const name = getFieldPath(isVariationField, fieldPath, rowIndex);
-      const value = get(formState, name);
-      const isRequired = get(requiredFields, name);
-      const tdProps = { type, label, name, value, onChange, ...rest };
-
-      if (isHeader) {
-        return (
-          <th key={idx}>
-            <InputHeader
-              id={`${name}-form-input`}
-              label={label}
-              isRequired={isRequired}
-              customClass={styles.tableHeader}
-              guidelinesProps={rest.guidelinesProps}
-            />
-          </th>
-        );
-      }
-
-      return (
-        <td key={idx}>
-          {name.includes("dimensions") ? (
-            <MultiInputGroup {...tdProps} groupType="input" />
-          ) : name.includes("pricing.special") ? (
-            <SpecialPriceWrapper {...tdProps} />
-          ) : (
-            <FormInput {...tdProps} suffixDisplay={{ maxValue }} />
-          )}
-        </td>
-      );
-    }
-  );
-};
-
 const TableHeaders = memo(
-  ({ hasVariationRows, variationColumnNames, additionalFields }) => {
-    return (
-      <thead>
-        <tr>
-          {hasVariationRows &&
-            variationColumnNames.map((columnName, columnIndex) => (
-              <th key={columnIndex}>{columnName}</th>
-            ))}
-          {renderField(additionalFields, true, false, {})}
-        </tr>
-      </thead>
-    );
-  }
+  ({ hasVariationRows, variationColumnNames, additionalFields }) => (
+    <thead>
+      <tr>
+        {hasVariationRows &&
+          variationColumnNames.map((columnName, columnIndex) => (
+            <th key={columnIndex}>{columnName}</th>
+          ))}
+        {renderTableContent(true, additionalFields, false, {})}
+      </tr>
+    </thead>
+  )
 );
 TableHeaders.displayName = "TableHeaders";
 
 const TableRows = memo(
   ({
-    formState,
-    onChange,
     variationRows,
     hasVariationRows,
     variationColumnNames,
     additionalFields,
-  }) => {
-    return (
-      <tbody>
-        {hasVariationRows ? (
-          variationRows.map((rowValues, rowIndex) => (
-            <tr key={`variation-row-${rowIndex}`}>
-              {variationColumnNames.map((columnName, columnIndex) => (
-                <td key={`variation-col-${columnIndex}`}>
-                  {rowValues[columnName]}
-                </td>
-              ))}
-              {renderField(additionalFields, false, true, {
-                formState,
-                onChange,
-                rowIndex,
-              })}
-            </tr>
-          ))
-        ) : (
-          <tr>
-            {renderField(additionalFields, false, false, {
-              formState,
-              onChange,
-              rowIndex: -1,
+  }) => (
+    <tbody>
+      {hasVariationRows ? (
+        variationRows.map((rowValues, rowIndex) => (
+          <tr key={`variation-row-${rowIndex}`}>
+            {variationColumnNames.map((columnName, columnIndex) => (
+              <td key={`variation-col-${columnIndex}`}>
+                {rowValues[columnName]}
+              </td>
+            ))}
+            {renderTableContent(false, additionalFields, true, {
+              rowIndex,
             })}
           </tr>
-        )}
-      </tbody>
-    );
-  }
+        ))
+      ) : (
+        <tr>
+          {renderTableContent(false, additionalFields, false, {
+            rowIndex: -1,
+          })}
+        </tr>
+      )}
+    </tbody>
+  )
 );
 TableRows.displayName = "TableRows";
 
-function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
-  const { requiredFields } = useProductFormUI();
-  const { formState, handleApplyToAll } = useProductFormState();
-
-  const variationNames = variations.map((variation) =>
-    variation.values.map((v) => v.name).join(",")
-  );
+function ProductPriceStockWrapper({ variations }) {
+  const { handleApplyToAll } = useProductFormState();
 
   const variationRows = useMemo(() => {
     if (variations.length === 0) return [];
-
     const maxValuesLength = Math.max(...variations.map((v) => v.values.length));
-
     return Array.from({ length: maxValuesLength }, (_, index) =>
       variations.reduce((acc, variation) => {
         acc[variation.type] = variation.values[index]?.name || "";
         return acc;
       }, {})
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [variations, variationNames]);
-
-  const variationColumnNames = useMemo(() => {
-    return variations.map((variation) => variation.type);
   }, [variations]);
 
-  const hasVariationRows = variationRows.length > 0;
-
-  const { commonFields, additionalFields } = useAdditionalFields(
-    variantShipping,
-    hasVariationRows
+  const variationColumnNames = useMemo(
+    () => variations.map((variation) => variation.type),
+    [variations]
   );
+
+  const hasVariationRows = useMemo(
+    () => variationRows.length > 0,
+    [variationRows]
+  );
+
+  const { commonFields, additionalFields } = useAdditionalFields();
 
   return (
     <div className={`${styles.productPSWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
       {hasVariationRows && (
         <div className={`${styles.variationInputContainer} flex align-center`}>
-          <div className={`${styles.variationInputWrapper} flex `}>
-            {commonFields
-              .slice(0, 4)
-              .map(
-                ({ fieldPath, maxValue, type = "number", ...rest }, index) => (
-                  <FormInput
-                    key={`non-row-${fieldPath}-${index}`}
-                    name={getFieldPath(false, fieldPath)}
-                    value={get(formState, getFieldPath(false, fieldPath))}
-                    suffixDisplay={{ maxValue }}
-                    {...{ type, onChange, ...rest }}
-                  />
-                )
-              )}
+          <div className={`${styles.variationInputWrapper} flex`}>
+            {renderTableContent(false, commonFields.slice(0, 4), false, {
+              rowIndex: -1,
+            })}
           </div>
           <button
             type="button"
@@ -254,15 +235,12 @@ function ProductPriceStockWrapper({ variations, variantShipping, onChange }) {
           <TableHeaders
             {...{
               hasVariationRows,
-              requiredFields,
               variationColumnNames,
               additionalFields,
             }}
           />
           <TableRows
             {...{
-              formState,
-              onChange,
               variationRows,
               hasVariationRows,
               variationColumnNames,

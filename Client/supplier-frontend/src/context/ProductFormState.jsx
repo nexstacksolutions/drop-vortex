@@ -29,7 +29,7 @@ export const ProductFormStateProvider = ({ children }) => {
     async (basePath, updatedVariants, dispatchType, payload) => {
       updateFormData(basePath, updatedVariants);
       uiDispatch({
-        type: "TOGGLE_VARIANT_PRICING",
+        type: "TOGGLE_VARIANT_VALUES",
         payload: updatedVariants.length > 0,
       });
       uiDispatch({ type: dispatchType, payload });

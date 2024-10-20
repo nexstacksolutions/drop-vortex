@@ -68,7 +68,7 @@ export const pricingSchema = (condition, customizer = false) =>
       start: nullableString,
       end: nullableString,
       discount: nullableString,
-      status: Yup.boolean().default(false),
+      status: nullableString,
     }),
     priceFormat: Yup.object({
       decimals: Yup.number().default(2),

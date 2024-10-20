@@ -33,89 +33,93 @@
     color: var(--secondary-text);
   }
 
-  & .sectionContent .inputContainer {
+  & .sectionContent {
     position: relative;
   }
+}
 
-  & .inputHeader {
-    flex-wrap: wrap;
+.inputContainer {
+  position: relative;
+}
 
-    &:has(.guidePopup) {
-      flex-direction: row;
-      align-items: center;
-    }
+.inputHeader {
+  flex-wrap: wrap;
 
-    & label > .requiredFieldIcon {
-      color: var(--danger-color);
-      font-size: 1rem;
-    }
+  &:has(.guidePopup) {
+    flex-direction: row;
+    align-items: center;
   }
 
-  & .inputControl {
-    position: relative;
-    flex: 1;
-
-    & > div {
-      flex: 1;
-    }
-
-    & .inputWrapper {
-      flex: 1;
-      position: relative;
-      border: var(--border-base);
-      border-radius: var(--radius-sm);
-      transition: var(--transition-base);
-
-      & input {
-        border: none;
-        flex: 1;
-      }
-
-      & .suffixDisplay {
-        position: absolute;
-        gap: var(--spacing-xs);
-        right: var(--spacing-md);
-        color: var(--secondary-text);
-        font-size: var(--font-xs);
-
-        & .suffixIcon {
-          font-size: 1.6rem;
-          cursor: pointer;
-          opacity: 0;
-        }
-      }
-
-      &:focus-within,
-      &:hover {
-        border-color: var(--accent-color);
-        box-shadow: var(--shadow-xs) rgba(var(--accent-Rgb), var(--opacity-md));
-
-        & .reactQuillInput > div:first-child {
-          border-color: var(--accent-color);
-        }
-
-        & .suffixDisplay .suffixIcon {
-          opacity: 1;
-        }
-      }
-    }
-  }
-
-  & .validationWrapper .errorMsg {
+  & label > .requiredFieldIcon {
     color: var(--danger-color);
+    font-size: 1rem;
+  }
+}
+
+.inputControl {
+  position: relative;
+  flex: 1;
+
+  & > div {
+    flex: 1;
   }
 
-  & .invalidInput .inputControl .inputWrapper {
-    border-color: var(--danger-color);
+  & .inputWrapper {
+    flex: 1;
+    position: relative;
+    border: var(--border-base);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-base);
 
-    & .reactQuillInput > div:first-child {
-      border-color: var(--danger-color);
+    & input {
+      border: none;
+      flex: 1;
+    }
+
+    & .suffixDisplay {
+      position: absolute;
+      gap: var(--spacing-xs);
+      right: var(--spacing-md);
+      color: var(--secondary-text);
+      font-size: var(--font-xs);
+
+      & .suffixIcon {
+        font-size: 1.6rem;
+        cursor: pointer;
+        opacity: 0;
+      }
     }
 
     &:focus-within,
     &:hover {
-      box-shadow: var(--shadow-xs) rgba(var(--danger-Rgb), var(--opacity-lg));
+      border-color: var(--accent-color);
+      box-shadow: var(--shadow-xs) rgba(var(--accent-Rgb), var(--opacity-md));
+
+      & .reactQuillInput > div:first-child {
+        border-color: var(--accent-color);
+      }
+
+      & .suffixDisplay .suffixIcon {
+        opacity: 1;
+      }
     }
+  }
+}
+
+.validationWrapper .errorMsg {
+  color: var(--danger-color);
+}
+
+.invalidInput .inputControl .inputWrapper {
+  border-color: var(--danger-color);
+
+  & .reactQuillInput > div:first-child {
+    border-color: var(--danger-color);
+  }
+
+  &:focus-within,
+  &:hover {
+    box-shadow: var(--shadow-xs) rgba(var(--danger-Rgb), var(--opacity-lg));
   }
 }
 
@@ -686,7 +690,10 @@
   }
 }
 
-/* .specialPriceTooltip{
-  padding: 0;
-  border: none;
-} */
+.specialPriceTooltip {
+  padding: var(--spacing-md) !important;
+
+  & > div:first-child {
+    gap: var(--spacing-md);
+  }
+}

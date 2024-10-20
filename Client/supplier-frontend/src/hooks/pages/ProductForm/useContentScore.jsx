@@ -6,7 +6,7 @@ const useContentScore = (
   emptyFields,
   requiredFields,
   variantShipping,
-  variantPricing
+  variantValues
 ) => {
   const [contentScore, setContentScore] = useState(0);
 
@@ -29,7 +29,7 @@ const useContentScore = (
       baseSuffixes.push("shipping.packageWeight.value", "shipping.dimensions");
     }
 
-    if (variantPricing) {
+    if (variantValues) {
       baseSuffixes.push(
         "productDetails.stock",
         "productDetails.pricing.original.amount"
@@ -37,7 +37,7 @@ const useContentScore = (
     }
 
     return baseSuffixes;
-  }, [variantShipping, variantPricing]);
+  }, [variantShipping, variantValues]);
 
   const calculateBaseScore = useCallback(
     (totalFields, filledFields) =>

@@ -473,18 +473,22 @@ const DropdownInput = memo(
       [options, rest.value]
     );
 
+    // Handle option selection from the dropdown
     const handleOptionClick = (e) => {
       const { innerText } = e.target;
       if (onChange) {
         onChange(null, name, innerText);
       }
+      setIsFocused(false); // Hide dropdown after selection
     };
 
+    // Clear the input field
     const handleClearInput = () => {
       onChange(null, name, "");
       inputRef.current.focus();
     };
 
+    // Determine which icon to display
     const suffixIcon =
       rest.value.length > 0 ? (
         <CgCloseO className={styles.suffixIcon} onClick={handleClearInput} />
@@ -499,15 +503,14 @@ const DropdownInput = memo(
           [styles.dropdownInputFocused]: isFocused,
         })}
       >
-        {/* {!disableInput && ( */}
         <FormInput
           {...{ id, name, onChange, inputRef, ...rest }}
           wrapInput={false}
           suffixDisplay={{ suffixIcon }}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          // onBlur={() => setIsFocused(false)}
+          readOnly={disableInput}
         />
-        {/* // )} */}
         {isFocused && (
           <ul className={classNames(styles.dropdownList, customClass)}>
             {filteredOptions.length ? (

@@ -1,6 +1,9 @@
 import { useMemo } from "react";
+import { useProductFormUI } from "../../../context/ProductForm";
 
-const useAdditionalFields = (variantShipping, hasVariationRows) => {
+const useAdditionalFields = () => {
+  const { variantShipping, variantValues } = useProductFormUI();
+
   // Memoize the common attributes
   const commonAttributes = useMemo(
     () => ({
@@ -22,6 +25,7 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
         fieldPath: "pricing.special",
         label: "Special Price",
         placeholder: "Special Price",
+        showMoreBtnProps: { section: "productDetails" },
         promotionDateProps: {
           label: "Promotion Date",
           type: "text",
@@ -64,7 +68,7 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
 
   // Memoize variant fields
   const variantFields = useMemo(() => {
-    if (variantShipping && hasVariationRows) {
+    if (variantShipping && variantValues) {
       return [
         {
           fieldPath: "packageWeight.value",
@@ -79,7 +83,7 @@ const useAdditionalFields = (variantShipping, hasVariationRows) => {
       ];
     }
     return [];
-  }, [variantShipping, hasVariationRows]);
+  }, [variantShipping, variantValues]);
 
   // Memoize additional fields
   const additionalFields = useMemo(() => {

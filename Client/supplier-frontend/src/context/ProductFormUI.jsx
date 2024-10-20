@@ -9,12 +9,20 @@ export const ProductFormUIProvider = ({ children }) => {
   const { uiState, uiDispatch, formState } = useProductForm();
   const { inputGuidance, updateInputGuidance } = useFormGuide();
   const sectionRefs = useRef(Array.from({ length: 5 }, () => createRef()));
+  const {
+    formErrors,
+    emptyFields,
+    requiredFields,
+    additionalFields,
+    variantShipping,
+    variantValues,
+  } = uiState;
   const { contentScore } = useContentScore(
     formState,
-    uiState.emptyFields,
-    uiState.requiredFields,
-    uiState.variantShipping,
-    uiState.variantPricing
+    emptyFields,
+    requiredFields,
+    variantShipping,
+    variantValues
   );
 
   const { validateForm, validateField } = useFormValidation(
@@ -22,8 +30,6 @@ export const ProductFormUIProvider = ({ children }) => {
     uiState,
     uiDispatch
   );
-
-  const { formErrors, emptyFields, requiredFields } = uiState;
 
   const toggleVariantShipping = useCallback(
     () => uiDispatch({ type: "TOGGLE_VARIANT_SHIPPING" }),
@@ -59,11 +65,6 @@ export const ProductFormUIProvider = ({ children }) => {
     [formState, validateForm, uiDispatch, uiState.isSubmitting]
   );
 
-  const isVariantShipping = useMemo(
-    () => formState.productDetails?.variations?.[0]?.values?.length > 1,
-    [formState.productDetails?.variations]
-  );
-
   useEffect(() => {
     let isMounted = true;
 
@@ -88,8 +89,9 @@ export const ProductFormUIProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!isVariantShipping) uiDispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
-  }, [isVariantShipping, uiDispatch]);
+    if (!uiState.variantValues)
+      uiDispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
+  }, [uiState.variantValues, uiDispatch]);
 
   const values = useMemo(
     () => ({
@@ -103,10 +105,12 @@ export const ProductFormUIProvider = ({ children }) => {
       updateInputGuidance,
       toggleAdditionalFields,
       toggleVariantShipping,
-      isVariantShipping,
       formErrors,
       emptyFields,
       requiredFields,
+      additionalFields,
+      variantShipping,
+      variantValues,
     }),
     [
       uiState,
@@ -119,10 +123,12 @@ export const ProductFormUIProvider = ({ children }) => {
       updateInputGuidance,
       toggleAdditionalFields,
       toggleVariantShipping,
-      isVariantShipping,
       formErrors,
       emptyFields,
       requiredFields,
+      additionalFields,
+      variantShipping,
+      variantValues,
     ]
   );
 
