@@ -2,7 +2,7 @@ import styles from "./index.module.css";
 import StatusSidebar from "./components/StatusSidebar";
 import ProductForm from "./components/ProductForm";
 import ProductFormProvider from "./contexts/ProductForm";
-import ShowcaseHeader from "../../components/common/ShowcaseV2/ShowcaseHeader";
+import ShowcaseHeader from "../../../components/common/ShowcaseV2/ShowcaseHeader";
 import classNames from "classnames";
 
 function ShowcaseContent() {
@@ -14,7 +14,7 @@ function ShowcaseContent() {
   );
 }
 
-function ProductCU() {
+function ProductEntry() {
   return (
     <ProductFormProvider>
       <main className={styles.showcaseGrid}>
@@ -33,4 +33,4 @@ function ProductCU() {
   );
 }
 
-export default ProductCU;
+export default ProductEntry;

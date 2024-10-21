@@ -1,7 +1,7 @@
 import { memo } from "react";
 import styles from "./index.module.css";
 import classNames from "classnames";
-import SwitchBtn from "../../../../components/UI/SwitchBtn";
+import SwitchBtn from "../../../../../components/UI/SwitchBtn";
 import { ShowMoreBtn } from "./FormUi";
 
 // Memoize AdditionalJsx component

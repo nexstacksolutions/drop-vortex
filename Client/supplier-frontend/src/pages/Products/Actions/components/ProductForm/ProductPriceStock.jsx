@@ -2,7 +2,7 @@ import styles from "./index.module.css";
 import { get } from "lodash";
 import { ShowMoreBtn } from "./FormUi";
 import { useMemo, memo, useEffect } from "react";
-import { useTooltip } from "../../../../contexts/Tooltip";
+import { useTooltip } from "../../../../../contexts/Tooltip";
 import useAdditionalFields from "../../hooks/useAdditionalFields";
 import {
   FormInput,

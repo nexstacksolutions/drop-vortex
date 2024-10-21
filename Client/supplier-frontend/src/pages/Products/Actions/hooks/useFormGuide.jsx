@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ProductFormTips from "../../../api/ProductFormTips.json";
+import ProductFormTips from "../../../../api/ProductFormTips.json";
 
 const defaultGuidance = ProductFormTips["defaultGuidance"];
 

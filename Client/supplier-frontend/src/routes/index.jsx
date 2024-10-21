@@ -4,7 +4,7 @@ import App from "../App";
 
 // All pages
 const HomePage = lazy(() => import("../pages/Home"));
-const CreateProduct = lazy(() => import("../pages/ProductCU"));
+const ProductForm = lazy(() => import("../pages/Products/Actions"));
 const ErrorBoundary = lazy(() => import("../pages/Error"));
 
 // Creating routes
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
       // { path: "/products/manage", element: <ProductList /> },
-      { path: "/products/add", element: <CreateProduct /> },
+      { path: "/products/add", element: <ProductForm /> },
     ],
   },
 ]);

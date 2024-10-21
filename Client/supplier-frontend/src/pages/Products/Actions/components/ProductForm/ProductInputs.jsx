@@ -4,12 +4,12 @@ import { get } from "lodash";
 import classNames from "classnames";
 import ReactQuill from "react-quill";
 import { CgCloseO, CgInfo } from "react-icons/cg";
-import SwitchBtn from "../../../../components/UI/SwitchBtn";
+import SwitchBtn from "../../../../../components/UI/SwitchBtn";
 import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
 import { useProductFormUI } from "../../contexts/ProductForm";
 import { memo, useCallback, useState, useRef, useEffect, useMemo } from "react";
-import { useTooltip } from "../../../../contexts/Tooltip";
+import { useTooltip } from "../../../../../contexts/Tooltip";
 
 const useHandleInputKeyDown = (callback) =>
   useCallback(
