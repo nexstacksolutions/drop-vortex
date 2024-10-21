@@ -1,6 +1,13 @@
 .productForm {
-  width: 100%;
-  gap: var(--spacing-lg);
+  flex: 1;
+  row-gap: var(--spacing-lg);
+  padding: var(--spacing-sm);
+  scroll-behavior: smooth;
+  overflow: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   & .formActions {
     padding: var(--spacing-md) 2rem;
@@ -577,19 +584,8 @@
   }
 }
 
-.productSW > div {
-  & .additionalJsx {
-    margin-top: var(--spacing-sm);
-  }
-
-  & > div:first-child {
-    flex: 0 0 30%;
-    width: 30%;
-  }
-
-  & .radioGroup {
-    margin-top: var(--spacing-sm);
-  }
+.productSW > div .additionalJsx {
+  margin-top: var(--spacing-md);
 }
 
 .showMoreBtn {
