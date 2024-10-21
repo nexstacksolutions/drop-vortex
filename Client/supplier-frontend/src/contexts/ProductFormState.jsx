@@ -12,7 +12,7 @@ export const ProductFormStateProvider = ({ children }) => {
 
   const updateFormData = useCallback(
     (name, value) => {
-      formDispatch(formActions.updateField(name, value));
+      formDispatch(formActions.updateField({ name, value }));
       validateField(formState, name, value);
     },
     [formDispatch, formState, validateField]
@@ -27,13 +27,14 @@ export const ProductFormStateProvider = ({ children }) => {
   );
 
   const updateVariantData = useCallback(
-    async (basePath, updatedVariants, dispatchType, payload) => {
+    async (basePath, updatedVariants, isAdding, payload) => {
       updateFormData(basePath, updatedVariants);
-      uiDispatch({
-        type: "TOGGLE_VARIANT_VALUES",
-        payload: updatedVariants.length > 0,
-      });
-      uiDispatch({ type: dispatchType, payload });
+      uiDispatch(formUIActions.toggleVariantValues(updatedVariants.length > 0));
+      uiDispatch(
+        isAdding
+          ? formUIActions.setEmptyFields(payload)
+          : formUIActions.clearEmptyFields(payload)
+      );
     },
     [updateFormData, uiDispatch]
   );
@@ -69,7 +70,7 @@ export const ProductFormStateProvider = ({ children }) => {
       await updateVariantData(
         basePath,
         updatedVariants,
-        isAdding ? "SET_EMPTY_FIELDS" : "CLEAR_EMPTY_FIELDS",
+        isAdding,
         isAdding
           ? additionalFields
           : { ...additionalFields, removedIndex: valueIndex }
@@ -80,7 +81,7 @@ export const ProductFormStateProvider = ({ children }) => {
 
   const handleApplyToAll = useCallback(() => {
     const { pricing, stock, sku } = formState.productDetails;
-    formDispatch(formActions.applyToAllVariants(pricing, stock, sku));
+    formDispatch(formActions.applyToAllVariants({ pricing, stock, sku }));
   }, [formDispatch, formState.productDetails]);
 
   const values = useMemo(

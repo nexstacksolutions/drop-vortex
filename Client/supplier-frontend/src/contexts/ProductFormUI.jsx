@@ -4,6 +4,7 @@ import useContentScore from "../pages/Products/Actions/hooks/useContentScore";
 import useFormValidation from "../pages/Products/Actions/hooks/useFormValidation";
 import { ProductFormUIContext, useProductForm } from "./ProductForm";
 import { createRef, useMemo, useEffect, useRef, useCallback } from "react";
+import { formUIActions } from "../store/productForm/actions";
 
 export const ProductFormUIProvider = ({ children }) => {
   const { uiState, uiDispatch, formState } = useProductForm();
@@ -32,13 +33,13 @@ export const ProductFormUIProvider = ({ children }) => {
   );
 
   const toggleVariantShipping = useCallback(
-    () => uiDispatch({ type: "TOGGLE_VARIANT_SHIPPING" }),
+    () => uiDispatch(formUIActions.toggleVariantShipping()),
     [uiDispatch]
   );
 
   const toggleAdditionalFields = useCallback(
     (section) => {
-      uiDispatch({ type: "TOGGLE_ADDITIONAL_FIELDS", payload: section });
+      uiDispatch(formUIActions.toggleAdditionalFields(section));
     },
     [uiDispatch]
   );
@@ -49,7 +50,7 @@ export const ProductFormUIProvider = ({ children }) => {
       if (uiState.isSubmitting || e.nativeEvent.submitter.name !== "submitBtn")
         return;
 
-      uiDispatch({ type: "SET_IS_SUBMITTING", payload: true });
+      uiDispatch(formUIActions.setIsSubmitting(true));
       try {
         const isValid = await validateForm(formState);
         console.log(
@@ -59,7 +60,7 @@ export const ProductFormUIProvider = ({ children }) => {
       } catch (error) {
         console.error("Error during submission", error);
       } finally {
-        uiDispatch({ type: "SET_IS_SUBMITTING", payload: false });
+        uiDispatch(formUIActions.setIsSubmitting(false));
       }
     },
     [formState, validateForm, uiDispatch, uiState.isSubmitting]
@@ -71,7 +72,7 @@ export const ProductFormUIProvider = ({ children }) => {
     const fetchFields = async (fieldType) => {
       try {
         if (isMounted) {
-          await validateForm(formState, true, fieldType);
+          await validateForm(formState, formUIActions.setRequiredFields);
         }
       } catch (error) {
         if (isMounted) {
@@ -90,7 +91,7 @@ export const ProductFormUIProvider = ({ children }) => {
 
   useEffect(() => {
     if (!uiState.variantValues)
-      uiDispatch({ type: "SET_VARIANT_SHIPPING_FALSE" });
+      uiDispatch(formUIActions.setVariantShippingFalse());
   }, [uiState.variantValues, uiDispatch]);
 
   const values = useMemo(

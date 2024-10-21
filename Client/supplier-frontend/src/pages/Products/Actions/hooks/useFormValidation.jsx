@@ -1,5 +1,6 @@
 import * as Yup from "yup";
 import { get } from "lodash";
+import { formUIActions } from "../../../../store/productForm/actions";
 
 // Custom hook for form validation
 const useFormValidation = (formSchema, uiState, uiDispatch) => {
@@ -30,45 +31,37 @@ const useFormValidation = (formSchema, uiState, uiDispatch) => {
         context: { uiState, parent },
       });
 
-      uiDispatch({
-        type: "CLEAR_FIELD_ERROR",
-        payload: fieldPath,
-      });
+      uiDispatch(formUIActions.clearFieldError(fieldPath));
 
       return false; // No error
     } catch (error) {
       const errors = handleErrors(error, fieldPath);
       if (errors[fieldPath] === undefined) return false;
 
-      uiDispatch({
-        type: "SET_FIELD_ERROR",
-        payload: { fieldPath, error: errors[fieldPath] },
-      });
+      uiDispatch(
+        formUIActions.setFieldError({ fieldPath, error: errors[fieldPath] })
+      );
 
       return true; // Error occurred
     }
   };
 
   // Validate the entire form
-  const validateForm = async (
-    formState,
-    additionalUpdate = false,
-    dispatchType
-  ) => {
+  const validateForm = async (formState, additionalUpdate) => {
     try {
       await formSchema.validate(formState, {
         abortEarly: false,
         context: { uiState },
       });
-      uiDispatch({ type: "CLEAR_FORM_ERRORS" });
+      uiDispatch(formUIActions.clearFormErrors());
       return true; // Form is valid
     } catch (error) {
       const errors = handleErrors(error);
 
       if (additionalUpdate) {
-        uiDispatch({ type: dispatchType, payload: errors });
+        uiDispatch(additionalUpdate(errors));
       } else {
-        uiDispatch({ type: "SET_FORM_ERRORS", payload: errors });
+        uiDispatch(formUIActions.setFormErrors(errors));
       }
       return false;
     }

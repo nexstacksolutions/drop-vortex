@@ -18,14 +18,14 @@ export const SET_IS_SUBMITTING = "SET_IS_SUBMITTING";
 
 // Form State Actions
 const formActions = {
-  updateField: (name, value) => ({
+  updateField: (payload) => ({
     type: UPDATE_FIELD,
-    payload: { name, value },
+    payload,
   }),
 
-  applyToAllVariants: (pricing, stock, sku) => ({
+  applyToAllVariants: (payload) => ({
     type: APPLY_TO_ALL_VARIANTS,
-    payload: { pricing, stock, sku },
+    payload,
   }),
 };
 
@@ -64,8 +64,9 @@ const formUIActions = {
     payload,
   }),
 
-  clearEmptyFields: () => ({
+  clearEmptyFields: (payload) => ({
     type: CLEAR_EMPTY_FIELDS,
+    payload,
   }),
 
   clearFormErrors: () => ({
@@ -77,9 +78,9 @@ const formUIActions = {
     payload,
   }),
 
-  setFieldError: (fieldPath, error) => ({
+  setFieldError: (payload) => ({
     type: SET_FIELD_ERROR,
-    payload: { fieldPath, error },
+    payload,
   }),
 
   setIsSubmitting: (payload) => ({
