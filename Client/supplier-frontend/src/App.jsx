@@ -2,12 +2,12 @@ import "./App.css";
 import { Suspense } from "react";
 
 // Common Components
-import Sidebar from "./components/constant/Sidebar/Sidebar";
-import MainLayout from "./layout/mainLayout";
-import ToggleTheme from "./components/constant/ToggleTheme/ToggleTheme";
-import LoadingSpinner from "./components/Constant/Spinner/Spinner";
-import TooltipManager from "./components/constant/ToolTip/TooltipManager";
-import { useTooltip } from "./context/Tooltip";
+import Sidebar from "./components/layouts/Sidebar";
+import MainLayout from "./layouts/MainLayout";
+import ToggleTheme from "./components/UI/ToggleTheme";
+import LoadingSpinner from "./components/UI/Spinner";
+import TooltipManager from "./components/UI/Tooltip";
+import { useTooltip } from "./contexts/Tooltip";
 
 function App() {
   const { tooltipProps } = useTooltip();
