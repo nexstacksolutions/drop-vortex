@@ -9,7 +9,7 @@ import Divider from "../../../../../components/UI/Divider";
 import {
   useProductFormUI,
   useProductFormState,
-} from "../../contexts/ProductForm";
+} from "../../../../../contexts/ProductForm";
 import {
   FormInput,
   MultiInputGroup,

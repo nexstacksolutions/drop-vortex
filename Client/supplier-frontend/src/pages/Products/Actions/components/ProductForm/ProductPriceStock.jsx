@@ -13,12 +13,11 @@ import {
 import {
   useProductFormState,
   useProductFormUI,
-} from "../../contexts/ProductForm";
+} from "../../../../../contexts/ProductForm";
 
 // Constants for repeated strings
 const AMOUNT = "amount";
 const STATUS = "status";
-const PRODUCT_DETAILS = "productDetails";
 
 const getFieldPath = (
   isVariationField,
@@ -27,8 +26,8 @@ const getFieldPath = (
   variationIndex = 0
 ) => {
   return isVariationField
-    ? `${PRODUCT_DETAILS}.variations[${variationIndex}].values[${valueIndex}].${basePath}`
-    : `${PRODUCT_DETAILS}.${basePath}`;
+    ? `productDetails.variations[${variationIndex}].values[${valueIndex}].${basePath}`
+    : `productDetails.${basePath}`;
 };
 
 const getComponentByFieldName = (name) => {

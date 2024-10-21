@@ -1,7 +1,7 @@
 import styles from "./index.module.css";
 import { useCallback, useState, memo } from "react";
 import { RiDeleteBin5Line, RiMenuFill } from "react-icons/ri";
-import { useProductFormState } from "../../contexts/ProductForm";
+import { useProductFormState } from "../../../../../contexts/ProductForm";
 import { FormInput, MediaInput, InputContainer } from "./ProductInputs";
 
 const VariantActionButtons = memo(({ handleRemove }) => {

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useProductFormUI } from "../contexts/ProductForm";
+import { useProductFormUI } from "../../../../contexts/ProductForm";
 
 const useAdditionalFields = () => {
   const { variantShipping, variantValues } = useProductFormUI();

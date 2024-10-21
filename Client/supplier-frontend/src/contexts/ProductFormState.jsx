@@ -1,9 +1,10 @@
 import { get } from "lodash";
 import { useMemo, useCallback } from "react";
-import formSchema from "../schemas/productForm";
-import { createNewVariant } from "../store/formStateReducer";
+import formSchema from "../schemas/productForm/productForm";
 import { ProductFormStateContext, useProductForm } from "./ProductForm";
-import useFormValidation from "../hooks/useFormValidation";
+import useFormValidation from "../pages/Products/Actions/hooks/useFormValidation";
+import { createNewVariant } from "../utils/productForm";
+import { formActions, formUIActions } from "../store/productForm/actions";
 
 export const ProductFormStateProvider = ({ children }) => {
   const { formState, formDispatch, uiState, uiDispatch } = useProductForm();
@@ -11,7 +12,7 @@ export const ProductFormStateProvider = ({ children }) => {
 
   const updateFormData = useCallback(
     (name, value) => {
-      formDispatch({ type: "UPDATE_FIELD", payload: { name, value } });
+      formDispatch(formActions.updateField(name, value));
       validateField(formState, name, value);
     },
     [formDispatch, formState, validateField]
@@ -79,10 +80,7 @@ export const ProductFormStateProvider = ({ children }) => {
 
   const handleApplyToAll = useCallback(() => {
     const { pricing, stock, sku } = formState.productDetails;
-    formDispatch({
-      type: "APPLY_TO_ALL_VARIANTS",
-      payload: { pricing, stock, sku },
-    });
+    formDispatch(formActions.applyToAllVariants(pricing, stock, sku));
   }, [formDispatch, formState.productDetails]);
 
   const values = useMemo(

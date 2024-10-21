@@ -2,7 +2,7 @@ import styles from "./index.module.css";
 import classNames from "classnames";
 import { memo } from "react";
 import { FaAngleDown } from "react-icons/fa6";
-import { useProductFormUI } from "../../contexts/ProductForm";
+import { useProductFormUI } from "../../../../../contexts/ProductForm";
 
 const ShowMoreBtn = memo(({ section, btnText = "Show More" }) => {
   const { additionalFields, toggleAdditionalFields } = useProductFormUI();

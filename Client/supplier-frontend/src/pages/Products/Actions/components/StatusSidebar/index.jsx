@@ -10,7 +10,7 @@ import { useMemo, useCallback, memo, useState, useEffect } from "react";
 import {
   useProductFormUI,
   useProductFormState,
-} from "../../contexts/ProductForm";
+} from "../../../../../contexts/ProductForm";
 
 const ScoreImproverGuide = memo(({ title, guinness, onToggle, isActive }) => (
   <div

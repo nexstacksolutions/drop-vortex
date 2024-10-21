@@ -1,8 +1,11 @@
-import { formControl, initialFormState } from "../store/formStateReducer";
-import { initialFormUI, uiControl } from "..//store/formUIReducer";
 import { createContext, useContext, useReducer, useMemo } from "react";
 import { ProductFormStateProvider } from "./ProductFormState";
 import { ProductFormUIProvider } from "./ProductFormUI";
+import {
+  initialFormState,
+  initialFormUIState,
+} from "../store/productForm/states";
+import { formControl, formUIControl } from "../store/productForm/reducers";
 
 export const ProductFormContext = createContext();
 export const ProductFormUIContext = createContext();
@@ -10,7 +13,7 @@ export const ProductFormStateContext = createContext();
 
 const ProductFormProvider = ({ children }) => {
   const [formState, formDispatch] = useReducer(formControl, initialFormState);
-  const [uiState, uiDispatch] = useReducer(uiControl, initialFormUI);
+  const [uiState, uiDispatch] = useReducer(formUIControl, initialFormUIState);
 
   const values = useMemo(
     () => ({
@@ -18,8 +21,6 @@ const ProductFormProvider = ({ children }) => {
       formDispatch,
       uiState,
       uiDispatch,
-      initialFormUI,
-      initialFormState,
     }),
     [formState, formDispatch, uiState, uiDispatch]
   );
