@@ -30,46 +30,57 @@ const getFieldPath = (
     : `productDetails.${basePath}`;
 };
 
-const getComponentByFieldName = (name) => {
-  return name.includes("dimensions")
-    ? MultiInputGroup
-    : name.includes("pricing.special")
-    ? SpecialPriceWrapper
-    : FormInput;
+const RenderInputField = ({ name, label, inputProps, isTableData }) => {
+  return name.includes("dimensions") ? (
+    <MultiInputGroup {...inputProps} />
+  ) : isTableData && name.includes("pricing.special") ? (
+    <SpecialPriceWrapper {...inputProps} label={label} />
+  ) : (
+    <FormInput {...inputProps} />
+  );
 };
 
-const renderTableContent = (
-  isHeader,
+const RenderTableContent = (
+  isTableHeader,
   fields,
+  isTableData,
   isVariationField,
   { rowIndex }
 ) => {
-  return fields.map(
-    ({ maxValue, type = "number", fieldPath, ...rest }, idx) => {
-      const { formState, handleInputChange: onChange } = useProductFormState();
-      const { requiredFields } = useProductFormUI();
-      const name = getFieldPath(isVariationField, fieldPath, rowIndex);
-      const value = get(formState, name);
-      const isRequired = get(requiredFields, name);
-      const inputProps = { type, name, value, onChange, ...rest };
-      const Component = getComponentByFieldName(name);
+  const { formState, handleInputChange: onChange } = useProductFormState();
 
-      return isHeader ? (
-        <th key={idx}>
-          <InputHeader
-            {...inputProps}
-            id={`${name}-form-input`}
-            isRequired={isRequired}
-            customClass={styles.tableHeader}
-          />
-        </th>
-      ) : (
-        <td key={idx}>
-          <Component {...inputProps} suffixDisplay={{ maxValue }} />
-        </td>
-      );
-    }
-  );
+  return fields.map(({ guidelinesProps, fieldPath, label, ...rest }, idx) => {
+    const name = getFieldPath(isVariationField, fieldPath, rowIndex);
+    const value = get(formState, name);
+    const inputHeaderProps = { name, label, guidelinesProps, ...rest };
+    const InputFieldProps = { name, value, onChange, ...rest };
+
+    return isTableHeader ? (
+      <th key={idx}>
+        <InputHeader
+          {...inputHeaderProps}
+          id={`${name}-form-input`}
+          customClass={styles.tableHeader}
+        />
+      </th>
+    ) : isTableData ? (
+      <td key={idx}>
+        <RenderInputField
+          name={name}
+          label={label}
+          inputProps={InputFieldProps}
+          isTableData={isTableData}
+        />
+      </td>
+    ) : (
+      <RenderInputField
+        key={idx}
+        name={name}
+        inputProps={InputFieldProps}
+        isTableData={isTableData}
+      />
+    );
+  });
 };
 
 const SpecialPriceWrapper = memo(
@@ -143,7 +154,7 @@ const TableHeaders = memo(
           variationColumnNames.map((columnName, columnIndex) => (
             <th key={columnIndex}>{columnName}</th>
           ))}
-        {renderTableContent(true, additionalFields, false, {})}
+        {RenderTableContent(true, additionalFields, true, false, {})}
       </tr>
     </thead>
   )
@@ -166,14 +177,14 @@ const TableRows = memo(
                 {rowValues[columnName]}
               </td>
             ))}
-            {renderTableContent(false, additionalFields, true, {
+            {RenderTableContent(false, additionalFields, true, true, {
               rowIndex,
             })}
           </tr>
         ))
       ) : (
         <tr>
-          {renderTableContent(false, additionalFields, false, {
+          {RenderTableContent(false, additionalFields, true, false, {
             rowIndex: -1,
           })}
         </tr>
@@ -215,7 +226,7 @@ function ProductPriceStockWrapper({ variations }) {
       {hasVariationRows && (
         <div className={`${styles.variationInputContainer} flex align-center`}>
           <div className={`${styles.variationInputWrapper} flex`}>
-            {renderTableContent(false, commonFields.slice(0, 4), false, {
+            {RenderTableContent(false, commonFields.slice(0, 4), false, false, {
               rowIndex: -1,
             })}
           </div>

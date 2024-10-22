@@ -138,26 +138,33 @@ MediaPreviewItem.displayName = "MediaPreviewItem";
 const InputHeader = memo(
   ({
     id,
+    name,
     label,
-    isRequired,
     customClass,
     featureLabel,
     hideValidation,
     filterTabsProps,
     guidelinesProps,
-  }) => (
-    <div className={classNames(styles.inputHeader, "flex ", customClass)}>
-      <label htmlFor={id} className="flex align-center">
-        {!hideValidation && isRequired && (
-          <FaAsterisk className={styles.requiredFieldIcon} />
-        )}
-        {typeof label === "string" ? <span>{label}</span> : label}
-      </label>
-      {featureLabel}
-      {guidelinesProps && <GuidanceTooltip {...guidelinesProps} />}
-      {filterTabsProps && <MultiInputGroup {...filterTabsProps} />}
-    </div>
-  )
+  }) => {
+    const { requiredFields } = useProductFormUI();
+    const isRequired = get(requiredFields, name);
+
+    if (!label) return;
+
+    return (
+      <div className={classNames(styles.inputHeader, "flex ", customClass)}>
+        <label htmlFor={id} className="flex align-center">
+          {!hideValidation && isRequired && (
+            <FaAsterisk className={styles.requiredFieldIcon} />
+          )}
+          {typeof label === "string" ? <span>{label}</span> : label}
+        </label>
+        {featureLabel}
+        {guidelinesProps && <GuidanceTooltip {...guidelinesProps} />}
+        {filterTabsProps && <MultiInputGroup {...filterTabsProps} />}
+      </div>
+    );
+  }
 );
 InputHeader.displayName = "InputHeader";
 
@@ -184,20 +191,16 @@ InputWrapper.displayName = "InputWrapper";
 
 const InputContainer = memo(
   ({
-    id,
     name,
     label,
     children,
-    hideLabel,
     hideFormGuide,
     hideValidation,
-    inputHeaderProps,
     inputWrapperProps,
     customClass,
+    ...rest
   }) => {
-    const { updateInputGuidance, requiredFields, formErrors } =
-      useProductFormUI();
-    const isRequired = get(requiredFields, name);
+    const { updateInputGuidance, formErrors } = useProductFormUI();
     const errorMessage = get(formErrors, name);
 
     const handleClick = () =>
@@ -213,11 +216,8 @@ const InputContainer = memo(
         )}
         onClick={handleClick}
       >
-        {!hideLabel && label && (
-          <InputHeader
-            {...{ id, label, isRequired, hideValidation, ...inputHeaderProps }}
-          />
-        )}
+        <InputHeader {...{ name, label, hideValidation, ...rest }} />
+
         <InputWrapper {...inputWrapperProps}>{children}</InputWrapper>
 
         {!hideValidation && errorMessage && (
@@ -250,7 +250,6 @@ const FormInput = memo(
     id,
     onKeyDown,
     wrapInput = true,
-    hideLabel,
     customClass,
     suffixDisplay,
     hideFormGuide,
@@ -300,7 +299,6 @@ const FormInput = memo(
         {...{
           name,
           label,
-          hideLabel,
           id: inputId,
           customClass,
           hideFormGuide,
@@ -437,9 +435,7 @@ const MediaInput = memo(
           ...(fileType === "video" && {
             filterTabsProps: {
               name,
-              label,
               type: "radio",
-              hideLabel: true,
               hideFormGuide: true,
               value: uploadOption,
               customClass: styles.filterTabs,

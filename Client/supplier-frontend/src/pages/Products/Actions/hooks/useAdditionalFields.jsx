@@ -1,20 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo } from "react";
 import { useProductFormUI } from "../../../../contexts/ProductForm";
 
 const useAdditionalFields = () => {
   const { variantShipping, variantValues } = useProductFormUI();
 
-  // Memoize the common attributes
   const commonAttributes = useMemo(
     () => ({
-      hideLabel: true,
       hideValidation: true,
+      type: "number",
     }),
     []
   );
 
-  // Memoize common fields
-  const commonFields = useMemo(
+  const applyCommonAttributes = (fields) =>
+    fields.map((field) => ({
+      ...commonAttributes,
+      ...field,
+    }));
+
+  const baseCommonFields = useMemo(
     () => [
       {
         fieldPath: "pricing.original.amount",
@@ -49,7 +54,7 @@ const useAdditionalFields = () => {
         label: "Seller SKU",
         placeholder: "Seller SKU",
         type: "text",
-        maxValue: 200,
+        suffixDisplay: { maxValue: 200 },
       },
       {
         fieldPath: "freeItems",
@@ -66,13 +71,13 @@ const useAdditionalFields = () => {
     []
   );
 
-  // Memoize variant fields
-  const variantFields = useMemo(() => {
+  const baseVariantFields = useMemo(() => {
     if (variantShipping && variantValues) {
       return [
         {
           fieldPath: "packageWeight.value",
           label: "Package Weight",
+          groupType: "input",
           placeholder: "0.001 - 300",
         },
         {
@@ -85,20 +90,24 @@ const useAdditionalFields = () => {
     return [];
   }, [variantShipping, variantValues]);
 
-  // Memoize additional fields
+  const commonFields = useMemo(
+    () => applyCommonAttributes(baseCommonFields),
+    [baseCommonFields, commonAttributes]
+  );
+
+  const variantFields = useMemo(
+    () => applyCommonAttributes(baseVariantFields),
+    [baseVariantFields, commonAttributes]
+  );
+
   const additionalFields = useMemo(() => {
     const allFields = [
       ...commonFields.slice(0, 3),
       ...variantFields,
       ...commonFields.slice(3),
     ];
-
-    // Apply common attributes
-    return allFields.map((field) => ({
-      ...commonAttributes,
-      ...field,
-    }));
-  }, [variantFields, commonFields, commonAttributes]);
+    return allFields;
+  }, [variantFields, commonFields]);
 
   return { commonFields, additionalFields };
 };
