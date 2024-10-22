@@ -15,8 +15,17 @@ import {
   useProductFormUI,
 } from "../../../../../contexts/ProductForm";
 
-const AMOUNT = "amount";
-const STATUS = "status";
+const getSpecialInputProps = (inputProps, requireValue = "amount") => {
+  const { name, value } = inputProps;
+
+  return {
+    inputProps: {
+      ...inputProps,
+      name: `${name}.${requireValue}`,
+      value: value[requireValue],
+    },
+  };
+};
 
 const getFieldPath = (
   isVariationField,
@@ -29,12 +38,15 @@ const getFieldPath = (
     : `productDetails.${basePath}`;
 };
 
-const RenderInputField = ({ isTableData, ...rest }) => {
+const RenderInputField = ({ isTableData, label, ...rest }) => {
   const { name } = rest.inputProps || {};
+
   return name.includes("dimensions") ? (
     <MultiInputGroup {...rest} />
   ) : isTableData && name.includes("pricing.special") ? (
-    <SpecialPriceWrapper {...rest} />
+    <SpecialPriceWrapper {...rest} label={label} />
+  ) : name.includes("pricing.special") ? (
+    <FormInput {...{ ...rest, ...getSpecialInputProps(rest.inputProps) }} />
   ) : (
     <FormInput {...rest} />
   );
@@ -72,7 +84,7 @@ const RenderTableContent = ({
         </th>
       ) : isTableData ? (
         <td key={`table-data-${idx}`}>
-          <RenderInputField {...InputFieldProps} />
+          <RenderInputField {...InputFieldProps} label={label} />
         </td>
       ) : (
         <RenderInputField key={`multi-input-${idx}`} {...InputFieldProps} />
@@ -89,25 +101,14 @@ const SpecialPriceWrapper = memo(
 
     const updatedProps = useMemo(
       () => ({
-        formInputProps: {
-          inputProps: {
-            ...inputProps,
-            name: `${name}.${AMOUNT}`,
-            value: value.amount,
-          },
-          ...rest,
-        },
+        formInputProps: { ...getSpecialInputProps(inputProps), ...rest },
         dropDownInputProps: {
-          inputProps: {
-            ...inputProps,
-            name: `${name}.${STATUS}`,
-            value: value.status,
-          },
+          ...getSpecialInputProps(inputProps, "status"),
           ...rest,
           ...promotionDateProps,
         },
       }),
-      [inputProps, name, value, rest, promotionDateProps]
+      [inputProps, rest, promotionDateProps]
     );
 
     const content = useMemo(
