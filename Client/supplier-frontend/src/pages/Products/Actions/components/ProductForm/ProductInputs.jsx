@@ -556,10 +556,9 @@ const MultiInputGroup = memo(
               >
                 <FormInput
                   wrapInput={false}
+                  id={`${name}-option-${index}`}
                   inputProps={{
                     ...inputProps,
-                    id: `${name}-option-${index}`,
-                    name: `${name}.${index}`,
                     value: option,
                     checked: value === option,
                   }}

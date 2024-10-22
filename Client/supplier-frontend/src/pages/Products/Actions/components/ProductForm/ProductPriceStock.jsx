@@ -239,8 +239,8 @@ function ProductPriceStockWrapper({ variations }) {
     <div className={`${styles.productPSWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
       {hasVariationRows && (
-        <div className={`${styles.variantInputContainer} flex align-center`}>
-          <div className={`${styles.variantInputWrapper} flex`}>
+        <div className="flex align-center">
+          <div className="flex">
             <RenderTableContent
               isTableHeader={false}
               fields={commonFields.slice(0, 4)}
