@@ -86,7 +86,6 @@ const SpecialPriceWrapper = memo(
     const { name, value } = inputProps;
     const { handleTooltipTrigger } = useTooltip();
     const { additionalFields } = useProductFormUI();
-    console.log(rest);
 
     const updatedProps = useMemo(
       () => ({
@@ -112,6 +111,8 @@ const SpecialPriceWrapper = memo(
       }),
       [inputProps, name, value, rest, promotionDateProps]
     );
+
+    console.log(updatedProps);
 
     const content = useMemo(
       () => (
