@@ -14,15 +14,16 @@ const useAdditionalFields = () => {
   );
 
   const buildField = (fieldPath, label, placeholder, extra = {}) => ({
+    ...extra,
     fieldPath,
     inputProps: {
       type: extra.inputProps?.type || commonAttributes.type,
       placeholder,
       ...extra.inputProps,
     },
-    inputHeaderProps: { label, ...extra.inputHeaderProps },
+    inputHeaderProps: { ...extra.inputHeaderProps },
     hideValidation: commonAttributes.hideValidation,
-    ...extra,
+    label,
   });
 
   const baseCommonFields = useMemo(
@@ -64,7 +65,10 @@ const useAdditionalFields = () => {
         buildField(
           "dimensions",
           "Package Dimensions(cm): Length * Width * Height",
-          "0.01 - 300"
+          "0.01 - 300",
+          {
+            groupType: "input",
+          }
         ),
       ];
     }

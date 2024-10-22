@@ -50,9 +50,8 @@ const RenderTableContent = ({
   const { formState, handleInputChange: onChange } = useProductFormState();
 
   return fields.map(
-    ({ fieldPath, inputProps, inputHeaderProps, ...rest }, idx) => {
+    ({ fieldPath, inputProps, inputHeaderProps, label, ...rest }, idx) => {
       const name = getFieldPath(isVariationField, fieldPath, rowIndex);
-
       const value = get(formState, name);
       const InputFieldProps = {
         inputProps: { ...inputProps, name, value, onChange },
@@ -66,6 +65,7 @@ const RenderTableContent = ({
           <InputHeader
             {...InputFieldProps.inputHeaderProps}
             hideValidation={false}
+            label={label}
             id={`${name}-form-input`}
             customClass={styles.tableHeader}
           />
@@ -239,8 +239,8 @@ function ProductPriceStockWrapper({ variations }) {
     <div className={`${styles.productPSWrapper} flex flex-col`}>
       <h3>Price & Stock</h3>
       {hasVariationRows && (
-        <div className={`${styles.variationInputContainer} flex align-center`}>
-          <div className={`${styles.variationInputWrapper} flex`}>
+        <div className={`${styles.variantInputContainer} flex align-center`}>
+          <div className={`${styles.variantInputWrapper} flex`}>
             <RenderTableContent
               isTableHeader={false}
               fields={commonFields.slice(0, 4)}

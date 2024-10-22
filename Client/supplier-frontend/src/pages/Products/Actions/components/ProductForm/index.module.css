@@ -345,7 +345,7 @@
     &:first-child {
       gap: var(--spacing-sm);
 
-      & > div:last-child {
+      & > div:has(button) {
         flex-basis: 100%;
       }
     }
@@ -584,8 +584,14 @@
   }
 }
 
-.productSW > div .additionalJsx {
-  margin-top: var(--spacing-md);
+.productSW > div {
+  & .additionalJsx {
+    margin-top: var(--spacing-md);
+  }
+
+  &:nth-child(2) > div:first-child > div:last-child:not(:has(label)) {
+    width: 30%;
+  }
 }
 
 .showMoreBtn {

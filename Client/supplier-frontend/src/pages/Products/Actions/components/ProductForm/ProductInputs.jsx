@@ -444,8 +444,6 @@ const DropdownInput = memo(
     const inputRef = useRef();
     const id = `${name}-dropdown-input`;
 
-    console.log(rest);
-
     const updatedInputProps = {
       ...inputProps,
       inputRef,
