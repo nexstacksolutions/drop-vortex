@@ -243,21 +243,15 @@ const inputComponents = {
 
 const FormInput = memo(
   ({
-    type,
-    name,
-    value,
-    label,
     id,
+    inputProps,
     onKeyDown,
     wrapInput = true,
-    customClass,
     suffixDisplay,
-    hideFormGuide,
-    hideValidation,
-    guidelinesProps,
-    inputWrapperProps,
+    inputContainerProps,
     ...rest
   }) => {
+    const { name, value, type } = inputProps;
     const inputId = id || `${name}-form-input`;
     const handleKeyDown = useHandleInputKeyDown(onKeyDown);
     const InputComponent = inputComponents[type] || inputComponents.default;
@@ -270,14 +264,9 @@ const FormInput = memo(
         )}
       >
         <InputComponent
-          {...{
-            type,
-            name,
-            value,
-            id: inputId,
-            onKeyDown: handleKeyDown,
-            ...rest,
-          }}
+          {...inputProps}
+          id={inputId}
+          onKeyDown={handleKeyDown}
         />
         {suffixDisplay && (
           <div className={classNames(styles.suffixDisplay, "flex")}>
@@ -297,14 +286,9 @@ const FormInput = memo(
     return wrapInput ? (
       <InputContainer
         {...{
-          name,
-          label,
           id: inputId,
-          customClass,
-          hideFormGuide,
-          hideValidation,
-          guidelinesProps,
-          inputWrapperProps,
+          ...inputProps,
+          ...inputContainerProps,
           ...rest,
         }}
       >
@@ -319,19 +303,17 @@ FormInput.displayName = "FormInput";
 
 const MediaInput = memo(
   ({
-    label,
-    name,
     maxFiles,
     fileType,
-    value = [],
-    onChange,
     resetTrigger,
-    hideFormGuide,
     customClass,
+    inputProps,
     inputHeaderProps,
+    inputContainerProps,
     guidelinesProps,
     mediaPreviewProps,
   }) => {
+    const { name, value, onChange } = inputProps;
     const [mediaFiles, setMediaFiles] = useState(value);
     const [uploadOption, setUploadOption] = useState("Upload Video");
     const fileInputRef = useRef();
@@ -393,13 +375,17 @@ const MediaInput = memo(
       if (uploadOption === "Youtube Link" && fileType === "video") {
         return (
           <FormInput
-            name={name}
+            inputProps={{
+              name,
+              type: "text",
+              onChange,
+              placeholder: "Paste Youtube URL link here",
+            }}
+            inputContainerProps={{
+              hideValidation: true,
+              hideFormGuide: true,
+            }}
             wrapInput={false}
-            type="text"
-            hideValidation={true}
-            hideFormGuide={true}
-            onChange={onChange}
-            placeholder="Paste Youtube URL link here"
           />
         );
       }
@@ -409,17 +395,21 @@ const MediaInput = memo(
           {renderMediaPreview(mediaFiles)}
           {mediaFiles.length < maxFiles && (
             <FormInput
-              label={<FaPlus />}
-              name={name}
-              type="file"
-              inputRef={fileInputRef}
-              multiple={maxFiles > 1}
-              hideValidation={true}
-              hideFormGuide={true}
-              customClass={styles.addMediaWrapper}
+              inputProps={{
+                name,
+                type: "file",
+                inputRef: fileInputRef,
+                multiple: maxFiles > 1,
+                onChange: handleFileChange,
+                accept: fileType === "image" ? "image/*" : "video/*",
+              }}
+              inputContainerProps={{
+                label: <FaPlus />,
+                hideValidation: true,
+                hideFormGuide: true,
+                customClass: styles.addMediaWrapper,
+              }}
               inputWrapperProps={{ InputActions: <AddMediaActions /> }}
-              onChange={handleFileChange}
-              accept={fileType === "image" ? "image/*" : "video/*"}
             />
           )}
         </div>
@@ -428,19 +418,21 @@ const MediaInput = memo(
 
     return (
       <InputContainer
-        {...{ name, label, hideFormGuide }}
+        {...{ name, ...inputContainerProps }}
         customClass={classNames(styles.mediaInputContainer, customClass)}
         inputHeaderProps={{
           ...inputHeaderProps,
           ...(fileType === "video" && {
             filterTabsProps: {
-              name,
-              type: "radio",
-              hideFormGuide: true,
-              value: uploadOption,
+              inputProps: {
+                name,
+                type: "radio",
+                value: uploadOption,
+                onChange: (e) => setUploadOption(e.target.value),
+              },
+              inputContainerProps: { hideFormGuide: true },
               customClass: styles.filterTabs,
               options: ["Upload Video", "Youtube Link"],
-              onChange: (e) => setUploadOption(e.target.value),
             },
           }),
         }}
@@ -456,17 +448,26 @@ const MediaInput = memo(
 MediaInput.displayName = "MediaInput";
 
 const DropdownInput = memo(
-  ({ customClass, name, options, onChange, disableInput, ...rest }) => {
+  ({ customClass, options, inputProps, disableInput, ...rest }) => {
+    const { name, value, onChange } = inputProps;
     const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef();
     const id = `${name}-dropdown-input`;
 
+    const updatedInputProps = {
+      ...inputProps,
+      inputRef,
+      readOnly: disableInput,
+      onFocus: () => setIsFocused(true),
+      onBlur: () => setIsFocused(false),
+    };
+
     const filteredOptions = useMemo(
       () =>
         options.filter((opt) =>
-          opt.toLowerCase().includes(rest.value.trim().toLowerCase())
+          opt.toLowerCase().includes(value.trim().toLowerCase())
         ),
-      [options, rest.value]
+      [options, value]
     );
 
     // Handle option selection from the dropdown
@@ -486,7 +487,7 @@ const DropdownInput = memo(
 
     // Determine which icon to display
     const suffixIcon =
-      rest.value.length > 0 ? (
+      value.length > 0 ? (
         <CgCloseO className={styles.suffixIcon} onClick={handleClearInput} />
       ) : (
         <FaAngleDown />
@@ -500,12 +501,10 @@ const DropdownInput = memo(
         })}
       >
         <FormInput
-          {...{ id, name, onChange, inputRef, ...rest }}
+          {...{ id, ...rest }}
           wrapInput={false}
           suffixDisplay={{ suffixIcon }}
-          onFocus={() => setIsFocused(true)}
-          // onBlur={() => setIsFocused(false)}
-          readOnly={disableInput}
+          inputProps={{ ...updatedInputProps }}
         />
         {isFocused && (
           <ul className={classNames(styles.dropdownList, customClass)}>
@@ -531,16 +530,8 @@ const DropdownInput = memo(
 DropdownInput.displayName = "DropdownInput";
 
 const MultiInputGroup = memo(
-  ({
-    value,
-    options,
-    name,
-    onChange,
-    type,
-    groupType,
-    customClass,
-    ...rest
-  }) => {
+  ({ options, groupType, customClass, inputProps, ...rest }) => {
+    const { name, value, onChange } = inputProps;
     const id = `${name}-multi-input-group`;
 
     return (
@@ -552,19 +543,19 @@ const MultiInputGroup = memo(
           ? Object.keys(value).map((dimension, index) => (
               <FormInput
                 key={index}
-                name={`${name}.${dimension}`}
-                value={value[dimension]}
-                type={type}
                 wrapInput={false}
-                placeholder={
-                  dimension.charAt(0).toUpperCase() + dimension.slice(1)
-                }
-                onChange={(e) =>
-                  onChange(null, name, {
-                    ...value,
-                    [dimension]: e.target.value,
-                  })
-                }
+                inputProps={{
+                  ...inputProps,
+                  name: `${name}.${dimension}`,
+                  value: value[dimension],
+                  placeholder:
+                    dimension.charAt(0).toUpperCase() + dimension.slice(1),
+                  onChange: (e) =>
+                    onChange(null, name, {
+                      ...value,
+                      [dimension]: e.target.value,
+                    }),
+                }}
               />
             ))
           : options?.map((option, index) => (
@@ -574,13 +565,14 @@ const MultiInputGroup = memo(
                 className={classNames(styles.radioItem, "flex flex-center")}
               >
                 <FormInput
-                  type={type}
-                  name={name}
-                  id={`${name}-option-${index}`}
-                  value={option}
                   wrapInput={false}
-                  checked={value === option}
-                  onChange={onChange}
+                  inputProps={{
+                    ...inputProps,
+                    id: `${name}-option-${index}`,
+                    name: `${name}.${index}`,
+                    value: option,
+                    checked: value === option,
+                  }}
                 />
                 <span
                   className={classNames(styles.customRadio, {

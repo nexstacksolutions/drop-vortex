@@ -79,38 +79,42 @@ const VariantItem = memo(
     return (
       <div className={`${styles.variantItem} flex align-center`}>
         <FormInput
-          name={`${updatedInputName}.name`}
-          type="text"
-          placeholder="Please type or select"
-          value={(variantData && variantData.name) || inputValue}
-          onChange={
-            onChange
+          inputProps={{
+            name: `${updatedInputName}.name`,
+            type: "text",
+            placeholder: "Please type or select",
+            value: (variantData && variantData.name) || inputValue,
+            onChange: onChange
               ? onChange
               : (e) =>
-                  setInputState({ ...inputState, inputValue: e.target.value })
-          }
-          hideFormGuide={true}
+                  setInputState({ ...inputState, inputValue: e.target.value }),
+          }}
+          inputContainerProps={{
+            hideFormGuide: true,
+          }}
           onKeyDown={handleKeyDown}
         />
 
         {showVariantImages && (
           <MediaInput
-            name={`${updatedInputName}.variantImages`}
-            fileType="image"
-            maxFiles={8}
-            value={variantData?.variantImages || variantImages}
-            resetTrigger={resetTrigger}
-            hideFormGuide={true}
-            mediaPreviewProps={{ showMediaPreview: true, enablePopup: true }}
-            onChange={
-              onChange
+            inputProps={{
+              name: `${updatedInputName}.variantImages`,
+              value: variantData?.variantImages || variantImages,
+              onChange: onChange
                 ? onChange
                 : (_, __, newMedia) =>
                     setInputState((prevState) => ({
                       ...prevState,
                       variantImages: newMedia,
-                    }))
-            }
+                    })),
+            }}
+            inputContainerProps={{
+              hideFormGuide: true,
+            }}
+            fileType="image"
+            maxFiles={8}
+            resetTrigger={resetTrigger}
+            mediaPreviewProps={{ showMediaPreview: true, enablePopup: true }}
           />
         )}
 
@@ -135,6 +139,12 @@ function ProductVariations({ variations, onChange }) {
     <div className={`${styles.productVariationsWrapper} flex flex-col`}>
       {variations.map(({ type, values }, variationIndex) => {
         const name = `productDetails.variations[${variationIndex}].values`;
+        const label = (
+          <>
+            <span>Add Image</span>
+            <span>Max 8 images for each variant.</span>
+          </>
+        );
 
         return (
           <InputContainer
@@ -151,18 +161,17 @@ function ProductVariations({ variations, onChange }) {
               <div className={`${styles.variationDetails} flex flex-col`}>
                 <span>Total Variants</span>
                 <FormInput
-                  name="showImageCheckbox"
-                  label={
-                    <>
-                      <span>Add Image</span>
-                      <span>Max 8 images for each variant.</span>
-                    </>
-                  }
-                  type="checkbox"
-                  value={showVariantImages}
-                  hideFormGuide={true}
-                  onChange={(e) => setShowVariantImages(e.target.checked)}
-                  customClass={styles.showImageCheckbox}
+                  inputProps={{
+                    name: "showImageCheckbox",
+                    type: "checkbox",
+                    value: { showVariantImages },
+                    onChange: (e) => setShowVariantImages(e.target.checked),
+                  }}
+                  inputContainerProps={{
+                    label,
+                    customClass: styles.showImageCheckbox,
+                    hideFormGuide: true,
+                  }}
                 />
               </div>
             </div>

@@ -18,10 +18,11 @@ import {
 } from "./ProductInputs";
 
 const RenderInputField = (
-  { name, formInputType, onChange, condition, useDivider, ...rest },
+  { inputProps, componentType, condition, useDivider, ...rest },
   i,
   formState
 ) => {
+  const { name, onChange } = inputProps || {};
   const { handleInputChange } = useProductFormState();
   const key = `${name}${i}`;
   const value = get(formState, name);
@@ -37,11 +38,14 @@ const RenderInputField = (
     default: FormInput,
   };
 
-  const InputComponent = inputTypes[formInputType] || inputTypes.default;
+  const InputComponent = inputTypes[componentType] || inputTypes.default;
 
   return (
     <React.Fragment key={`fragment-${key}`}>
-      <InputComponent {...{ name, value, onChange: handleChange, ...rest }} />
+      <InputComponent
+        {...rest}
+        inputProps={{ ...inputProps, value, onChange: handleChange }}
+      />
       {useDivider && <Divider />}
     </React.Fragment>
   );
@@ -65,18 +69,26 @@ function ProductForm({ customClass }) {
         customClass: styles.basicInfo,
         fields: [
           {
-            label: "Product Name",
-            name: "basicInfo.productName",
+            inputContainerProps: {
+              label: "Product Name",
+            },
+            inputProps: {
+              name: "basicInfo.productName",
+              type: "text",
+              placeholder: "Nikon Coolpix A300",
+            },
             suffixDisplay: { maxValue: 255 },
-            type: "text",
-            placeholder: "Nikon Coolpix A300",
           },
           {
-            label: "Category",
-            name: "basicInfo.category",
-            type: "text",
-            formInputType: "dropdown",
-            placeholder: "Please select category or search with keyword",
+            inputContainerProps: {
+              label: "Category",
+            },
+            inputProps: {
+              name: "basicInfo.category",
+              type: "text",
+              placeholder: "Please select category or search with keyword",
+            },
+            componentType: "dropdown",
             options: [
               "Electronics",
               "Clothing",
@@ -97,10 +109,14 @@ function ProductForm({ customClass }) {
             ],
           },
           {
-            label: "Product Images",
-            name: "basicInfo.media.productImages",
-            type: "file",
-            formInputType: "media",
+            inputContainerProps: {
+              label: "Product Images",
+            },
+            inputProps: {
+              name: "basicInfo.media.productImages",
+              type: "file",
+            },
+            componentType: "media",
             fileType: "image",
             maxFiles: 5,
             inputHeaderProps: {
@@ -114,10 +130,14 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            label: "Buyer Promotion Image",
-            name: "basicInfo.media.buyerPromotionImage",
-            type: "file",
-            formInputType: "media",
+            inputContainerProps: {
+              label: "Buyer Promotion Image",
+            },
+            inputProps: {
+              name: "basicInfo.media.buyerPromotionImage",
+              type: "file",
+            },
+            componentType: "media",
             fileType: "image",
             maxFiles: 1,
             guidelinesProps: {
@@ -145,10 +165,14 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            label: "Product Video",
-            name: "basicInfo.media.productVideo",
-            type: "file",
-            formInputType: "media",
+            inputContainerProps: {
+              label: "Product Video",
+            },
+            inputProps: {
+              name: "basicInfo.media.productVideo",
+              type: "file",
+            },
+            componentType: "media",
             fileType: "video",
             maxFiles: 1,
             guidelinesProps: {
@@ -170,28 +194,45 @@ function ProductForm({ customClass }) {
         showMoreBtnProps: { section: "additionalSpecs" },
         fields: [
           {
-            label: "Brand",
-            name: "specifications.brand.name",
-            type: "text",
-            placeholder: "Brand Name",
+            inputContainerProps: {
+              label: "Brand",
+            },
+            inputProps: {
+              name: "specifications.brand.name",
+              type: "text",
+              placeholder: "Brand Name",
+            },
           },
           {
-            label: "Number of Pieces",
-            name: "specifications.numberOfPieces",
-            type: "number",
-            placeholder: "Number of Pieces",
+            inputContainerProps: {
+              label: "Number of Pieces",
+            },
+            inputProps: {
+              name: "specifications.numberOfPieces",
+              type: "number",
+              placeholder: "Number of Pieces",
+            },
           },
           {
-            label: "Power Source",
-            name: "specifications.powerSource",
-            type: "text",
-            placeholder: "Power Source",
+            inputContainerProps: {
+              label: "Power Source",
+            },
+            inputProps: {
+              name: "specifications.powerSource",
+              type: "text",
+              placeholder: "Power Source",
+            },
           },
           {
-            label: "Additional Specifications",
-            name: "specifications.additionalSpecs",
-            type: "text",
-            placeholder: "Additional Specifications",
+            inputContainerProps: {
+              label: "Additional Specifications",
+            },
+            inputProps: {
+              name: "specifications.additionalSpecs",
+              type: "text",
+              placeholder: "Additional Specifications",
+            },
+
             condition: additionalFields.additionalSpecs,
           },
         ],
@@ -203,11 +244,11 @@ function ProductForm({ customClass }) {
         customClass: styles.productPSV,
         fields: [
           {
-            formInputType: "productVariations",
+            componentType: "productVariations",
             variations: formState.productDetails.variations,
           },
           {
-            formInputType: "productPriceStockWrapper",
+            componentType: "productPriceStockWrapper",
             variations: formState.productDetails.variations,
           },
         ],
@@ -218,33 +259,53 @@ function ProductForm({ customClass }) {
         showMoreBtnProps: { section: "description" },
         fields: [
           {
-            label: "Main Description",
-            name: "description.main",
-            type: "textarea",
-            formInputType: "textarea",
+            inputContainerProps: {
+              label: "Main Description",
+            },
+            inputProps: {
+              name: "description.main",
+              type: "textarea",
+            },
+
+            componentType: "textarea",
           },
           {
-            label: "Highlights",
-            name: "description.highlights",
-            type: "textarea",
-            formInputType: "textarea",
+            inputContainerProps: {
+              label: "Highlights",
+            },
+            inputProps: {
+              name: "description.highlights",
+              type: "textarea",
+            },
+
+            componentType: "textarea",
           },
           {
-            label: "Tags",
-            name: "description.tags",
-            type: "text",
-            placeholder: "Ex: New, Sale, Bestseller",
-            onChange: (e) =>
-              handleInputChange(e, null, null, (value) =>
-                value.split(", ").map((tag) => tag.trim())
-              ),
+            inputContainerProps: {
+              label: "Tags",
+            },
+            inputProps: {
+              name: "description.tags",
+              type: "text",
+              placeholder: "Ex: New, Sale, Bestseller",
+              onChange: (e) =>
+                handleInputChange(e, null, null, (value) =>
+                  value.split(", ").map((tag) => tag.trim())
+                ),
+            },
+
             condition: additionalFields.description,
           },
           {
-            label: "What's in the Box",
-            name: "description.whatsInBox",
-            type: "text",
-            placeholder: "Ex: 1x product, 1x accessory",
+            inputContainerProps: {
+              label: "What's in the Box",
+            },
+            inputProps: {
+              name: "description.whatsInBox",
+              type: "text",
+              placeholder: "Ex: 1x product, 1x accessory",
+            },
+
             condition: additionalFields.description,
           },
         ],
@@ -265,19 +326,29 @@ function ProductForm({ customClass }) {
         },
         fields: [
           {
-            label: "Package Weight",
-            name: "shipping.packageWeight.value",
-            type: "number",
-            placeholder: "0.01 - 300",
+            inputContainerProps: {
+              label: "Package Weight",
+            },
+            inputProps: {
+              name: "shipping.packageWeight.value",
+              type: "number",
+              placeholder: "0.01 - 300",
+            },
+
             condition: !variantShipping,
           },
           {
-            label: "Package Dimensions (L x W x H)",
-            name: "shipping.dimensions",
-            type: "number",
-            formInputType: "inputGroup",
+            inputContainerProps: {
+              label: "Package Dimensions (L x W x H)",
+            },
+            inputProps: {
+              name: "shipping.dimensions",
+              type: "number",
+              placeholder: "0.01 - 300",
+            },
+
+            componentType: "inputGroup",
             groupType: "input",
-            placeholder: "0.01 - 300",
             condition: !variantShipping,
             inputHeaderProps: {
               guidelinesProps: {
@@ -292,34 +363,54 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            label: "Dangerous Goods",
-            name: "shipping.dangerousGoods",
-            type: "radio",
+            inputContainerProps: {
+              label: "Dangerous Goods",
+            },
+            inputProps: {
+              name: "shipping.dangerousGoods",
+              type: "radio",
+            },
+
             useDivider: true,
             groupType: "radio",
-            formInputType: "inputGroup",
+            componentType: "inputGroup",
             options: ["None", "Contains battery / flammables / liquid"],
             customClass: styles.radioGroup,
           },
           {
-            label: "Warranty Type",
-            name: "shipping.warranty.type",
-            type: "text",
-            placeholder: "Warranty Type",
+            inputContainerProps: {
+              label: "Warranty Type",
+            },
+            inputProps: {
+              name: "shipping.warranty.type",
+              type: "text",
+              placeholder: "Warranty Type",
+            },
+
             condition: additionalFields.warranty,
           },
           {
-            label: "Warranty Period",
-            name: "shipping.warranty.period",
-            type: "text",
-            placeholder: "Warranty Period",
+            inputContainerProps: {
+              label: "Warranty Period",
+            },
+            inputProps: {
+              name: "shipping.warranty.period",
+              type: "text",
+              placeholder: "Warranty Period",
+            },
+
             condition: additionalFields.warranty,
           },
           {
-            label: "Warranty Policy",
-            name: "shipping.warranty.policy",
-            type: "text",
-            placeholder: "Warranty Policy",
+            inputContainerProps: {
+              label: "Warranty Policy",
+            },
+            inputProps: {
+              name: "shipping.warranty.policy",
+              type: "text",
+              placeholder: "Warranty Policy",
+            },
+
             condition: additionalFields.warranty,
           },
         ],

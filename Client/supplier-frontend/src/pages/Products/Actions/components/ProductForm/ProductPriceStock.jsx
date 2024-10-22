@@ -30,13 +30,15 @@ const getFieldPath = (
     : `productDetails.${basePath}`;
 };
 
-const RenderInputField = ({ name, label, inputProps, isTableData }) => {
+const RenderInputField = ({ isTableData, ...rest }) => {
+  const { name } = rest.inputProps || {};
+
   return name.includes("dimensions") ? (
-    <MultiInputGroup {...inputProps} />
+    <MultiInputGroup {...rest} />
   ) : isTableData && name.includes("pricing.special") ? (
-    <SpecialPriceWrapper {...inputProps} label={label} />
+    <SpecialPriceWrapper {...rest} />
   ) : (
-    <FormInput {...inputProps} />
+    <FormInput {...rest} />
   );
 };
 
@@ -49,11 +51,17 @@ const RenderTableContent = (
 ) => {
   const { formState, handleInputChange: onChange } = useProductFormState();
 
-  return fields.map(({ guidelinesProps, fieldPath, label, ...rest }, idx) => {
+  return fields.map(({ fieldPath, placeholder, label, type, ...rest }, idx) => {
     const name = getFieldPath(isVariationField, fieldPath, rowIndex);
     const value = get(formState, name);
-    const inputHeaderProps = { name, label, guidelinesProps, ...rest };
-    const InputFieldProps = { name, value, onChange, ...rest };
+    const inputProps = { name, value, type, placeholder, onChange };
+    const inputHeaderProps = { ...inputProps, label, ...rest };
+    const InputFieldProps = {
+      inputProps,
+      isTableData,
+      inputHeaderProps,
+      ...rest,
+    };
 
     return isTableHeader ? (
       <th key={idx}>
@@ -65,58 +73,58 @@ const RenderTableContent = (
       </th>
     ) : isTableData ? (
       <td key={idx}>
-        <RenderInputField
-          name={name}
-          label={label}
-          inputProps={InputFieldProps}
-          isTableData={isTableData}
-        />
+        <RenderInputField {...InputFieldProps} />
       </td>
     ) : (
-      <RenderInputField
-        key={idx}
-        name={name}
-        inputProps={InputFieldProps}
-        isTableData={isTableData}
-      />
+      <RenderInputField key={idx} {...InputFieldProps} />
     );
   });
 };
 
 const SpecialPriceWrapper = memo(
-  ({ name, value, showMoreBtnProps, promotionDateProps, ...rest }) => {
+  ({ inputProps, showMoreBtnProps, promotionDateProps, ...rest }) => {
+    const { name, value } = inputProps;
     const { handleTooltipTrigger } = useTooltip();
     const { additionalFields } = useProductFormUI();
+    console.log(rest);
 
-    const inputProps = useMemo(
+    const updatedProps = useMemo(
       () => ({
-        formInput: {
-          name: `${name}.${AMOUNT}`,
-          value: value.amount,
+        formInputProps: {
+          inputProps: {
+            ...inputProps,
+            name: `${name}.${AMOUNT}`,
+            value: value.amount,
+          },
           ...rest,
         },
-        dropDownInput: {
-          name: `${name}.${STATUS}`,
-          value: value.status,
+
+        dropDownInputProps: {
+          inputProps: {
+            ...inputProps,
+            name: `${name}.${STATUS}`,
+            value: value.status,
+          },
+
           ...rest,
           ...promotionDateProps,
         },
       }),
-      [name, value, rest, promotionDateProps]
+      [inputProps, name, value, rest, promotionDateProps]
     );
 
     const content = useMemo(
       () => (
         <div className="flex flex-col">
-          <FormInput {...inputProps.formInput} />
+          <FormInput {...updatedProps.formInputProps} />
           {additionalFields.productDetails ? (
-            <DropdownInput {...inputProps.dropDownInput} />
+            <DropdownInput {...updatedProps.dropDownInputProps} />
           ) : (
             <ShowMoreBtn {...showMoreBtnProps} />
           )}
         </div>
       ),
-      [inputProps, additionalFields, showMoreBtnProps]
+      [updatedProps, additionalFields, showMoreBtnProps]
     );
 
     useEffect(() => {
