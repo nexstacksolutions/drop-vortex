@@ -15,9 +15,9 @@ import {
 } from "./validationHelpers";
 
 export const productDetailsSchema = Yup.object({
-  pricing: pricingSchema("uiState.variantPricing", (value) => !value),
+  pricing: pricingSchema("uiState.variantValues", (value) => !value),
   stock: conditionalMeasurementField(
-    "uiState.variantPricing",
+    "uiState.variantValues",
     (value) => !value
   ),
   availability: Yup.boolean().default(true),
@@ -32,8 +32,8 @@ export const productDetailsSchema = Yup.object({
           id: requiredString,
           name: requiredString,
           variantImages: nullableArrayOfSchema(fileValidation),
-          pricing: pricingSchema("uiState.variantPricing", null),
-          stock: conditionalMeasurementField("uiState.variantPricing", null),
+          pricing: pricingSchema("uiState.variantValues", null),
+          stock: conditionalMeasurementField("uiState.variantValues", null),
           availability: Yup.boolean().default(true),
           freeItems: nullableString,
           sku: nullableString,
