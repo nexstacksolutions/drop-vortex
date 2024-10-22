@@ -13,23 +13,22 @@ const useAdditionalFields = () => {
     []
   );
 
-  const applyCommonAttributes = (fields) =>
-    fields.map((field) => ({
-      ...commonAttributes,
-      ...field,
-    }));
+  const buildField = (fieldPath, label, placeholder, extra = {}) => ({
+    fieldPath,
+    inputProps: {
+      type: extra.inputProps?.type || commonAttributes.type,
+      placeholder,
+      ...extra.inputProps,
+    },
+    inputHeaderProps: { label, ...extra.inputHeaderProps },
+    hideValidation: commonAttributes.hideValidation,
+    ...extra,
+  });
 
   const baseCommonFields = useMemo(
     () => [
-      {
-        fieldPath: "pricing.original.amount",
-        label: "Price",
-        placeholder: "Price",
-      },
-      {
-        fieldPath: "pricing.special",
-        label: "Special Price",
-        placeholder: "Special Price",
+      buildField("pricing.original.amount", "Price", "Price"),
+      buildField("pricing.special", "Special Price", "Special Price", {
         showMoreBtnProps: { section: "productDetails" },
         promotionDateProps: {
           label: "Promotion Date",
@@ -38,78 +37,50 @@ const useAdditionalFields = () => {
           disableInput: true,
           options: ["Set Date"],
         },
-      },
-      {
-        fieldPath: "stock",
-        label: "Stock",
-        placeholder: "Stock",
+      }),
+      buildField("stock", "Stock", "Stock", {
         guidelinesProps: {
           instructions: [
             "Stock here refers to the total stock that seller has in the main warehouse only, including those reserved for campaigns.",
           ],
         },
-      },
-      {
-        fieldPath: "sku",
-        label: "Seller SKU",
-        placeholder: "Seller SKU",
-        type: "text",
+      }),
+      buildField("sku", "Seller SKU", "Seller SKU", {
+        inputProps: { type: "text" },
         suffixDisplay: { maxValue: 200 },
-      },
-      {
-        fieldPath: "freeItems",
-        label: "Free Items",
-        placeholder: "Free Items",
-      },
-      {
-        fieldPath: "availability",
-        label: "Availability",
-        placeholder: "Availability",
-        type: "switch",
-      },
+      }),
+      buildField("freeItems", "Free Items", "Free Items"),
+      buildField("availability", "Availability", "Availability", {
+        inputProps: { type: "switch" },
+      }),
     ],
-    []
+    [commonAttributes]
   );
 
   const baseVariantFields = useMemo(() => {
     if (variantShipping && variantValues) {
       return [
-        {
-          fieldPath: "packageWeight.value",
-          label: "Package Weight",
-          groupType: "input",
-          placeholder: "0.001 - 300",
-        },
-        {
-          fieldPath: "dimensions",
-          label: "Package Dimensions(cm): Length * Width * Height",
-          placeholder: "0.01 - 300",
-        },
+        buildField("packageWeight.value", "Package Weight", "0.001 - 300"),
+        buildField(
+          "dimensions",
+          "Package Dimensions(cm): Length * Width * Height",
+          "0.01 - 300"
+        ),
       ];
     }
     return [];
   }, [variantShipping, variantValues]);
 
-  const commonFields = useMemo(
-    () => applyCommonAttributes(baseCommonFields),
-    [baseCommonFields, commonAttributes]
+  const additionalFields = useMemo(
+    () => [
+      ...baseCommonFields.slice(0, 3),
+      ...baseVariantFields,
+      ...baseCommonFields.slice(3),
+    ],
+    [baseCommonFields, baseVariantFields]
   );
 
-  const variantFields = useMemo(
-    () => applyCommonAttributes(baseVariantFields),
-    [baseVariantFields, commonAttributes]
-  );
-
-  const additionalFields = useMemo(() => {
-    const allFields = [
-      ...commonFields.slice(0, 3),
-      ...variantFields,
-      ...commonFields.slice(3),
-    ];
-    return allFields;
-  }, [variantFields, commonFields]);
-
-  return { commonFields, additionalFields };
+  return { commonFields: baseCommonFields, additionalFields };
 };
 
 export default useAdditionalFields;

@@ -197,6 +197,7 @@ const InputContainer = memo(
     hideFormGuide,
     hideValidation,
     inputWrapperProps,
+    inputHeaderProps,
     customClass,
     ...rest
   }) => {
@@ -216,7 +217,9 @@ const InputContainer = memo(
         )}
         onClick={handleClick}
       >
-        <InputHeader {...{ name, label, hideValidation, ...rest }} />
+        <InputHeader
+          {...{ name, label, hideValidation, ...inputHeaderProps, ...rest }}
+        />
 
         <InputWrapper {...inputWrapperProps}>{children}</InputWrapper>
 
@@ -242,15 +245,7 @@ const inputComponents = {
 };
 
 const FormInput = memo(
-  ({
-    id,
-    inputProps,
-    onKeyDown,
-    wrapInput = true,
-    suffixDisplay,
-    inputContainerProps,
-    ...rest
-  }) => {
+  ({ id, inputProps, onKeyDown, wrapInput = true, suffixDisplay, ...rest }) => {
     const { name, value, type } = inputProps;
     const inputId = id || `${name}-form-input`;
     const handleKeyDown = useHandleInputKeyDown(onKeyDown);
@@ -288,7 +283,6 @@ const FormInput = memo(
         {...{
           id: inputId,
           ...inputProps,
-          ...inputContainerProps,
           ...rest,
         }}
       >
@@ -309,9 +303,9 @@ const MediaInput = memo(
     customClass,
     inputProps,
     inputHeaderProps,
-    inputContainerProps,
     guidelinesProps,
     mediaPreviewProps,
+    ...rest
   }) => {
     const { name, value, onChange } = inputProps;
     const [mediaFiles, setMediaFiles] = useState(value);
@@ -381,10 +375,8 @@ const MediaInput = memo(
               onChange,
               placeholder: "Paste Youtube URL link here",
             }}
-            inputContainerProps={{
-              hideValidation: true,
-              hideFormGuide: true,
-            }}
+            hideValidation={true}
+            hideFormGuide={true}
             wrapInput={false}
           />
         );
@@ -403,12 +395,10 @@ const MediaInput = memo(
                 onChange: handleFileChange,
                 accept: fileType === "image" ? "image/*" : "video/*",
               }}
-              inputContainerProps={{
-                label: <FaPlus />,
-                hideValidation: true,
-                hideFormGuide: true,
-                customClass: styles.addMediaWrapper,
-              }}
+              label={<FaPlus />}
+              hideValidation={true}
+              hideFormGuide={true}
+              customClass={styles.addMediaWrapper}
               inputWrapperProps={{ InputActions: <AddMediaActions /> }}
             />
           )}
@@ -418,7 +408,7 @@ const MediaInput = memo(
 
     return (
       <InputContainer
-        {...{ name, ...inputContainerProps }}
+        {...{ name, ...rest }}
         customClass={classNames(styles.mediaInputContainer, customClass)}
         inputHeaderProps={{
           ...inputHeaderProps,
@@ -430,7 +420,7 @@ const MediaInput = memo(
                 value: uploadOption,
                 onChange: (e) => setUploadOption(e.target.value),
               },
-              inputContainerProps: { hideFormGuide: true },
+              hideFormGuide: true,
               customClass: styles.filterTabs,
               options: ["Upload Video", "Youtube Link"],
             },
@@ -453,6 +443,8 @@ const DropdownInput = memo(
     const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef();
     const id = `${name}-dropdown-input`;
+
+    console.log(rest);
 
     const updatedInputProps = {
       ...inputProps,

@@ -69,9 +69,7 @@ function ProductForm({ customClass }) {
         customClass: styles.basicInfo,
         fields: [
           {
-            inputContainerProps: {
-              label: "Product Name",
-            },
+            label: "Product Name",
             inputProps: {
               name: "basicInfo.productName",
               type: "text",
@@ -80,9 +78,7 @@ function ProductForm({ customClass }) {
             suffixDisplay: { maxValue: 255 },
           },
           {
-            inputContainerProps: {
-              label: "Category",
-            },
+            label: "Category",
             inputProps: {
               name: "basicInfo.category",
               type: "text",
@@ -109,9 +105,7 @@ function ProductForm({ customClass }) {
             ],
           },
           {
-            inputContainerProps: {
-              label: "Product Images",
-            },
+            label: "Product Images",
             inputProps: {
               name: "basicInfo.media.productImages",
               type: "file",
@@ -130,9 +124,7 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            inputContainerProps: {
-              label: "Buyer Promotion Image",
-            },
+            label: "Buyer Promotion Image",
             inputProps: {
               name: "basicInfo.media.buyerPromotionImage",
               type: "file",
@@ -165,9 +157,7 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            inputContainerProps: {
-              label: "Product Video",
-            },
+            label: "Product Video",
             inputProps: {
               name: "basicInfo.media.productVideo",
               type: "file",
@@ -194,9 +184,7 @@ function ProductForm({ customClass }) {
         showMoreBtnProps: { section: "additionalSpecs" },
         fields: [
           {
-            inputContainerProps: {
-              label: "Brand",
-            },
+            label: "Brand",
             inputProps: {
               name: "specifications.brand.name",
               type: "text",
@@ -204,9 +192,7 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            inputContainerProps: {
-              label: "Number of Pieces",
-            },
+            label: "Number of Pieces",
             inputProps: {
               name: "specifications.numberOfPieces",
               type: "number",
@@ -214,9 +200,7 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            inputContainerProps: {
-              label: "Power Source",
-            },
+            label: "Power Source",
             inputProps: {
               name: "specifications.powerSource",
               type: "text",
@@ -224,9 +208,7 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            inputContainerProps: {
-              label: "Additional Specifications",
-            },
+            label: "Additional Specifications",
             inputProps: {
               name: "specifications.additionalSpecs",
               type: "text",
@@ -259,31 +241,23 @@ function ProductForm({ customClass }) {
         showMoreBtnProps: { section: "description" },
         fields: [
           {
-            inputContainerProps: {
-              label: "Main Description",
-            },
+            label: "Main Description",
             inputProps: {
               name: "description.main",
               type: "textarea",
             },
-
             componentType: "textarea",
           },
           {
-            inputContainerProps: {
-              label: "Highlights",
-            },
+            label: "Highlights",
             inputProps: {
               name: "description.highlights",
               type: "textarea",
             },
-
             componentType: "textarea",
           },
           {
-            inputContainerProps: {
-              label: "Tags",
-            },
+            label: "Tags",
             inputProps: {
               name: "description.tags",
               type: "text",
@@ -293,19 +267,15 @@ function ProductForm({ customClass }) {
                   value.split(", ").map((tag) => tag.trim())
                 ),
             },
-
             condition: additionalFields.description,
           },
           {
-            inputContainerProps: {
-              label: "What's in the Box",
-            },
+            label: "What's in the Box",
             inputProps: {
               name: "description.whatsInBox",
               type: "text",
               placeholder: "Ex: 1x product, 1x accessory",
             },
-
             condition: additionalFields.description,
           },
         ],
@@ -326,21 +296,16 @@ function ProductForm({ customClass }) {
         },
         fields: [
           {
-            inputContainerProps: {
-              label: "Package Weight",
-            },
+            label: "Package Weight",
             inputProps: {
               name: "shipping.packageWeight.value",
               type: "number",
               placeholder: "0.01 - 300",
             },
-
             condition: !variantShipping,
           },
           {
-            inputContainerProps: {
-              label: "Package Dimensions (L x W x H)",
-            },
+            label: "Package Dimensions (L x W x H)",
             inputProps: {
               name: "shipping.dimensions",
               type: "number",
@@ -363,14 +328,11 @@ function ProductForm({ customClass }) {
             },
           },
           {
-            inputContainerProps: {
-              label: "Dangerous Goods",
-            },
+            label: "Dangerous Goods",
             inputProps: {
               name: "shipping.dangerousGoods",
               type: "radio",
             },
-
             useDivider: true,
             groupType: "radio",
             componentType: "inputGroup",
@@ -378,39 +340,30 @@ function ProductForm({ customClass }) {
             customClass: styles.radioGroup,
           },
           {
-            inputContainerProps: {
-              label: "Warranty Type",
-            },
+            label: "Warranty Type",
             inputProps: {
               name: "shipping.warranty.type",
               type: "text",
               placeholder: "Warranty Type",
             },
-
             condition: additionalFields.warranty,
           },
           {
-            inputContainerProps: {
-              label: "Warranty Period",
-            },
+            label: "Warranty Period",
             inputProps: {
               name: "shipping.warranty.period",
               type: "text",
               placeholder: "Warranty Period",
             },
-
             condition: additionalFields.warranty,
           },
           {
-            inputContainerProps: {
-              label: "Warranty Policy",
-            },
+            label: "Warranty Policy",
             inputProps: {
               name: "shipping.warranty.policy",
               type: "text",
               placeholder: "Warranty Policy",
             },
-
             condition: additionalFields.warranty,
           },
         ],

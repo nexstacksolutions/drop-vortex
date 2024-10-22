@@ -15,7 +15,6 @@ import {
   useProductFormUI,
 } from "../../../../../contexts/ProductForm";
 
-// Constants for repeated strings
 const AMOUNT = "amount";
 const STATUS = "status";
 
@@ -32,7 +31,6 @@ const getFieldPath = (
 
 const RenderInputField = ({ isTableData, ...rest }) => {
   const { name } = rest.inputProps || {};
-
   return name.includes("dimensions") ? (
     <MultiInputGroup {...rest} />
   ) : isTableData && name.includes("pricing.special") ? (
@@ -42,43 +40,45 @@ const RenderInputField = ({ isTableData, ...rest }) => {
   );
 };
 
-const RenderTableContent = (
+const RenderTableContent = ({
   isTableHeader,
   fields,
   isTableData,
   isVariationField,
-  { rowIndex }
-) => {
+  rowIndex,
+}) => {
   const { formState, handleInputChange: onChange } = useProductFormState();
 
-  return fields.map(({ fieldPath, placeholder, label, type, ...rest }, idx) => {
-    const name = getFieldPath(isVariationField, fieldPath, rowIndex);
-    const value = get(formState, name);
-    const inputProps = { name, value, type, placeholder, onChange };
-    const inputHeaderProps = { ...inputProps, label, ...rest };
-    const InputFieldProps = {
-      inputProps,
-      isTableData,
-      inputHeaderProps,
-      ...rest,
-    };
+  return fields.map(
+    ({ fieldPath, inputProps, inputHeaderProps, ...rest }, idx) => {
+      const name = getFieldPath(isVariationField, fieldPath, rowIndex);
 
-    return isTableHeader ? (
-      <th key={idx}>
-        <InputHeader
-          {...inputHeaderProps}
-          id={`${name}-form-input`}
-          customClass={styles.tableHeader}
-        />
-      </th>
-    ) : isTableData ? (
-      <td key={idx}>
-        <RenderInputField {...InputFieldProps} />
-      </td>
-    ) : (
-      <RenderInputField key={idx} {...InputFieldProps} />
-    );
-  });
+      const value = get(formState, name);
+      const InputFieldProps = {
+        inputProps: { ...inputProps, name, value, onChange },
+        isTableData,
+        inputHeaderProps: { ...inputHeaderProps, name, ...rest },
+        ...rest,
+      };
+
+      return isTableHeader ? (
+        <th key={`table-header-${idx}`}>
+          <InputHeader
+            {...InputFieldProps.inputHeaderProps}
+            hideValidation={false}
+            id={`${name}-form-input`}
+            customClass={styles.tableHeader}
+          />
+        </th>
+      ) : isTableData ? (
+        <td key={`table-data-${idx}`}>
+          <RenderInputField {...InputFieldProps} />
+        </td>
+      ) : (
+        <RenderInputField key={`multi-input-${idx}`} {...InputFieldProps} />
+      );
+    }
+  );
 };
 
 const SpecialPriceWrapper = memo(
@@ -97,22 +97,18 @@ const SpecialPriceWrapper = memo(
           },
           ...rest,
         },
-
         dropDownInputProps: {
           inputProps: {
             ...inputProps,
             name: `${name}.${STATUS}`,
             value: value.status,
           },
-
           ...rest,
           ...promotionDateProps,
         },
       }),
       [inputProps, name, value, rest, promotionDateProps]
     );
-
-    console.log(updatedProps);
 
     const content = useMemo(
       () => (
@@ -163,7 +159,11 @@ const TableHeaders = memo(
           variationColumnNames.map((columnName, columnIndex) => (
             <th key={columnIndex}>{columnName}</th>
           ))}
-        {RenderTableContent(true, additionalFields, true, false, {})}
+        <RenderTableContent
+          isTableHeader={true}
+          fields={additionalFields}
+          isTableData={true}
+        />
       </tr>
     </thead>
   )
@@ -186,16 +186,23 @@ const TableRows = memo(
                 {rowValues[columnName]}
               </td>
             ))}
-            {RenderTableContent(false, additionalFields, true, true, {
-              rowIndex,
-            })}
+            <RenderTableContent
+              isTableHeader={false}
+              fields={additionalFields}
+              isTableData={true}
+              rowIndex={rowIndex}
+              isVariationField={true}
+            />
           </tr>
         ))
       ) : (
         <tr>
-          {RenderTableContent(false, additionalFields, true, false, {
-            rowIndex: -1,
-          })}
+          <RenderTableContent
+            isTableHeader={false}
+            fields={additionalFields}
+            isTableData={true}
+            rowIndex={-1}
+          />
         </tr>
       )}
     </tbody>
@@ -203,11 +210,11 @@ const TableRows = memo(
 );
 TableRows.displayName = "TableRows";
 
+// Main Product Price & Stock component
 function ProductPriceStockWrapper({ variations }) {
   const { handleApplyToAll } = useProductFormState();
 
   const variationRows = useMemo(() => {
-    if (variations.length === 0) return [];
     const maxValuesLength = Math.max(...variations.map((v) => v.values.length));
     return Array.from({ length: maxValuesLength }, (_, index) =>
       variations.reduce((acc, variation) => {
@@ -221,7 +228,6 @@ function ProductPriceStockWrapper({ variations }) {
     () => variations.map((variation) => variation.type),
     [variations]
   );
-
   const hasVariationRows = useMemo(
     () => variationRows.length > 0,
     [variationRows]
@@ -235,9 +241,12 @@ function ProductPriceStockWrapper({ variations }) {
       {hasVariationRows && (
         <div className={`${styles.variationInputContainer} flex align-center`}>
           <div className={`${styles.variationInputWrapper} flex`}>
-            {RenderTableContent(false, commonFields.slice(0, 4), false, false, {
-              rowIndex: -1,
-            })}
+            <RenderTableContent
+              isTableHeader={false}
+              fields={commonFields.slice(0, 4)}
+              isTableData={false}
+              rowIndex={-1}
+            />
           </div>
           <button
             type="button"
@@ -248,23 +257,18 @@ function ProductPriceStockWrapper({ variations }) {
           </button>
         </div>
       )}
-
       <div className={styles.variantTableWrapper}>
         <table className={styles.variantTable}>
           <TableHeaders
-            {...{
-              hasVariationRows,
-              variationColumnNames,
-              additionalFields,
-            }}
+            hasVariationRows={hasVariationRows}
+            variationColumnNames={variationColumnNames}
+            additionalFields={additionalFields}
           />
           <TableRows
-            {...{
-              variationRows,
-              hasVariationRows,
-              variationColumnNames,
-              additionalFields,
-            }}
+            variationRows={variationRows}
+            hasVariationRows={hasVariationRows}
+            variationColumnNames={variationColumnNames}
+            additionalFields={additionalFields}
           />
         </table>
       </div>

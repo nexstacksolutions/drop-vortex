@@ -89,9 +89,7 @@ const VariantItem = memo(
               : (e) =>
                   setInputState({ ...inputState, inputValue: e.target.value }),
           }}
-          inputContainerProps={{
-            hideFormGuide: true,
-          }}
+          hideFormGuide={true}
           onKeyDown={handleKeyDown}
         />
 
@@ -108,9 +106,7 @@ const VariantItem = memo(
                       variantImages: newMedia,
                     })),
             }}
-            inputContainerProps={{
-              hideFormGuide: true,
-            }}
+            hideFormGuide={true}
             fileType="image"
             maxFiles={8}
             resetTrigger={resetTrigger}
@@ -131,8 +127,9 @@ const VariantItem = memo(
 );
 VariantItem.displayName = "VariantItem";
 
-function ProductVariations({ variations, onChange }) {
-  const { updateVariantItem } = useProductFormState();
+function ProductVariations({ variations }) {
+  const { updateVariantItem, handleInputChange: onChange } =
+    useProductFormState();
   const [showVariantImages, setShowVariantImages] = useState(false);
 
   return (
@@ -167,11 +164,9 @@ function ProductVariations({ variations, onChange }) {
                     value: { showVariantImages },
                     onChange: (e) => setShowVariantImages(e.target.checked),
                   }}
-                  inputContainerProps={{
-                    label,
-                    customClass: styles.showImageCheckbox,
-                    hideFormGuide: true,
-                  }}
+                  label={label}
+                  customClass={styles.showImageCheckbox}
+                  hideFormGuide={true}
                 />
               </div>
             </div>

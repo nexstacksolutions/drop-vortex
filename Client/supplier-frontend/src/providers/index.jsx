@@ -6,9 +6,9 @@ import ProductFormProvider from "../contexts/ProductForm";
 const Providers = ({ children }) => {
   return (
     <ThemeProvider>
-      <TooltipProvider>
-        <ProductFormProvider>{children}</ProductFormProvider>
-      </TooltipProvider>
+      <ProductFormProvider>
+        <TooltipProvider>{children}</TooltipProvider>
+      </ProductFormProvider>
     </ThemeProvider>
   );
 };
