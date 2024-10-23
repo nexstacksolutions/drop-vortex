@@ -15,21 +15,28 @@ import {
   useProductFormUI,
 } from "../../../../../contexts/ProductForm";
 
+const removeUndefinedProps = (obj) =>
+  Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
+
 const getSpecialInputProps = (
-  { inputProps, ...rest },
+  { inputProps, promotionDateProps = {}, ...rest },
   wrapInput = false,
   requireValue = "amount"
 ) => {
   const { name, value = {} } = inputProps;
+  const { label, type, placeholder, ...promotionRest } = promotionDateProps;
 
-  const updatedProps = {
+  const updatedProps = removeUndefinedProps({
     name: `${name}.${requireValue}`,
     value: value[requireValue],
-  };
+    label,
+    type,
+    placeholder,
+  });
 
   return wrapInput
     ? { ...rest, inputProps: { ...inputProps, ...updatedProps } }
-    : { ...rest, inputProps: { ...updatedProps } };
+    : { ...rest, inputProps: { ...updatedProps }, ...promotionRest };
 };
 
 const getFieldPath = (
@@ -104,14 +111,15 @@ const SpecialPriceWrapper = memo(
       () => ({
         formInputProps: { ...getSpecialInputProps(rest, true) },
         dropDownInputProps: {
-          ...getSpecialInputProps(rest, false, "status"),
-          ...promotionDateProps,
+          ...getSpecialInputProps(
+            { ...rest, promotionDateProps },
+            false,
+            "status"
+          ),
         },
       }),
       [rest, promotionDateProps]
     );
-
-    console.log(updatedProps);
 
     const content = useMemo(
       () => (
