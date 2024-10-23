@@ -15,16 +15,21 @@ import {
   useProductFormUI,
 } from "../../../../../contexts/ProductForm";
 
-const getSpecialInputProps = (inputProps, requireValue = "amount") => {
-  const { name, value } = inputProps;
+const getSpecialInputProps = (
+  { inputProps, ...rest },
+  wrapInput = false,
+  requireValue = "amount"
+) => {
+  const { name, value = {} } = inputProps;
 
-  return {
-    inputProps: {
-      ...inputProps,
-      name: `${name}.${requireValue}`,
-      value: value[requireValue],
-    },
+  const updatedProps = {
+    name: `${name}.${requireValue}`,
+    value: value[requireValue],
   };
+
+  return wrapInput
+    ? { ...rest, inputProps: { ...inputProps, ...updatedProps } }
+    : { ...rest, inputProps: { ...updatedProps } };
 };
 
 const getFieldPath = (
@@ -46,7 +51,7 @@ const RenderInputField = ({ isTableData, label, ...rest }) => {
   ) : isTableData && name.includes("pricing.special") ? (
     <SpecialPriceWrapper {...rest} label={label} />
   ) : name.includes("pricing.special") ? (
-    <FormInput {...{ ...rest, ...getSpecialInputProps(rest.inputProps) }} />
+    <FormInput {...getSpecialInputProps(rest, true)} />
   ) : (
     <FormInput {...rest} />
   );
@@ -61,55 +66,52 @@ const RenderTableContent = ({
 }) => {
   const { formState, handleInputChange: onChange } = useProductFormState();
 
-  return fields.map(
-    ({ fieldPath, inputProps, inputHeaderProps, label, ...rest }, idx) => {
-      const name = getFieldPath(isVariationField, fieldPath, rowIndex);
-      const value = get(formState, name);
-      const InputFieldProps = {
-        inputProps: { ...inputProps, name, value, onChange },
-        isTableData,
-        inputHeaderProps: { ...inputHeaderProps, name, ...rest },
-        ...rest,
-      };
+  return fields.map(({ fieldPath, inputProps, label, ...rest }, idx) => {
+    const name = getFieldPath(isVariationField, fieldPath, rowIndex);
+    const value = get(formState, name);
+    const InputFieldProps = {
+      inputProps: { ...inputProps, name, value, onChange },
+      isTableData,
+      ...rest,
+    };
 
-      return isTableHeader ? (
-        <th key={`table-header-${idx}`}>
-          <InputHeader
-            {...InputFieldProps.inputHeaderProps}
-            hideValidation={false}
-            label={label}
-            id={`${name}-form-input`}
-            customClass={styles.tableHeader}
-          />
-        </th>
-      ) : isTableData ? (
-        <td key={`table-data-${idx}`}>
-          <RenderInputField {...InputFieldProps} label={label} />
-        </td>
-      ) : (
-        <RenderInputField key={`multi-input-${idx}`} {...InputFieldProps} />
-      );
-    }
-  );
+    return isTableHeader ? (
+      <th key={`table-header-${idx}`}>
+        <InputHeader
+          hideValidation={false}
+          label={label}
+          name={name}
+          id={`${name}-form-input`}
+          customClass={styles.tableHeader}
+        />
+      </th>
+    ) : isTableData ? (
+      <td key={`table-data-${idx}`}>
+        <RenderInputField {...InputFieldProps} label={label} />
+      </td>
+    ) : (
+      <RenderInputField key={`multi-input-${idx}`} {...InputFieldProps} />
+    );
+  });
 };
 
 const SpecialPriceWrapper = memo(
-  ({ inputProps, showMoreBtnProps, promotionDateProps, ...rest }) => {
-    const { name, value } = inputProps;
+  ({ showMoreBtnProps, promotionDateProps, ...rest }) => {
     const { handleTooltipTrigger } = useTooltip();
     const { additionalFields } = useProductFormUI();
 
     const updatedProps = useMemo(
       () => ({
-        formInputProps: { ...getSpecialInputProps(inputProps), ...rest },
+        formInputProps: { ...getSpecialInputProps(rest, true) },
         dropDownInputProps: {
-          ...getSpecialInputProps(inputProps, "status"),
-          ...rest,
+          ...getSpecialInputProps(rest, false, "status"),
           ...promotionDateProps,
         },
       }),
-      [inputProps, rest, promotionDateProps]
+      [rest, promotionDateProps]
     );
+
+    console.log(updatedProps);
 
     const content = useMemo(
       () => (
@@ -131,7 +133,7 @@ const SpecialPriceWrapper = memo(
         customClass: styles.specialPriceTooltip,
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value, additionalFields.productDetails]);
+    }, [rest.inputProps.value, additionalFields.productDetails]);
 
     return (
       <div className={styles.specialPriceWrapper}>
