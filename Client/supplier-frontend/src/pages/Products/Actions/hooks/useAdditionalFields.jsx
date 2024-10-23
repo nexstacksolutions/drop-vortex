@@ -17,12 +17,10 @@ const useAdditionalFields = () => {
   });
 
   const commonFields = useMemo(() => {
-    const inputHeaderProps = {
-      guidelinesProps: {
-        instructions: [
-          "Stock here refers to the total stock that seller has in the main warehouse only, including those reserved for campaigns.",
-        ],
-      },
+    const guidelinesProps = {
+      instructions: [
+        "Stock here refers to the total stock that seller has in the main warehouse only, including those reserved for campaigns.",
+      ],
     };
 
     return [
@@ -39,7 +37,7 @@ const useAdditionalFields = () => {
           },
         },
       }),
-      buildField("stock", "Stock", "Stock", { extra: { inputHeaderProps } }),
+      buildField("stock", "Stock", "Stock", { extra: { guidelinesProps } }),
       buildField("sku", "Seller SKU", "Seller SKU", {
         inputProps: { type: "text" },
         extra: { suffixDisplay: { maxValue: 200 } },

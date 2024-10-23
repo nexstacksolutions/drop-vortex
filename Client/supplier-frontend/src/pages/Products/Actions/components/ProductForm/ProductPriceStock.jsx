@@ -73,33 +73,36 @@ const RenderTableContent = ({
 }) => {
   const { formState, handleInputChange: onChange } = useProductFormState();
 
-  return fields.map(({ fieldPath, inputProps, label, ...rest }, idx) => {
-    const name = getFieldPath(isVariationField, fieldPath, rowIndex);
-    const value = get(formState, name);
-    const InputFieldProps = {
-      inputProps: { ...inputProps, name, value, onChange },
-      isTableData,
-      ...rest,
-    };
+  return fields.map(
+    ({ fieldPath, inputProps, label, guidelinesProps, ...rest }, idx) => {
+      const name = getFieldPath(isVariationField, fieldPath, rowIndex);
+      const value = get(formState, name);
+      const InputFieldProps = {
+        inputProps: { ...inputProps, name, value, onChange },
+        isTableData,
+        ...rest,
+      };
 
-    return isTableHeader ? (
-      <th key={`table-header-${idx}`}>
-        <InputHeader
-          hideValidation={false}
-          label={label}
-          name={name}
-          id={`${name}-form-input`}
-          customClass={styles.tableHeader}
-        />
-      </th>
-    ) : isTableData ? (
-      <td key={`table-data-${idx}`}>
-        <RenderInputField {...InputFieldProps} label={label} />
-      </td>
-    ) : (
-      <RenderInputField key={`multi-input-${idx}`} {...InputFieldProps} />
-    );
-  });
+      return isTableHeader ? (
+        <th key={`table-header-${idx}`}>
+          <InputHeader
+            hideValidation={false}
+            label={label}
+            name={name}
+            id={`${name}-form-input`}
+            customClass={styles.tableHeader}
+            guidelinesProps={guidelinesProps}
+          />
+        </th>
+      ) : isTableData ? (
+        <td key={`table-data-${idx}`}>
+          <RenderInputField {...InputFieldProps} label={label} />
+        </td>
+      ) : (
+        <RenderInputField key={`multi-input-${idx}`} {...InputFieldProps} />
+      );
+    }
+  );
 };
 
 const SpecialPriceWrapper = memo(
