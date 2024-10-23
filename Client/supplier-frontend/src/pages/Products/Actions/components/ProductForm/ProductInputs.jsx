@@ -460,7 +460,6 @@ const DropdownInput = memo(
       [options, value]
     );
 
-    // Handle option selection from the dropdown
     const handleOptionClick = (e) => {
       const { innerText } = e.target;
 
@@ -470,13 +469,11 @@ const DropdownInput = memo(
       setIsFocused(false);
     };
 
-    // Clear the input field
     const handleClearInput = () => {
       onChange(null, name, "");
       inputRef.current.focus();
     };
 
-    // Determine which icon to display
     const suffixIcon =
       value.length > 0 ? (
         <CgCloseO className={styles.suffixIcon} onClick={handleClearInput} />
