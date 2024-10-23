@@ -20,23 +20,19 @@ const removeUndefinedProps = (obj) =>
 
 const getSpecialInputProps = (
   { inputProps, promotionDateProps = {}, ...rest },
-  wrapInput = false,
   requireValue = "amount"
 ) => {
   const { name, value = {} } = inputProps;
-  const { label, type, placeholder, ...promotionRest } = promotionDateProps;
+  const { type, placeholder, ...promotionRest } = promotionDateProps;
 
   const updatedProps = removeUndefinedProps({
+    ...inputProps,
     name: `${name}.${requireValue}`,
     value: value[requireValue],
-    label,
-    type,
-    placeholder,
+    ...removeUndefinedProps({ type, placeholder }),
   });
 
-  return wrapInput
-    ? { ...rest, inputProps: { ...inputProps, ...updatedProps } }
-    : { ...rest, inputProps: { ...updatedProps }, ...promotionRest };
+  return { ...rest, inputProps: { ...updatedProps }, ...promotionRest };
 };
 
 const getFieldPath = (
@@ -58,7 +54,7 @@ const RenderInputField = ({ isTableData, label, ...rest }) => {
   ) : isTableData && name.includes("pricing.special") ? (
     <SpecialPriceWrapper {...rest} label={label} />
   ) : name.includes("pricing.special") ? (
-    <FormInput {...getSpecialInputProps(rest, true)} />
+    <FormInput {...getSpecialInputProps(rest)} />
   ) : (
     <FormInput {...rest} />
   );
@@ -112,13 +108,9 @@ const SpecialPriceWrapper = memo(
 
     const updatedProps = useMemo(
       () => ({
-        formInputProps: { ...getSpecialInputProps(rest, true) },
+        formInputProps: { ...getSpecialInputProps(rest) },
         dropDownInputProps: {
-          ...getSpecialInputProps(
-            { ...rest, promotionDateProps },
-            false,
-            "status"
-          ),
+          ...getSpecialInputProps({ ...rest, promotionDateProps }, "status"),
         },
       }),
       [rest, promotionDateProps]

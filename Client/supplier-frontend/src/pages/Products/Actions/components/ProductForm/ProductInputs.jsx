@@ -463,10 +463,11 @@ const DropdownInput = memo(
     // Handle option selection from the dropdown
     const handleOptionClick = (e) => {
       const { innerText } = e.target;
+
       if (onChange) {
         onChange(null, name, innerText);
       }
-      setIsFocused(false); // Hide dropdown after selection
+      setIsFocused(false);
     };
 
     // Clear the input field
