@@ -10,7 +10,7 @@ const ShowMoreBtn = memo(({ section, btnText = "Show More" }) => {
   return (
     <button
       type="button"
-      onClick={() => toggleAdditionalFields(section)}
+      onClick={() => toggleAdditionalFields({ section })}
       className={classNames(styles.showMoreBtn, {
         [styles.showMoreBtnActive]: additionalFields[section],
       })}

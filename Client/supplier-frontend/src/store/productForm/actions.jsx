@@ -6,14 +6,13 @@ export const APPLY_TO_ALL_VARIANTS = "APPLY_TO_ALL_VARIANTS";
 export const TOGGLE_ADDITIONAL_FIELDS = "TOGGLE_ADDITIONAL_FIELDS";
 export const TOGGLE_VARIANT_SHIPPING = "TOGGLE_VARIANT_SHIPPING";
 export const TOGGLE_VARIANT_VALUES = "TOGGLE_VARIANT_VALUES";
-export const SET_VARIANT_SHIPPING_FALSE = "SET_VARIANT_SHIPPING_FALSE";
 export const SET_REQUIRED_FIELDS = "SET_REQUIRED_FIELDS";
 export const SET_FORM_ERRORS = "SET_FORM_ERRORS";
+export const CLEAR_FORM_ERRORS = "CLEAR_FORM_ERRORS";
 export const SET_EMPTY_FIELDS = "SET_EMPTY_FIELDS";
 export const CLEAR_EMPTY_FIELDS = "CLEAR_EMPTY_FIELDS";
-export const CLEAR_FORM_ERRORS = "CLEAR_FORM_ERRORS";
-export const CLEAR_FIELD_ERROR = "CLEAR_FIELD_ERROR";
 export const SET_FIELD_ERROR = "SET_FIELD_ERROR";
+export const CLEAR_FIELD_ERROR = "CLEAR_FIELD_ERROR";
 export const SET_IS_SUBMITTING = "SET_IS_SUBMITTING";
 
 // Form State Actions
@@ -36,17 +35,14 @@ const formUIActions = {
     payload,
   }),
 
-  toggleVariantShipping: () => ({
+  toggleVariantShipping: (payload) => ({
     type: TOGGLE_VARIANT_SHIPPING,
+    payload,
   }),
 
   toggleVariantValues: (payload) => ({
     type: TOGGLE_VARIANT_VALUES,
     payload,
-  }),
-
-  setVariantShippingFalse: () => ({
-    type: SET_VARIANT_SHIPPING_FALSE,
   }),
 
   setRequiredFields: (payload) => ({

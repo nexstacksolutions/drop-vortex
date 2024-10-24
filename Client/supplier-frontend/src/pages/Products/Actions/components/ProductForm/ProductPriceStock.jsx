@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { get } from "lodash";
 import classNames from "classnames";
 import { ShowMoreBtn } from "./FormUi";
-import { useMemo, memo } from "react";
+import { useMemo, memo, useState, useEffect } from "react";
 import useAdditionalFields from "../../hooks/useAdditionalFields";
 import { DatePicker, Tooltip } from "antd";
 import {
@@ -110,7 +110,8 @@ const RenderTableContent = ({
 const SpecialPriceWrapper = memo(
   ({ showMoreBtnProps, promotionDateProps, ...rest }) => {
     const { name, value, onChange } = { ...rest.inputProps };
-    const { additionalFields } = useProductFormUI();
+    const [isOpen, setIsOpen] = useState(false);
+    const { additionalFields, toggleAdditionalFields } = useProductFormUI();
     const { RangePicker } = DatePicker;
     const dateFormat = "DD-MM-YYYY";
 
@@ -149,16 +150,18 @@ const SpecialPriceWrapper = memo(
         >
           <FormInput {...updatedProps.formInputProps} />
           {additionalFields.productDetails ? (
-            <DropdownInput {...updatedProps.dropDownInputProps} />
+            <>
+              <DropdownInput {...updatedProps.dropDownInputProps} />
+              {value.status === "Set Date" && (
+                <RangePicker
+                  defaultValue={defaultRange}
+                  onChange={handleRangeChange}
+                  format={dateFormat}
+                />
+              )}
+            </>
           ) : (
             <ShowMoreBtn {...showMoreBtnProps} />
-          )}
-          {value.status === "Set Date" && (
-            <RangePicker
-              defaultValue={defaultRange}
-              onChange={handleRangeChange}
-              format={dateFormat}
-            />
           )}
         </div>
       ),
@@ -166,10 +169,16 @@ const SpecialPriceWrapper = memo(
       [updatedProps, additionalFields, showMoreBtnProps, value.status]
     );
 
+    useEffect(() => {
+      if (!isOpen)
+        toggleAdditionalFields({ section: "productDetails", forceClose: true });
+    }, [isOpen, toggleAdditionalFields]);
+
     return (
       <Tooltip
         title={content}
         destroyTooltipOnHide
+        onOpenChange={(isOpen) => setIsOpen(isOpen)}
         trigger={"click"}
         overlayClassName={styles.globalTooltip}
       >

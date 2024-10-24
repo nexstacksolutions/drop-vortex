@@ -90,8 +90,9 @@ export const ProductFormUIProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!uiState.variantValues)
-      uiDispatch(formUIActions.setVariantShippingFalse());
+    if (!uiState.variantValues) {
+      uiDispatch(formUIActions.toggleVariantShipping(true));
+    }
   }, [uiState.variantValues, uiDispatch]);
 
   const values = useMemo(

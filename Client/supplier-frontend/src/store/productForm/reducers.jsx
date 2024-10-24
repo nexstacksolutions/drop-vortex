@@ -6,7 +6,6 @@ import {
   TOGGLE_ADDITIONAL_FIELDS,
   TOGGLE_VARIANT_SHIPPING,
   TOGGLE_VARIANT_VALUES,
-  SET_VARIANT_SHIPPING_FALSE,
   SET_REQUIRED_FIELDS,
   SET_FORM_ERRORS,
   SET_EMPTY_FIELDS,
@@ -47,21 +46,23 @@ function formControl(state, action) {
 function formUIControl(state, action) {
   return produce(state, (draft) => {
     const { type, payload } = action;
+
     switch (type) {
       case TOGGLE_ADDITIONAL_FIELDS:
-        draft.additionalFields[payload] = !draft.additionalFields[payload];
+        {
+          const { section, forceClose } = payload;
+          draft.additionalFields[section] = !forceClose
+            ? !draft.additionalFields[section]
+            : false;
+        }
         break;
 
       case TOGGLE_VARIANT_SHIPPING:
-        draft.variantShipping = !draft.variantShipping;
+        draft.variantShipping = !payload ? !draft.variantShipping : false;
         break;
 
       case TOGGLE_VARIANT_VALUES:
         draft.variantValues = payload;
-        break;
-
-      case SET_VARIANT_SHIPPING_FALSE:
-        draft.variantShipping = false;
         break;
 
       case SET_REQUIRED_FIELDS:
@@ -71,6 +72,10 @@ function formUIControl(state, action) {
 
       case SET_FORM_ERRORS:
         draft.formErrors = payload;
+        break;
+
+      case CLEAR_FORM_ERRORS:
+        draft.formErrors = {};
         break;
 
       case SET_EMPTY_FIELDS:
@@ -104,21 +109,17 @@ function formUIControl(state, action) {
         );
         break;
 
-      case CLEAR_FORM_ERRORS:
-        draft.formErrors = {};
-        break;
-
-      case CLEAR_FIELD_ERROR:
-        delete draft.formErrors[payload];
-        draft.emptyFields[payload] = false;
-        break;
-
       case SET_FIELD_ERROR: {
         const { fieldPath, error } = payload;
         draft.formErrors[fieldPath] = error;
         draft.emptyFields[fieldPath] = true;
         break;
       }
+
+      case CLEAR_FIELD_ERROR:
+        delete draft.formErrors[payload];
+        draft.emptyFields[payload] = false;
+        break;
 
       case SET_IS_SUBMITTING:
         draft.isSubmitting = payload;
