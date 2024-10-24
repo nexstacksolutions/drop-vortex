@@ -62,7 +62,7 @@ const RenderInputField = ({ isTableData, label, ...rest }) => {
   ) : isSpecialPricing ? (
     <SpecialPriceWrapper {...rest} label={label} />
   ) : (
-    <FormInput {...updatedProps} />
+    <FormInput {...updatedProps} label={null} />
   );
 };
 
