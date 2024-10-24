@@ -1,5 +1,5 @@
 import styles from "./index.module.css";
-import moment from "moment";
+import dayjs from "dayjs";
 import { get } from "lodash";
 import classNames from "classnames";
 import { ShowMoreBtn } from "./FormUi";
@@ -112,6 +112,12 @@ const SpecialPriceWrapper = memo(
     const { name, value, onChange } = { ...rest.inputProps };
     const { additionalFields } = useProductFormUI();
     const { RangePicker } = DatePicker;
+    const dateFormat = "DD-MM-YYYY";
+
+    const defaultRange = Object.values(value.range).map((date) => {
+      const dayjsDate = dayjs(date, dateFormat);
+      return dayjsDate.isValid() ? dayjsDate : null;
+    });
 
     const updatedProps = useMemo(() => {
       const { inputProps, ...otherRest } = rest;
@@ -131,10 +137,8 @@ const SpecialPriceWrapper = memo(
     ]);
 
     const handleRangeChange = (dates) => {
-      if (!dates) return;
-      const [start, end] = dates.map((date) =>
-        moment(date).format("DD-MM-YYYY")
-      );
+      if (!dates || dates.length !== 2) return;
+      const [start, end] = dates.map((date) => date.format(dateFormat));
       onChange(null, `${name}.range`, { start, end });
     };
 
@@ -150,7 +154,11 @@ const SpecialPriceWrapper = memo(
             <ShowMoreBtn {...showMoreBtnProps} />
           )}
           {value.status === "Set Date" && (
-            <RangePicker onChange={handleRangeChange} />
+            <RangePicker
+              defaultValue={defaultRange}
+              onChange={handleRangeChange}
+              format={dateFormat}
+            />
           )}
         </div>
       ),

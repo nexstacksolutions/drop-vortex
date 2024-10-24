@@ -17,7 +17,7 @@ const initialFormState = {
       },
       special: {
         amount: "",
-        range: { start: "", end: "" },
+        range: { start: "01-10-2024", end: "03-10-2024" },
         status: "",
         discount: "",
       },
