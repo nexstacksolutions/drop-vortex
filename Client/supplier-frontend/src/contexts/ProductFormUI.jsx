@@ -55,7 +55,7 @@ export const ProductFormUIProvider = ({ children }) => {
         const isValid = await validateForm(formState);
         console.log(
           isValid ? "Form submitted successfully" : "Validation failed",
-          formState
+          formErrors
         );
       } catch (error) {
         console.error("Error during submission", error);
@@ -63,7 +63,7 @@ export const ProductFormUIProvider = ({ children }) => {
         uiDispatch(formUIActions.setIsSubmitting(false));
       }
     },
-    [formState, validateForm, uiDispatch, uiState.isSubmitting]
+    [formState, formErrors, validateForm, uiDispatch, uiState.isSubmitting]
   );
 
   useEffect(() => {
