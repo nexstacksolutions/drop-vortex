@@ -104,6 +104,7 @@ const RenderTableContent = ({
 
 const SpecialPriceWrapper = memo(
   ({ showMoreBtnProps, promotionDateProps, ...rest }) => {
+    const { status } = { ...rest.inputProps.value };
     const { additionalFields } = useProductFormUI();
     const { RangePicker } = DatePicker;
 
@@ -128,12 +129,10 @@ const SpecialPriceWrapper = memo(
           ) : (
             <ShowMoreBtn {...showMoreBtnProps} />
           )}
-          <Space direction="vertical" size={12}>
-            <RangePicker />
-          </Space>
+          {status === "Set Date" && <RangePicker />}
         </div>
       ),
-      [updatedProps, additionalFields, showMoreBtnProps]
+      [updatedProps, additionalFields, showMoreBtnProps, status]
     );
 
     return (

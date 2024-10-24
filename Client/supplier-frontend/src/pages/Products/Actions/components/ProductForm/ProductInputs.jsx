@@ -107,7 +107,7 @@ const MediaPreviewItem = memo(
           destroyTooltipOnHide
           overlayClassName={styles.globalTooltip}
         >
-          <MediaTag src={src} controls={fileType !== "image"} />
+          <MediaTag src={src} />
         </Tooltip>
         {!enablePopup && content}
       </div>
@@ -452,7 +452,7 @@ const DropdownInput = memo(
 
     const handleClearInput = () => {
       onChange(null, name, "");
-      inputRef.current.focus();
+      if (!disableInput) inputRef.current.focus();
     };
 
     const suffixIcon =
