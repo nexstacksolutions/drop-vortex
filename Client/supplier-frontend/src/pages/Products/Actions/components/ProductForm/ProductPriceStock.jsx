@@ -1,9 +1,9 @@
 import styles from "./index.module.css";
 import { get } from "lodash";
 import { ShowMoreBtn } from "./FormUi";
-import { useMemo, memo, useEffect } from "react";
-import { useTooltip } from "../../../../../contexts/Tooltip";
+import { useMemo, memo, useState } from "react";
 import useAdditionalFields from "../../hooks/useAdditionalFields";
+import { DatePicker, Space, Tooltip } from "antd";
 import {
   FormInput,
   MultiInputGroup,
@@ -14,6 +14,7 @@ import {
   useProductFormState,
   useProductFormUI,
 } from "../../../../../contexts/ProductForm";
+import classNames from "classnames";
 
 const removeUndefinedProps = (obj) =>
   Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
@@ -103,8 +104,8 @@ const RenderTableContent = ({
 
 const SpecialPriceWrapper = memo(
   ({ showMoreBtnProps, promotionDateProps, ...rest }) => {
-    const { handleTooltipTrigger } = useTooltip();
     const { additionalFields } = useProductFormUI();
+    const { RangePicker } = DatePicker;
 
     const updatedProps = useMemo(
       () => ({
@@ -118,40 +119,32 @@ const SpecialPriceWrapper = memo(
 
     const content = useMemo(
       () => (
-        <div className="flex flex-col">
+        <div
+          className={classNames(styles.specialPriceWrapper, "flex flex-col")}
+        >
           <FormInput {...updatedProps.formInputProps} />
           {additionalFields.productDetails ? (
             <DropdownInput {...updatedProps.dropDownInputProps} />
           ) : (
             <ShowMoreBtn {...showMoreBtnProps} />
           )}
+          <Space direction="vertical" size={12}>
+            <RangePicker />
+          </Space>
         </div>
       ),
       [updatedProps, additionalFields, showMoreBtnProps]
     );
 
-    useEffect(() => {
-      handleTooltipTrigger({
-        content,
-        customClass: styles.specialPriceTooltip,
-      });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rest.inputProps.value, additionalFields.productDetails]);
-
     return (
-      <div className={styles.specialPriceWrapper}>
-        <button
-          id="global-tooltip"
-          onMouseOver={() =>
-            handleTooltipTrigger({
-              content,
-              customClass: styles.specialPriceTooltip,
-            })
-          }
-        >
-          Add
-        </button>
-      </div>
+      <Tooltip
+        title={content}
+        destroyTooltipOnHide
+        trigger={"click"}
+        overlayClassName={styles.globalTooltip}
+      >
+        <button>Add</button>
+      </Tooltip>
     );
   }
 );

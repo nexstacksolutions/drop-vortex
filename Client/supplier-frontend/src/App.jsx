@@ -6,18 +6,15 @@ import Sidebar from "./components/layouts/Sidebar";
 import MainLayout from "./layouts/MainLayout";
 import ToggleTheme from "./components/UI/ToggleTheme";
 import LoadingSpinner from "./components/UI/Spinner";
-import TooltipManager from "./components/UI/Tooltip";
-import { useTooltip } from "./contexts/Tooltip";
+import { Tooltip } from "react-tooltip";
 
 function App() {
-  const { tooltipProps } = useTooltip();
-
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Sidebar />
       <MainLayout />
       <ToggleTheme />
-      <TooltipManager {...tooltipProps} />
+      <Tooltip id="global-tooltip" />
     </Suspense>
   );
 }

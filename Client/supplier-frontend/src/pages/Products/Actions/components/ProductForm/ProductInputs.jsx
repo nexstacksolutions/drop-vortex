@@ -1,6 +1,7 @@
 import "react-quill/dist/quill.snow.css";
 import styles from "./index.module.css";
 import { get } from "lodash";
+import { Tooltip } from "antd";
 import classNames from "classnames";
 import ReactQuill from "react-quill";
 import { CgCloseO, CgInfo } from "react-icons/cg";
@@ -9,7 +10,6 @@ import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
 import { useProductFormUI } from "../../../../../contexts/ProductForm";
 import { memo, useCallback, useState, useRef, useEffect, useMemo } from "react";
-import { useTooltip } from "../../../../../contexts/Tooltip";
 
 const useHandleInputKeyDown = (callback) =>
   useCallback(
@@ -31,8 +31,6 @@ const GuidanceTooltip = memo(
     enablePopup = true,
     place = "top",
   }) => {
-    const { handleTooltipTrigger } = useTooltip();
-
     const content = useMemo(
       () => (
         <div
@@ -53,22 +51,19 @@ const GuidanceTooltip = memo(
       [imgSrc, instructions]
     );
 
-    const tooltipProps = useMemo(
-      () => ({ content, place, customClass: styles.guidanceTooltip }),
-      [content, place]
-    );
-
     if (!enablePopup) return content;
 
     return (
       <div className={classNames(styles.guidanceHeader, "flex")}>
         {title && <span>{title}</span>}
-        <button
-          id="global-tooltip"
-          onMouseOver={() => handleTooltipTrigger(tooltipProps)}
+        <Tooltip
+          title={content}
+          placement={place}
+          destroyTooltipOnHide
+          overlayClassName={styles.globalTooltip}
         >
-          {popupBtn}
-        </button>
+          <button>{popupBtn}</button>
+        </Tooltip>
       </div>
     );
   }
@@ -77,7 +72,6 @@ GuidanceTooltip.displayName = "GuidanceTooltip";
 
 const MediaPreviewItem = memo(
   ({ file, fileType, onRemove, showMediaPreview, enablePopup }) => {
-    const { handleTooltipTrigger } = useTooltip();
     const src = useMemo(() => URL.createObjectURL(file), [file]);
     const MediaTag = fileType === "image" ? "img" : "video";
 
@@ -106,28 +100,15 @@ const MediaPreviewItem = memo(
       [src, showMediaPreview, onRemove]
     );
 
-    const tooltipProps = useMemo(
-      () => ({
-        content,
-        customClass: styles.mediaPreviewTooltip,
-      }),
-      [content]
-    );
-
-    const renderMediaTag = () => (
-      <MediaTag
-        src={src}
-        controls={fileType !== "image"}
-        {...(enablePopup && {
-          id: "global-tooltip",
-          onMouseOver: () => handleTooltipTrigger(tooltipProps),
-        })}
-      />
-    );
-
     return (
       <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
-        {renderMediaTag()}
+        <Tooltip
+          title={enablePopup ? content : null}
+          destroyTooltipOnHide
+          overlayClassName={styles.globalTooltip}
+        >
+          <MediaTag src={src} controls={fileType !== "image"} />
+        </Tooltip>
         {!enablePopup && content}
       </div>
     );

@@ -623,79 +623,81 @@
 }
 
 /* Tooltips stylings */
-.guidanceTooltip > div:first-child {
-  max-width: 30rem;
+.globalTooltip {
+  & .guidanceWrapper {
+    max-width: 30rem;
+    padding: var(--spacing-sm);
 
-  &:has(img) {
-    max-width: 50rem;
-    gap: var(--spacing-xl);
-    padding: var(--spacing-md);
-
-    & img {
-      width: 10rem;
-    }
-
-    &:not(:has(ul > li:nth-child(2))) {
-      max-width: 42.6rem;
-      flex-direction: column-reverse;
+    &:has(img) {
+      max-width: 50rem;
+      gap: var(--spacing-xl);
+      padding: var(--spacing-md);
 
       & img {
-        width: 25rem;
+        width: 10rem;
       }
 
-      & ul {
-        padding: var(--spacing-md);
-        border-radius: var(--radius-md);
+      &:not(:has(ul > li:nth-child(2))) {
+        max-width: 42.6rem;
+        flex-direction: column-reverse;
+
+        & img {
+          width: 25rem;
+        }
+
+        & ul {
+          padding: var(--spacing-md);
+          border-radius: var(--radius-md);
+          background-color: var(--canvas-color);
+        }
+      }
+    }
+  }
+
+  &:has(.actionWrapper) {
+    border: none;
+
+    & .actionWrapper:first-child {
+      gap: 0;
+      max-width: 17rem;
+
+      & img {
+        height: 10rem;
+        aspect-ratio: 16/9;
+      }
+
+      & > div:last-child {
+        padding: var(--spacing-sm);
         background-color: var(--canvas-color);
-      }
-    }
-  }
-}
+        border-radius: var(--radius-sm);
 
-.mediaPreviewTooltip {
-  padding: 0 !important;
-  border: none !important;
+        & button {
+          flex: 1;
+          position: relative;
 
-  & > div:first-child {
-    gap: 0;
-    max-width: 17rem;
+          & svg {
+            font-size: var(--font-md);
+          }
 
-    & img {
-      height: 10rem;
-      aspect-ratio: 16/9;
-    }
-
-    & > div:last-child {
-      padding: var(--spacing-sm);
-      background-color: var(--canvas-color);
-      border-radius: var(--radius-sm);
-
-      & button {
-        flex: 1;
-        position: relative;
-
-        & svg {
-          font-size: var(--font-md);
-        }
-
-        &:first-child::before {
-          cursor: default;
-          position: absolute;
-          content: "";
-          right: -0.4rem;
-          height: 100%;
-          width: 1px;
-          background-color: var(--border-color);
+          &:first-child::before {
+            cursor: default;
+            position: absolute;
+            content: "";
+            right: -0.4rem;
+            height: 100%;
+            width: 1px;
+            background-color: var(--border-color);
+          }
         }
       }
     }
   }
-}
 
-.specialPriceTooltip {
-  padding: var(--spacing-md) !important;
+  & .specialPriceWrapper {
+    padding: var(--spacing-md);
 
-  & > div:first-child {
-    gap: var(--spacing-md);
+    & > div:first-child {
+      gap: var(--spacing-md);
+    }
   }
 }

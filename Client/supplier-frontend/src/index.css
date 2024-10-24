@@ -80,6 +80,10 @@ body {
   --shadow-md: 2px 4px 12px;
   --shadow-lg: 4px 6px 18px;
 
+  /* Tooltip Styles */
+  --tooltip-bg: var(--canvas-color);
+  --tooltip-border: var(--border-base);
+
   /* Opacity */
   --opacity-xs: 0.1;
   --opacity-sm: 0.2;
@@ -257,6 +261,38 @@ button {
   &:hover {
     background-color: var(--accent-color);
     color: var(--primary-text);
+  }
+}
+
+.globalTooltip,
+.ant-tooltip {
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  max-width: max-content;
+  border: var(--tooltip-border);
+  border-radius: var(--radius-base);
+  backdrop-filter: blur(50px);
+  background-color: var(--tooltip-bg);
+  opacity: 0.9;
+
+  & > div:first-child {
+    &::before {
+      background-color: var(--tooltip-bg);
+    }
+
+    &::after {
+      border: var(--tooltip-border);
+      border-left-color: transparent;
+      border-top-color: transparent;
+    }
+  }
+
+  & > div:last-child > div:first-child {
+    background-color: inherit;
+    color: inherit;
+    padding: 0;
   }
 }
 
