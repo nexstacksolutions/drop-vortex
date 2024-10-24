@@ -1,9 +1,11 @@
 import styles from "./index.module.css";
+import moment from "moment";
 import { get } from "lodash";
+import classNames from "classnames";
 import { ShowMoreBtn } from "./FormUi";
-import { useMemo, memo, useState } from "react";
+import { useMemo, memo } from "react";
 import useAdditionalFields from "../../hooks/useAdditionalFields";
-import { DatePicker, Space, Tooltip } from "antd";
+import { DatePicker, Tooltip } from "antd";
 import {
   FormInput,
   MultiInputGroup,
@@ -14,25 +16,23 @@ import {
   useProductFormState,
   useProductFormUI,
 } from "../../../../../contexts/ProductForm";
-import classNames from "classnames";
-import moment from "moment";
 
 const removeUndefinedProps = (obj) =>
   Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
 
-const getSpecialInputProps = (
+const buildInputProps = (
   { inputProps, promotionDateProps = {}, ...rest },
   requireValue = "amount"
 ) => {
   const { name, value = {} } = inputProps;
   const { type, placeholder, ...promotionRest } = promotionDateProps;
 
-  const updatedProps = removeUndefinedProps({
+  const updatedProps = {
     ...inputProps,
     name: `${name}.${requireValue}`,
     value: value[requireValue],
     ...removeUndefinedProps({ type, placeholder }),
-  });
+  };
 
   return { ...rest, inputProps: { ...updatedProps }, ...promotionRest };
 };
@@ -50,15 +50,19 @@ const getFieldPath = (
 
 const RenderInputField = ({ isTableData, label, ...rest }) => {
   const { name } = rest.inputProps || {};
+  const isDimensions = name.includes("dimensions");
+  const isSpecialPricing = isTableData && name.includes("pricing.special");
 
-  return name.includes("dimensions") ? (
+  const updatedProps = name.includes("pricing.special")
+    ? buildInputProps(rest)
+    : rest;
+
+  return isDimensions ? (
     <MultiInputGroup {...rest} />
-  ) : isTableData && name.includes("pricing.special") ? (
+  ) : isSpecialPricing ? (
     <SpecialPriceWrapper {...rest} label={label} />
-  ) : name.includes("pricing.special") ? (
-    <FormInput {...getSpecialInputProps(rest)} />
   ) : (
-    <FormInput {...rest} />
+    <FormInput {...updatedProps} />
   );
 };
 
@@ -106,29 +110,32 @@ const RenderTableContent = ({
 const SpecialPriceWrapper = memo(
   ({ showMoreBtnProps, promotionDateProps, ...rest }) => {
     const { name, value, onChange } = { ...rest.inputProps };
-
     const { additionalFields } = useProductFormUI();
     const { RangePicker } = DatePicker;
 
-    const updatedProps = useMemo(
-      () => ({
-        formInputProps: { ...getSpecialInputProps(rest) },
-        dropDownInputProps: {
-          ...getSpecialInputProps({ ...rest, promotionDateProps }, "status"),
-        },
-      }),
-      [rest, promotionDateProps]
-    );
+    const updatedProps = useMemo(() => {
+      const { inputProps, ...otherRest } = rest;
+      return {
+        formInputProps: buildInputProps({ inputProps, ...otherRest }),
+        dropDownInputProps: buildInputProps(
+          { ...rest, promotionDateProps },
+          "status"
+        ),
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+      rest.inputProps.name,
+      rest.inputProps.value,
+      promotionDateProps.type,
+      promotionDateProps.placeholder,
+    ]);
 
     const handleRangeChange = (dates) => {
       if (!dates) return;
-      const formatDates = dates.reduce((acc, date, idx) => {
-        const key = idx < 1 ? "start" : "end";
-        acc[key] = moment(date).format("DD-MM-YYYY");
-        return acc;
-      }, {});
-
-      onChange(null, `${name}.range`, formatDates);
+      const [start, end] = dates.map((date) =>
+        moment(date).format("DD-MM-YYYY")
+      );
+      onChange(null, `${name}.range`, { start, end });
     };
 
     const content = useMemo(
@@ -242,6 +249,7 @@ function ProductPriceStockWrapper({ variations }) {
     () => variations.map((variation) => variation.type),
     [variations]
   );
+
   const hasVariationRows = useMemo(
     () => variationRows.length > 0,
     [variationRows]
