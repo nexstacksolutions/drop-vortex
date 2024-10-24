@@ -1,6 +1,6 @@
 import styles from "./index.module.css";
 import classNames from "classnames";
-import Divider from "../../UI/Divider";
+import { Divider } from "antd";
 import { useTheme } from "../../../contexts/Theme";
 import navigation from "../../../constants/navigation";
 import { CSSTransition } from "react-transition-group";

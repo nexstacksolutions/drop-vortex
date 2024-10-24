@@ -3,7 +3,7 @@ import { get } from "lodash";
 import classNames from "classnames";
 import { RxReload } from "react-icons/rx";
 import { FaAngleDown } from "react-icons/fa6";
-import Divider from "../../../../../components/UI/Divider";
+import { Divider } from "antd";
 import useMediaExport from "../../../../../hooks/useMediaExport";
 import useSectionScroll from "../../hooks/useSectionScroll";
 import { useMemo, useCallback, memo, useState, useEffect } from "react";

@@ -17,10 +17,9 @@ const initialFormState = {
       },
       special: {
         amount: "",
-        start: "",
-        end: "",
-        discount: "",
+        range: { start: "", end: "" },
         status: "",
+        discount: "",
       },
       priceFormat: {
         decimals: 2,

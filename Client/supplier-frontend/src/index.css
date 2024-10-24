@@ -264,7 +264,6 @@ button {
   }
 }
 
-.globalTooltip,
 .ant-tooltip {
   color: inherit;
   font-family: inherit;
@@ -293,6 +292,14 @@ button {
     background-color: inherit;
     color: inherit;
     padding: 0;
+  }
+}
+
+.ant-divider {
+  background-color: var(--border-color);
+
+  &.ant-divider-horizontal {
+    margin: var(--spacing-sm) 0;
   }
 }
 

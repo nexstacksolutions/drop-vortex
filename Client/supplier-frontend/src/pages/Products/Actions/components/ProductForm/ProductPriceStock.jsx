@@ -15,6 +15,7 @@ import {
   useProductFormUI,
 } from "../../../../../contexts/ProductForm";
 import classNames from "classnames";
+import moment from "moment";
 
 const removeUndefinedProps = (obj) =>
   Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
@@ -104,7 +105,8 @@ const RenderTableContent = ({
 
 const SpecialPriceWrapper = memo(
   ({ showMoreBtnProps, promotionDateProps, ...rest }) => {
-    const { status } = { ...rest.inputProps.value };
+    const { name, value, onChange } = { ...rest.inputProps };
+
     const { additionalFields } = useProductFormUI();
     const { RangePicker } = DatePicker;
 
@@ -118,6 +120,17 @@ const SpecialPriceWrapper = memo(
       [rest, promotionDateProps]
     );
 
+    const handleRangeChange = (dates) => {
+      if (!dates) return;
+      const formatDates = dates.reduce((acc, date, idx) => {
+        const key = idx < 1 ? "start" : "end";
+        acc[key] = moment(date).format("DD-MM-YYYY");
+        return acc;
+      }, {});
+
+      onChange(null, `${name}.range`, formatDates);
+    };
+
     const content = useMemo(
       () => (
         <div
@@ -129,10 +142,13 @@ const SpecialPriceWrapper = memo(
           ) : (
             <ShowMoreBtn {...showMoreBtnProps} />
           )}
-          {status === "Set Date" && <RangePicker />}
+          {value.status === "Set Date" && (
+            <RangePicker onChange={handleRangeChange} />
+          )}
         </div>
       ),
-      [updatedProps, additionalFields, showMoreBtnProps, status]
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [updatedProps, additionalFields, showMoreBtnProps, value.status]
     );
 
     return (

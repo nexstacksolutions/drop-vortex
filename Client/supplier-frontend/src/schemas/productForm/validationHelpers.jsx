@@ -65,10 +65,12 @@ export const pricingSchema = (condition, customizer = false) =>
         "Current price must be less than the original price.",
         isCurrentLessThanOriginal
       ),
-      start: nullableString,
-      end: nullableString,
-      discount: nullableString,
+      range: Yup.object({
+        start: nullableString.datetime(),
+        end: nullableString.datetime(),
+      }),
       status: nullableString,
+      discount: nullableString,
     }),
     priceFormat: Yup.object({
       decimals: Yup.number().default(2),

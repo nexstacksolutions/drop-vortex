@@ -5,7 +5,7 @@ import React, { useMemo, memo } from "react";
 import FormSection from "./FormSection";
 import ProductVariations from "./ProductVariations";
 import ProductPriceStockWrapper from "./ProductPriceStock";
-import Divider from "../../../../../components/UI/Divider";
+import { Divider, ConfigProvider } from "antd";
 import {
   useProductFormUI,
   useProductFormState,
