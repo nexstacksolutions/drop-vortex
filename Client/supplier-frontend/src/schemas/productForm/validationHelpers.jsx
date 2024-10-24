@@ -66,8 +66,8 @@ export const pricingSchema = (condition, customizer = false) =>
         isCurrentLessThanOriginal
       ),
       range: Yup.object({
-        start: nullableString.datetime(),
-        end: nullableString.datetime(),
+        start: nullableString,
+        end: nullableString,
       }),
       status: nullableString,
       discount: nullableString,
