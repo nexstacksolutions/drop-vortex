@@ -101,11 +101,7 @@ const MediaPreviewItem = memo(
     );
 
     return (
-      <Reorder.Item
-        value={file}
-        id={file.name}
-        className={classNames(styles.mediaPreviewItem, "flex flex-center")}
-      >
+      <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
         <Tooltip
           title={enablePopup ? content : null}
           destroyTooltipOnHide
@@ -114,7 +110,7 @@ const MediaPreviewItem = memo(
           <MediaTag src={src} />
         </Tooltip>
         {!enablePopup && content}
-      </Reorder.Item>
+      </div>
     );
   }
 );
@@ -331,23 +327,15 @@ const MediaInput = memo(
     }, [resetTrigger, resetFiles]);
 
     const RenderMediaPreview = ({ files }) => {
-      return (
-        <Reorder.Group
-          axis="x"
-          values={mediaFiles}
-          onReorder={(newOrder) => handleFileChange(null, newOrder)}
-        >
-          {files.map((file, index) => (
-            <MediaPreviewItem
-              key={file.name}
-              file={file}
-              fileType={fileType}
-              {...mediaPreviewProps}
-              onRemove={() => handleRemoveFile(index)}
-            />
-          ))}
-        </Reorder.Group>
-      );
+      return files.map((file, index) => (
+        <MediaPreviewItem
+          key={file.name}
+          file={file}
+          fileType={fileType}
+          {...mediaPreviewProps}
+          onRemove={() => handleRemoveFile(index)}
+        />
+      ));
     };
 
     const RenderInputField = () => {

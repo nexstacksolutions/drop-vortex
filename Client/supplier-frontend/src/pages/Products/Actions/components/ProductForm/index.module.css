@@ -157,50 +157,46 @@
     & .mediaPreviewWrapper {
       max-width: max-content;
 
-      & ul {
-        flex-direction: row;
+      & .mediaPreviewItem {
+        position: relative;
+        width: 6rem;
+        height: 6rem;
+        border: var(--border-base-dashed);
 
-        & .mediaPreviewItem {
-          position: relative;
-          width: 6rem;
-          height: 6rem;
-          border: var(--border-base-dashed);
+        & img,
+        video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
 
-          & img,
-          video {
+        & .actionWrapper {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          opacity: 0;
+          visibility: hidden;
+          transition: var(--transition-base);
+
+          & .mediaPreview {
             width: 100%;
-            height: 100%;
             object-fit: cover;
           }
 
-          & .actionWrapper {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+          & .mediaAction {
+            padding: 0 var(--spacing-xs);
 
-            & .mediaPreview {
-              width: 100%;
-              object-fit: cover;
-            }
-
-            & .mediaAction {
-              padding: 0 var(--spacing-xs);
-
-              & button svg {
-                font-size: var(--font-lg);
-                color: var(--white-color);
-              }
+            & button svg {
+              font-size: var(--font-lg);
+              color: var(--white-color);
             }
           }
+        }
 
-          &:hover .actionWrapper {
-            opacity: 1;
-            visibility: visible;
-          }
+        &:hover .actionWrapper {
+          opacity: 1;
+          visibility: visible;
         }
       }
 
@@ -482,7 +478,7 @@
           }
 
           & > div > div {
-            & > ul .mediaPreviewItem {
+            & > .mediaPreviewItem {
               width: 4rem;
               height: 4rem;
               position: relative;
