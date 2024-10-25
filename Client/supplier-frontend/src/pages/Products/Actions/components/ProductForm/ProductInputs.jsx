@@ -9,6 +9,7 @@ import SwitchBtn from "../../../../../components/UI/SwitchBtn";
 import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import { FaPlus, FaAngleDown, FaAsterisk } from "react-icons/fa6";
 import { useProductFormUI } from "../../../../../contexts/ProductForm";
+import { Reorder } from "framer-motion";
 import { memo, useCallback, useState, useRef, useEffect, useMemo } from "react";
 
 const useHandleInputKeyDown = (callback) =>
@@ -83,8 +84,7 @@ const MediaPreviewItem = memo(
             "flex flex-col justify-center"
           )}
         >
-          {showMediaPreview && <img src={src} alt="" />}
-
+          {showMediaPreview && <MediaTag src={src} alt="" />}
           <div
             className={classNames(styles.mediaAction, "flex justify-between")}
           >
@@ -101,7 +101,11 @@ const MediaPreviewItem = memo(
     );
 
     return (
-      <div className={classNames(styles.mediaPreviewItem, "flex flex-center")}>
+      <Reorder.Item
+        value={file}
+        id={file.name}
+        className={classNames(styles.mediaPreviewItem, "flex flex-center")}
+      >
         <Tooltip
           title={enablePopup ? content : null}
           destroyTooltipOnHide
@@ -110,10 +114,11 @@ const MediaPreviewItem = memo(
           <MediaTag src={src} />
         </Tooltip>
         {!enablePopup && content}
-      </div>
+      </Reorder.Item>
     );
   }
 );
+
 MediaPreviewItem.displayName = "MediaPreviewItem";
 
 const InputHeader = memo(
@@ -293,29 +298,31 @@ const MediaInput = memo(
     const [uploadOption, setUploadOption] = useState("Upload Video");
     const fileInputRef = useRef();
 
-    const resetFiles = useCallback(() => {
-      setMediaFiles([]);
-      onChange?.(null, name, []);
-    }, [name, onChange]);
-
     const handleFileChange = useCallback(
-      (e) => {
-        const files = Array.from(e.target.files);
-        const updatedFiles = [...mediaFiles, ...files].slice(0, maxFiles);
+      (e, updatedFiles) => {
+        if (e && e.target.files.length) {
+          const files = Array.from(e.target.files);
+          updatedFiles = [...mediaFiles, ...files].slice(0, maxFiles);
+        }
+
         setMediaFiles(updatedFiles);
         onChange?.(null, name, updatedFiles);
       },
-      [mediaFiles, maxFiles, name, onChange]
+      [name, onChange, mediaFiles, maxFiles]
     );
 
     const handleRemoveFile = useCallback(
       (index) => {
         const updatedFiles = mediaFiles.filter((_, i) => i !== index);
-        setMediaFiles(updatedFiles);
-        onChange?.(null, name, updatedFiles);
+        handleFileChange(null, updatedFiles);
       },
-      [mediaFiles, name, onChange]
+      [mediaFiles, handleFileChange]
     );
+
+    const resetFiles = useCallback(() => {
+      setMediaFiles([]);
+      onChange?.(null, name, []);
+    }, [name, onChange]);
 
     useEffect(() => {
       if (resetTrigger) {
@@ -323,30 +330,27 @@ const MediaInput = memo(
       }
     }, [resetTrigger, resetFiles]);
 
-    const renderMediaPreview = useCallback(
-      (files) =>
-        files.map((file, index) => (
-          <MediaPreviewItem
-            key={index}
-            file={file}
-            fileType={fileType}
-            {...mediaPreviewProps}
-            onRemove={() => handleRemoveFile(index)}
-          />
-        )),
-      [fileType, handleRemoveFile, mediaPreviewProps]
-    );
+    const RenderMediaPreview = ({ files }) => {
+      return (
+        <Reorder.Group
+          axis="x"
+          values={mediaFiles}
+          onReorder={(newOrder) => handleFileChange(null, newOrder)}
+        >
+          {files.map((file, index) => (
+            <MediaPreviewItem
+              key={file.name}
+              file={file}
+              fileType={fileType}
+              {...mediaPreviewProps}
+              onRemove={() => handleRemoveFile(index)}
+            />
+          ))}
+        </Reorder.Group>
+      );
+    };
 
-    const AddMediaActions = () => (
-      <div className={`${styles.addMediaActions} flex flex-col`}>
-        <button onClick={handleUpload}>Upload</button>
-        <button>Media Center</button>
-      </div>
-    );
-
-    const handleUpload = useCallback(() => fileInputRef.current.click(), []);
-
-    const renderInputField = () => {
+    const RenderInputField = () => {
       if (uploadOption === "Youtube Link" && fileType === "video") {
         return (
           <FormInput
@@ -365,7 +369,7 @@ const MediaInput = memo(
 
       return (
         <div className={`${styles.mediaPreviewWrapper} flex`}>
-          {renderMediaPreview(mediaFiles)}
+          <RenderMediaPreview files={mediaFiles} />
           {mediaFiles.length < maxFiles && (
             <FormInput
               inputProps={{
@@ -386,6 +390,15 @@ const MediaInput = memo(
         </div>
       );
     };
+
+    const handleUpload = useCallback(() => fileInputRef.current.click(), []);
+
+    const AddMediaActions = () => (
+      <div className={`${styles.addMediaActions} flex flex-col`}>
+        <button onClick={handleUpload}>Upload</button>
+        <button>Media Center</button>
+      </div>
+    );
 
     return (
       <InputContainer
@@ -408,7 +421,7 @@ const MediaInput = memo(
           }),
         }}
       >
-        {renderInputField()}
+        <RenderInputField />
         {uploadOption !== "Youtube Link" && guidelinesProps && (
           <GuidanceTooltip {...guidelinesProps} />
         )}
@@ -416,6 +429,7 @@ const MediaInput = memo(
     );
   }
 );
+
 MediaInput.displayName = "MediaInput";
 
 const DropdownInput = memo(
