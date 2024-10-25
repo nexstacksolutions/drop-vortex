@@ -145,28 +145,44 @@ const SpecialPriceWrapper = memo(
 
     const content = useMemo(
       () => (
-        <div
-          className={classNames(styles.specialPriceWrapper, "flex flex-col")}
-        >
-          <FormInput {...updatedProps.formInputProps} />
-          {additionalFields.productDetails ? (
-            <>
-              <DropdownInput {...updatedProps.dropDownInputProps} />
-              {value.status === "Set Date" && (
-                <RangePicker
-                  defaultValue={defaultRange}
-                  onChange={handleRangeChange}
-                  format={dateFormat}
-                />
-              )}
-            </>
-          ) : (
-            <ShowMoreBtn {...showMoreBtnProps} />
-          )}
-        </div>
+        <>
+          <div
+            className={classNames(styles.specialPriceWrapper, "flex flex-col")}
+          >
+            <FormInput {...updatedProps.formInputProps} />
+            <p>
+              Sales Price for a Product for Promotion,. The rate of the special
+              price to the price must be between 0.05 and 1.00
+            </p>
+            {additionalFields.productDetails ? (
+              <>
+                <DropdownInput {...updatedProps.dropDownInputProps} />
+                {value.status === "Set Date" && (
+                  <RangePicker
+                    defaultValue={defaultRange}
+                    onChange={handleRangeChange}
+                    format={dateFormat}
+                  />
+                )}
+              </>
+            ) : (
+              <ShowMoreBtn {...showMoreBtnProps} />
+            )}{" "}
+          </div>
+
+          <div className={`${styles.tooltipActions} flex justify-end`}>
+            <button className="btn primary-btn ">Ok</button>
+            <button
+              className="btn secondary-btn"
+              onClick={() => setIsOpen(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </>
       ),
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [updatedProps, additionalFields, showMoreBtnProps, value.status]
+      [updatedProps, additionalFields, showMoreBtnProps, value]
     );
 
     useEffect(() => {
@@ -178,11 +194,11 @@ const SpecialPriceWrapper = memo(
       <Tooltip
         title={content}
         destroyTooltipOnHide
-        onOpenChange={(isOpen) => setIsOpen(isOpen)}
-        trigger={"click"}
+        open={isOpen}
+        onClick={() => setIsOpen(true)}
         overlayClassName={styles.globalTooltip}
       >
-        <button>Add</button>
+        <button>{value.amount || "Add"}</button>
       </Tooltip>
     );
   }

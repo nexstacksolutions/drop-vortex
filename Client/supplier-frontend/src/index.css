@@ -62,6 +62,7 @@ body {
 
   /* Borders */
   --border-base: 1px solid var(--border-color);
+  --border-transparent: 1px solid transparent;
   --border-accent: 1px solid var(--accent-color);
   --border-err: 1px solid var(--danger-color);
   --border-base-dotted: 1px dotted var(--border-color);
@@ -79,10 +80,6 @@ body {
   --shadow-sm: 0 2px 4px;
   --shadow-md: 2px 4px 12px;
   --shadow-lg: 4px 6px 18px;
-
-  /* Tooltip Styles */
-  --tooltip-bg: var(--canvas-color);
-  --tooltip-border: var(--border-base);
 
   /* Opacity */
   --opacity-xs: 0.1;
@@ -116,6 +113,7 @@ body {
   --primary-bg: #1e1e1e;
   --secondary-bg: #121212;
   --canvas-color: #2c2c2c;
+  --tooltip-bg: 44, 44, 44;
   --primary-text: #e0e0e0;
   --secondary-text: #b0b0b0;
   --inactive-text: #959595;
@@ -141,6 +139,7 @@ body {
   --primary-bg: #f5f5f5;
   --secondary-bg: #2d2d2d;
   --canvas-color: #ffffff;
+  --tooltip-bg: 255, 255, 255;
   --primary-text: #333333;
   --secondary-text: #666666;
   --inactive-text: #959595;
@@ -242,53 +241,58 @@ button {
   z-index: 2;
 }
 
-.primary-btn {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-sm);
-  line-height: normal;
-  background-color: var(--accent-color);
-  color: var(--white-color);
+.btn {
+  height: 32px;
+  font-size: var(--font-base);
+  padding: 0 var(--spacing-base);
+  border-radius: var(--radius-md);
+  border: var(--border-base);
+  border-color: transparent;
+  color: var(--primary-text);
 
-  &:hover {
-    opacity: 0.9;
+  &.primary-btn {
+    background: var(--accent-color);
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &.secondary-btn {
+    border-color: var(--border-color);
+
+    &:hover {
+      opacity: 0.8;
+    }
   }
 }
 
-.secondary-btn {
-  background-color: transparent;
-  border: var(--border-base) var(--accent-color);
-
-  &:hover {
-    background-color: var(--accent-color);
-    color: var(--primary-text);
-  }
-}
-
+/* antd default styles */
 .ant-tooltip {
   color: inherit;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
   max-width: max-content;
-  border: var(--tooltip-border);
+  backdrop-filter: blur(1px);
+  border: var(--border-base);
   border-radius: var(--radius-base);
-  backdrop-filter: blur(50px);
-  background-color: var(--tooltip-bg);
-  opacity: 0.9;
+  background-color: rgba(var(--tooltip-bg), 0.8);
 
-  & > div:first-child {
+  & > .ant-tooltip-arrow {
     &::before {
-      background-color: var(--tooltip-bg);
+      background-color: var(--canvas-color);
     }
 
     &::after {
-      border: var(--tooltip-border);
+      border: var(--border-base);
       border-left-color: transparent;
       border-top-color: transparent;
     }
   }
 
-  & > div:last-child > div:first-child {
+  & .ant-tooltip-content .ant-tooltip-inner {
+    box-shadow: inherit;
     background-color: inherit;
     color: inherit;
     padding: 0;

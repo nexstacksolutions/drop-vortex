@@ -595,6 +595,7 @@
 }
 
 .showMoreBtn {
+  color: var(--accent-color);
   transition: var(--transition-base);
 
   &:hover {
@@ -693,11 +694,28 @@
     }
   }
 
-  & .specialPriceWrapper {
+  & > div:last-child:has(.specialPriceWrapper) {
     padding: var(--spacing-md);
+    max-width: 40rem;
 
-    & > div:first-child {
+    & .specialPriceWrapper {
+      & > div:first-child > div:last-child:has(div > input) {
+        max-width: 40%;
+      }
+
+      & > div:nth-of-type(2) > div:last-child:has(div > div) {
+        max-width: 60%;
+      }
+    }
+
+    & p {
+      font-size: var(--font-xs);
+      color: var(--secondary-text);
+    }
+
+    & .tooltipActions {
       gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
     }
   }
 }

@@ -27,10 +27,10 @@ function formControl(state, action) {
       case APPLY_TO_ALL_VARIANTS:
         draft.productDetails.variations.forEach((variation) => {
           variation.values.forEach((value) => {
-            value.pricing.current =
-              payload.pricing.current || value.pricing.current;
-            value.pricing.original =
-              payload.pricing.original || value.pricing.original;
+            value.pricing.special.amount =
+              payload.pricing.special.amount || value.pricing.special.amount;
+            value.pricing.original.amount =
+              payload.pricing.original.amount || value.pricing.original.amount;
             value.stock = payload.stock || value.stock;
             value.sku = payload.sku || value.sku;
           });
