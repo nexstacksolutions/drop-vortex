@@ -406,7 +406,7 @@ function ProductForm({ customClass }) {
         <button
           type="submit"
           name="submitBtn"
-          className={`${styles.submitButton} primary-btn`}
+          className={`${styles.submitButton} btn primary-btn`}
         >
           Submit
         </button>

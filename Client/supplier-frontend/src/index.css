@@ -30,7 +30,6 @@ body {
   /* Common Palette */
   --white-color: #fff;
   --accent-color: #3b82f6;
-  --feature-color: #f97316;
   --switch-btn-bg: #cbced5;
   --scrollbar-bg: transparent;
   --accent-Rgb: 59, 130, 246;
@@ -248,9 +247,9 @@ button {
   border-radius: var(--radius-md);
   border: var(--border-base);
   border-color: transparent;
-  color: var(--primary-text);
 
   &.primary-btn {
+    color: var(--white-color);
     background: var(--accent-color);
 
     &:hover {
@@ -259,6 +258,7 @@ button {
   }
 
   &.secondary-btn {
+    color: var(--primary-text);
     border-color: var(--border-color);
 
     &:hover {

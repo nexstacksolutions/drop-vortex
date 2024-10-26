@@ -20,8 +20,8 @@ const mediaExport = {
   FeatureIcon4,
 };
 
-const useMediaExport = () => {
+const useMedia = () => {
   return { ...mediaExport };
 };
 
-export default useMediaExport;
+export default useMedia;

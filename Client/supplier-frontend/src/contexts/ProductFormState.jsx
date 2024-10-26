@@ -5,6 +5,7 @@ import { ProductFormStateContext, useProductForm } from "./ProductForm";
 import useFormValidation from "../pages/Products/Actions/hooks/useFormValidation";
 import { createNewVariant } from "../utils/productForm";
 import { formActions, formUIActions } from "../store/productForm/actions";
+import useInputChange from "../hooks/useInputChange";
 
 export const ProductFormStateProvider = ({ children }) => {
   const { formState, formDispatch, uiState, uiDispatch } = useProductForm();
@@ -18,13 +19,7 @@ export const ProductFormStateProvider = ({ children }) => {
     [formDispatch, formState, validateField]
   );
 
-  const handleInputChange = useCallback(
-    (e, name, value, customizer) => {
-      if (e) ({ name, value } = e.target);
-      updateFormData(name, customizer ? customizer(value) : value);
-    },
-    [updateFormData]
-  );
+  const handleInputChange = useInputChange(updateFormData);
 
   const updateVariantData = useCallback(
     async (basePath, updatedVariants, isAdding, payload) => {

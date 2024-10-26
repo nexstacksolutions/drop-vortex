@@ -296,11 +296,15 @@
   flex: 1;
 
   & > div {
-    border: none;
     transition: var(--transition-base);
 
     &:first-child {
+      border: none;
       border-bottom: var(--border-base);
+    }
+
+    &:last-child {
+      border: none;
     }
   }
 }
@@ -561,6 +565,10 @@
       justify-content: center;
     }
 
+    & tr td:has(button) > button {
+      color: var(--accent-color);
+    }
+
     & td:last-child > div > div > div {
       justify-content: center;
       border: none !important;
@@ -677,6 +685,7 @@
           position: relative;
 
           & svg {
+            color: var(--accent-color);
             font-size: var(--font-md);
           }
 

@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { get } from "lodash";
 import classNames from "classnames";
 import { ShowMoreBtn } from "./FormUi";
-import { useMemo, memo, useState, useEffect } from "react";
+import { useMemo, memo, useState, useEffect, useCallback } from "react";
 import useAdditionalFields from "../../hooks/useAdditionalFields";
 import { DatePicker, Tooltip } from "antd";
 import {
@@ -29,7 +29,7 @@ const buildInputProps = (
 
   const updatedProps = {
     ...inputProps,
-    name: `${name}.${requireValue}`,
+    name: `${name}${name === "" ? "" : "."}${requireValue}`,
     value: value[requireValue],
     ...removeUndefinedProps({ type, placeholder }),
   };
@@ -108,34 +108,50 @@ const RenderTableContent = ({
 };
 
 const SpecialPriceWrapper = memo(
-  ({ showMoreBtnProps, promotionDateProps, ...rest }) => {
-    const { name, value, onChange } = { ...rest.inputProps };
+  ({ inputProps, showMoreBtnProps, promotionDateProps, ...rest }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const { additionalFields, toggleAdditionalFields } = useProductFormUI();
+    const { name, value, onChange } = inputProps;
+    const [initialValues, setInitialValues] = useState(value);
+    const { additionalFields, toggleAdditionalFields, formErrors } =
+      useProductFormUI();
     const { RangePicker } = DatePicker;
     const dateFormat = "DD-MM-YYYY";
+    const hasErrors = Object.keys(formErrors).some((key) =>
+      key.startsWith(name)
+    );
 
     const defaultRange = Object.values(value.range).map((date) => {
       const dayjsDate = dayjs(date, dateFormat);
       return dayjsDate.isValid() ? dayjsDate : null;
     });
 
+    const handleOpen = useCallback(() => {
+      setIsOpen(true);
+    }, []);
+
+    const handleClose = useCallback(
+      (e) => {
+        const { innerText } = e.target;
+        if ((hasErrors || value.amount === "") && innerText === "Ok") return;
+        if (innerText === "Ok") setInitialValues(value);
+        if (innerText === "Cancel") {
+          onChange(null, name, initialValues);
+        }
+
+        setIsOpen(false);
+      },
+      [hasErrors, name, value, initialValues, onChange]
+    );
+
     const updatedProps = useMemo(() => {
-      const { inputProps, ...otherRest } = rest;
       return {
-        formInputProps: buildInputProps({ inputProps, ...otherRest }),
+        formInputProps: buildInputProps({ inputProps, ...rest }),
         dropDownInputProps: buildInputProps(
-          { ...rest, promotionDateProps },
+          { inputProps, ...rest, promotionDateProps },
           "status"
         ),
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-      rest.inputProps.name,
-      rest.inputProps.value,
-      promotionDateProps.type,
-      promotionDateProps.placeholder,
-    ]);
+    }, [inputProps, rest, promotionDateProps]);
 
     const handleRangeChange = (dates) => {
       if (!dates || dates.length !== 2) return;
@@ -143,46 +159,41 @@ const SpecialPriceWrapper = memo(
       onChange(null, `${name}.range`, { start, end });
     };
 
-    const content = useMemo(
-      () => (
-        <>
-          <div
-            className={classNames(styles.specialPriceWrapper, "flex flex-col")}
-          >
-            <FormInput {...updatedProps.formInputProps} />
-            <p>
-              Sales Price for a Product for Promotion,. The rate of the special
-              price to the price must be between 0.05 and 1.00
-            </p>
-            {additionalFields.productDetails ? (
-              <>
-                <DropdownInput {...updatedProps.dropDownInputProps} />
-                {value.status === "Set Date" && (
-                  <RangePicker
-                    defaultValue={defaultRange}
-                    onChange={handleRangeChange}
-                    format={dateFormat}
-                  />
-                )}
-              </>
-            ) : (
-              <ShowMoreBtn {...showMoreBtnProps} />
-            )}{" "}
-          </div>
+    const content = (
+      <>
+        <div
+          className={classNames(styles.specialPriceWrapper, "flex flex-col")}
+        >
+          <FormInput {...updatedProps.formInputProps} />
+          <p>
+            Sales Price for a Product for Promotion,. The rate of the special
+            price to the price must be between 0.05 and 1.00
+          </p>
+          {additionalFields.productDetails ? (
+            <>
+              <DropdownInput {...updatedProps.dropDownInputProps} />
+              {value.status === "Set Date" && (
+                <RangePicker
+                  defaultValue={defaultRange}
+                  onChange={handleRangeChange}
+                  format={dateFormat}
+                />
+              )}
+            </>
+          ) : (
+            <ShowMoreBtn {...showMoreBtnProps} />
+          )}
+        </div>
 
-          <div className={`${styles.tooltipActions} flex justify-end`}>
-            <button className="btn primary-btn ">Ok</button>
-            <button
-              className="btn secondary-btn"
-              onClick={() => setIsOpen(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </>
-      ),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [updatedProps, additionalFields, showMoreBtnProps, value]
+        <div className={`${styles.tooltipActions} flex justify-end`}>
+          <button className="btn primary-btn" onClick={handleClose}>
+            Ok
+          </button>
+          <button className="btn secondary-btn" onClick={handleClose}>
+            Cancel
+          </button>
+        </div>
+      </>
     );
 
     useEffect(() => {
@@ -195,7 +206,7 @@ const SpecialPriceWrapper = memo(
         title={content}
         destroyTooltipOnHide
         open={isOpen}
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpen}
         overlayClassName={styles.globalTooltip}
       >
         <button>{value.amount || "Add"}</button>
@@ -306,7 +317,7 @@ function ProductPriceStockWrapper({ variations }) {
           <button
             type="button"
             onClick={handleApplyToAll}
-            className={`${styles.applyToAllButton} primary-btn`}
+            className={`${styles.applyToAllButton} btn primary-btn`}
           >
             Apply to All
           </button>

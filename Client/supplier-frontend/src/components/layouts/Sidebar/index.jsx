@@ -4,7 +4,7 @@ import { Divider } from "antd";
 import { useTheme } from "../../../contexts/Theme";
 import navigation from "../../../constants/navigation";
 import { CSSTransition } from "react-transition-group";
-import useMediaExport from "../../../hooks/useMediaExport";
+import useMedia from "../../../hooks/useMedia";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
 import { NavLink, useLocation, Link } from "react-router-dom";
 import { useState, useCallback, useEffect, useMemo, memo } from "react";
@@ -95,8 +95,7 @@ NavItems.displayName = "NavItems";
 const RenderLogo = memo(
   ({ expandSideBar, showDivider = false, customClass }) => {
     const { theme } = useTheme();
-    const { LogoLight, LogoDark, MiniLogoLight, MiniLogoDark } =
-      useMediaExport();
+    const { LogoLight, LogoDark, MiniLogoLight, MiniLogoDark } = useMedia();
 
     const Logo = useMemo(() => {
       const logos = {

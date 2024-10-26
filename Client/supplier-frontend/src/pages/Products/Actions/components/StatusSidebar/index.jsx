@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { RxReload } from "react-icons/rx";
 import { FaAngleDown } from "react-icons/fa6";
 import { Divider } from "antd";
-import useMediaExport from "../../../../../hooks/useMediaExport";
+import useMedia from "../../../../../hooks/useMedia";
 import useSectionScroll from "../../hooks/useSectionScroll";
 import { useMemo, useCallback, memo, useState, useEffect } from "react";
 import {
@@ -154,7 +154,7 @@ const ContentStatus = memo(
 ContentStatus.displayName = "ContentStatus";
 
 const TipsCard = memo(({ inputGuidance }) => {
-  const { TipsIcon } = useMediaExport();
+  const { TipsIcon } = useMedia();
   const [contentKey, setContentKey] = useState(0);
 
   useEffect(() => {
