@@ -597,7 +597,7 @@
     margin-top: var(--spacing-md);
   }
 
-  &:nth-child(2) > div:first-child > div:last-child:not(:has(label)) {
+  &:nth-child(2) > div:first-child > div:has(input) {
     width: 30%;
   }
 }
